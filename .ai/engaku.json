@@ -1,0 +1,16 @@
+{
+  "agents": {
+    "dev": "Claude Sonnet 4.6 (copilot)",
+    "knowledge-keeper": "GPT-5 mini (copilot)",
+    "planner": "Claude Sonnet 4.6 (copilot)",
+    "scanner": "Claude Sonnet 4.6 (copilot)",
+    "scanner-update": "GPT-5 mini (copilot)"
+  },
+  "max_chars": 1600,
+  "check_update": {
+    "ignore": [
+      "docs/"
+    ],
+    "uncovered_action": "warn"
+  }
+}

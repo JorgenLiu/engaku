@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "engaku inject",
+        "timeout": 5
+      }
+    ]
+  }
+}

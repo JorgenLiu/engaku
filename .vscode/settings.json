@@ -1,0 +1,4 @@
+{
+  // Required to enable agent-scoped hooks in .agent.md frontmatter (VS Code Preview, 1.111+)
+  "chat.useCustomAgentHooks": true
+}

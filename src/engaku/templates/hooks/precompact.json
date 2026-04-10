@@ -1,0 +1,11 @@
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "type": "command",
+        "command": "engaku inject",
+        "timeout": 5
+      }
+    ]
+  }
+}

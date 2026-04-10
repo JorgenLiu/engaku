@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=45"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "engaku"
+version = "0.1.0"
+description = "AI persistent memory layer for VS Code Copilot"
+requires-python = ">=3.8"
+dependencies = []
+
+[project.scripts]
+engaku = "engaku.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"engaku.templates" = ["*.md", "*.json"]

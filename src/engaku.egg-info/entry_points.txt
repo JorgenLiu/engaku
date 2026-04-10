@@ -1,0 +1,2 @@
+[console_scripts]
+engaku = engaku.cli:main
