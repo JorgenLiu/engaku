@@ -4,10 +4,24 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "engaku"
-version = "0.1.0"
+version = "0.2.0"
 description = "AI persistent memory layer for VS Code Copilot"
+readme = "README.md"
+license = {text = "MIT"}
 requires-python = ">=3.8"
 dependencies = []
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Software Development :: Quality Assurance",
+]
+
+[project.urls]
+Homepage = "https://github.com/YOUR_USERNAME/engaku"
+Repository = "https://github.com/YOUR_USERNAME/engaku"
 
 [project.scripts]
 engaku = "engaku.cli:main"

@@ -5,23 +5,26 @@ git repository.
 
 Files created (never overwritten if they already exist):
   .ai/
-    rules.md
     overview.md
     engaku.json
-    modules/.gitkeep
     decisions/.gitkeep
     tasks/.gitkeep
+    docs/.gitkeep
   .github/
     agents/
       dev.agent.md
-      knowledge-keeper.agent.md
       planner.agent.md
+      reviewer.agent.md
       scanner.agent.md
-    hooks/
-      session.json
-      access-log.json
-      precompact.json
-      prompt-reminder.json
+    instructions/
+      hooks.instructions.md
+      tests.instructions.md
+      templates.instructions.md
+    skills/
+      systematic-debugging/SKILL.md
+      verification-before-completion/SKILL.md
+      frontend-design/SKILL.md
+      proactive-initiative/SKILL.md
     copilot-instructions.md
 """
 import os
@@ -119,11 +122,6 @@ def run(cwd=None):
 
     # ── .ai/ skeleton ────────────────────────────────────────────────────────
     _copy_template(
-        os.path.join(tpl, "ai", "rules.md"),
-        os.path.join(cwd, ".ai", "rules.md"),
-        out,
-    )
-    _copy_template(
         os.path.join(tpl, "ai", "overview.md"),
         os.path.join(cwd, ".ai", "overview.md"),
         out,
@@ -133,19 +131,33 @@ def run(cwd=None):
         os.path.join(cwd, ".ai", "engaku.json"),
         out,
     )
-    _touch_gitkeep(os.path.join(cwd, ".ai", "modules"), out)
     _touch_gitkeep(os.path.join(cwd, ".ai", "decisions"), out)
     _touch_gitkeep(os.path.join(cwd, ".ai", "tasks"), out)
+    _touch_gitkeep(os.path.join(cwd, ".ai", "docs"), out)
 
     # ── .github/agents/ ──────────────────────────────────────────────────────
     agents_dir = os.path.join(cwd, ".github", "agents")
-    for name in ("dev.agent.md", "knowledge-keeper.agent.md", "planner.agent.md", "scanner.agent.md", "scanner-update.agent.md"):
+    for name in ("dev.agent.md", "planner.agent.md",
+                   "reviewer.agent.md", "scanner.agent.md"):
         _copy_template(os.path.join(tpl, "agents", name), os.path.join(agents_dir, name), out)
 
-    # ── .github/hooks/ ───────────────────────────────────────────────────────
-    hooks_dir = os.path.join(cwd, ".github", "hooks")
-    for name in ("session.json", "access-log.json", "precompact.json"):
-        _copy_template(os.path.join(tpl, "hooks", name), os.path.join(hooks_dir, name), out)
+    # ── .github/instructions/ ─────────────────────────────────────────────
+    instructions_dir = os.path.join(cwd, ".github", "instructions")
+    for name in ("hooks.instructions.md", "tests.instructions.md", "templates.instructions.md"):
+        _copy_template(
+            os.path.join(tpl, "instructions", name),
+            os.path.join(instructions_dir, name),
+            out,
+        )
+
+    # ── .github/skills/ ──────────────────────────────────────────────────────
+    skills_dir = os.path.join(cwd, ".github", "skills")
+    for skill in ("systematic-debugging", "verification-before-completion", "frontend-design", "proactive-initiative"):
+        _copy_template(
+            os.path.join(tpl, "skills", skill, "SKILL.md"),
+            os.path.join(skills_dir, skill, "SKILL.md"),
+            out,
+        )
 
     # ── .github/copilot-instructions.md ──────────────────────────────────────
     _copy_template(
@@ -163,7 +175,7 @@ def run(cwd=None):
     skipped = sum(1 for l in out if l.startswith("[skip]"))
     sys.stdout.write(
         "\nDone. {} file(s) created, {} skipped.\n"
-        "Tip: Run the scanner agent in Copilot chat to generate initial knowledge files.\n".format(created, skipped)
+        "Tip: Run the scanner agent in Copilot chat to generate .instructions.md files.\n".format(created, skipped)
     )
     return 0
 

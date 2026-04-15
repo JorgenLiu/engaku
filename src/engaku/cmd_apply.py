@@ -66,30 +66,6 @@ def _update_agent_model(agent_path, model):
     return True, "ok"
 
 
-def _update_rules_max_chars(rules_path, max_chars):
-    """Update the MAX_CHARS value in rules.md.
-
-    Matches the line: 'MAX_CHARS for module knowledge body: {n} (frontmatter excluded).'
-    Returns (changed, reason).
-    """
-    if not os.path.isfile(rules_path):
-        return False, "file not found"
-
-    with open(rules_path, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    pattern = r"(MAX_CHARS for module knowledge body:) \d+ (\(frontmatter excluded\))"
-    replacement = r"\g<1> {} \g<2>".format(max_chars)
-    new_content = re.sub(pattern, replacement, content)
-
-    if new_content == content:
-        return False, "no change"
-
-    with open(rules_path, "w", encoding="utf-8") as f:
-        f.write(new_content)
-    return True, "ok"
-
-
 def run(cwd=None):
     if cwd is None:
         cwd = os.getcwd()
@@ -113,19 +89,6 @@ def run(cwd=None):
 
     config = load_config(cwd)
 
-    # ── max_chars → .ai/rules.md ─────────────────────────────────────────────
-    max_chars = config.get("max_chars")
-    rules_path = os.path.join(cwd, ".ai", "rules.md")
-    rules_changed = 0
-    rules_skipped = 0
-    if max_chars is not None:
-        updated, reason = _update_rules_max_chars(rules_path, max_chars)
-        if updated:
-            sys.stdout.write("  [updated] .ai/rules.md MAX_CHARS -> {}\n".format(max_chars))
-            rules_changed += 1
-        else:
-            sys.stdout.write("  [skip]    .ai/rules.md ({})\n".format(reason))
-            rules_skipped += 1
 
     # ── agents → .github/agents/ ─────────────────────────────────────────────
     agents_config = config.get("agents", {})
@@ -155,8 +118,8 @@ def run(cwd=None):
             )
             skipped += 1
 
-    total_changed = rules_changed + changed
-    total_skipped = rules_skipped + skipped
+    total_changed = changed
+    total_skipped = skipped
     sys.stdout.write(
         "\napply complete: {} updated, {} skipped.\n".format(total_changed, total_skipped)
     )

@@ -2,86 +2,79 @@ import json
 import os
 import sys
 
-from engaku.utils import parse_frontmatter, parse_paths_from_frontmatter, read_hook_input
+from engaku.utils import parse_frontmatter, read_hook_input
 
 
-def _parse_paths_frontmatter(filepath):
-    """Backward-compat wrapper used by existing tests."""
+def _find_active_task(cwd):
+    """Scan .ai/tasks/*.md for first file with status: in-progress.
+
+    Returns (title, unchecked_lines) tuple or None.
+    """
+    tasks_dir = os.path.join(cwd, ".ai", "tasks")
+    if not os.path.isdir(tasks_dir):
+        return None
     try:
-        with open(filepath, "r", encoding="utf-8") as f:
-            content = f.read()
+        entries = sorted(os.listdir(tasks_dir))
     except OSError:
-        return []
-    fm, _ = parse_frontmatter(content)
-    return parse_paths_from_frontmatter(fm) if fm is not None else []
-
-
-def _build_module_index(cwd):
-    """Scan .ai/modules/*.md and return Markdown table string, or empty string."""
-    modules_dir = os.path.join(cwd, ".ai", "modules")
-    if not os.path.isdir(modules_dir):
-        return ""
-    try:
-        entries = sorted(os.listdir(modules_dir))
-    except OSError:
-        return ""
-    md_files = [e for e in entries if e.endswith(".md")]
-    if not md_files:
-        return ""
-    rows = []
-    for filename in md_files:
-        filepath = os.path.join(modules_dir, filename)
-        module_name = filename[:-3]
-        rel_path = ".ai/modules/" + filename
+        return None
+    for filename in entries:
+        if not filename.endswith(".md"):
+            continue
+        filepath = os.path.join(tasks_dir, filename)
         try:
-            with open(filepath, "r", encoding="utf-8") as _f:
-                _content = _f.read()
+            with open(filepath, "r", encoding="utf-8") as f:
+                content = f.read()
         except OSError:
-            _content = ""
-        _fm, _ = parse_frontmatter(_content)
-        paths = parse_paths_from_frontmatter(_fm) if _fm is not None else []
-        paths_str = ", ".join(paths) if paths else "(unscoped)"
-        rows.append((module_name, paths_str, rel_path))
-    lines = [
-        "## Module Knowledge Index",
-        "| Module | Paths | Knowledge File |",
-        "|--------|-------|----------------|",
-    ]
-    for module_name, paths_str, rel_path in rows:
-        lines.append("| {} | {} | {} |".format(module_name, paths_str, rel_path))
-    lines.append("")
-    lines.append(
-        "Before modifying files listed above, read the corresponding knowledge file."
-    )
-    return "\n".join(lines)
+            continue
+        fm, body = parse_frontmatter(content)
+        if fm is None:
+            continue
+        status = None
+        title = None
+        for line in fm.splitlines():
+            if line.startswith("status:"):
+                status = line[len("status:"):].strip()
+            elif line.startswith("title:"):
+                title = line[len("title:"):].strip()
+        if status != "in-progress":
+            continue
+        if title is None:
+            title = filename[:-3]
+        unchecked = [l for l in body.splitlines() if l.strip().startswith("- [ ]")]
+        return (title, unchecked)
+    return None
 
 
 def run(cwd=None):
     if cwd is None:
         cwd = os.getcwd()
     ai_dir = os.path.join(cwd, ".ai")
-    rules_path = os.path.join(ai_dir, "rules.md")
     overview_path = os.path.join(ai_dir, "overview.md")
 
-    parts = []
-
-    if os.path.isfile(rules_path):
-        with open(rules_path, "r", encoding="utf-8") as f:
-            content = f.read().strip()
-        if content:
-            parts.append(content)
+    context_parts = []
 
     if os.path.isfile(overview_path):
         with open(overview_path, "r", encoding="utf-8") as f:
             content = f.read().strip()
         if content:
-            parts.append(content)
+            context_parts.append(content)
 
-    module_index = _build_module_index(cwd)
-    if module_index:
-        parts.append(module_index)
+    inner = "\n\n---\n\n".join(context_parts)
+    project_context = "<project-context>\n{}\n</project-context>".format(inner) if inner else ""
 
-    additional_context = "\n\n---\n\n".join(parts)
+    parts = []
+    if project_context:
+        parts.append(project_context)
+
+    active_task = _find_active_task(cwd)
+    if active_task:
+        title, unchecked = active_task
+        task_lines = ["<active-task>", "## {}".format(title)]
+        task_lines.extend(unchecked)
+        task_lines.append("</active-task>")
+        parts.append("\n".join(task_lines))
+
+    additional_context = "\n\n".join(parts)
 
     # Determine event from stdin so PreCompact can use a different output format.
     # PreCompact uses the common output format (systemMessage), not hookSpecificOutput.
@@ -90,6 +83,13 @@ def run(cwd=None):
 
     if event == "PreCompact":
         output = {"systemMessage": additional_context}
+    elif event == "SubagentStart":
+        output = {
+            "hookSpecificOutput": {
+                "hookEventName": "SubagentStart",
+                "additionalContext": additional_context,
+            }
+        }
     else:
         # SessionStart (and default)
         output = {
@@ -102,3 +102,7 @@ def run(cwd=None):
     sys.stdout.write(json.dumps(output, ensure_ascii=False))
     sys.stdout.flush()
     return 0
+
+
+def main(argv=None):
+    sys.exit(run())

@@ -1,24 +1,26 @@
 # Project Overview
 
 ## Overview
-<!-- Project name, tech stack, core purpose — one paragraph. -->
-<!-- e.g., "Acme API is a Python/FastAPI service that powers the Acme mobile app.
-     It exposes REST endpoints for auth, payments, and notifications." -->
+Describe your project here: name, language/framework, core purpose, and who it serves.
+Example: "Acme API is a Python/FastAPI service that powers the Acme mobile app. It exposes REST endpoints for auth, payments, and notifications."
 
 ## Directory Structure
-<!-- Key directories and their roles. -->
-<!-- e.g.,
-     src/          Application source code
-     src/api/      FastAPI route handlers
-     src/services/ Business logic layer
-     tests/        Pytest test suite
-     infra/        Terraform / Docker configs
--->
+List key directories and their roles (one line each).
 
-## Core Modules
-<!-- One-line description per module that Copilot should know about. -->
-<!-- e.g.,
-     auth       JWT-based authentication and session management
-     payment    Stripe integration for subscription billing
-     notify     Email/push notification dispatch
--->
+    src/          Application source code
+    tests/        Unit and integration tests
+
+## Constraints
+List hard technical constraints the AI must always respect.
+
+- Language/runtime version (e.g. Python >=3.8, Node >=18)
+- Dependency policy (e.g. no third-party packages, approved libraries only)
+- Code style rules (e.g. no global state, all errors must be logged)
+
+## Tech Stack
+List the primary technologies used in this project.
+
+- Language:
+- Framework:
+- Database:
+- Infrastructure:

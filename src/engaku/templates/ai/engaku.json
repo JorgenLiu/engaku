@@ -1,8 +1,1 @@
-{
-  "agents": {},
-  "max_chars": 1500,
-  "check_update": {
-    "ignore": [],
-    "uncovered_action": "warn"
-  }
-}
+{"agents": {}}

@@ -10,20 +10,22 @@ from engaku.cmd_init import run
 
 
 EXPECTED_FILES = [
-    os.path.join(".ai", "rules.md"),
     os.path.join(".ai", "overview.md"),
     os.path.join(".ai", "engaku.json"),
-    os.path.join(".ai", "modules", ".gitkeep"),
     os.path.join(".ai", "decisions", ".gitkeep"),
     os.path.join(".ai", "tasks", ".gitkeep"),
+    os.path.join(".ai", "docs", ".gitkeep"),
     os.path.join(".github", "agents", "dev.agent.md"),
-    os.path.join(".github", "agents", "knowledge-keeper.agent.md"),
     os.path.join(".github", "agents", "planner.agent.md"),
+    os.path.join(".github", "agents", "reviewer.agent.md"),
     os.path.join(".github", "agents", "scanner.agent.md"),
-    os.path.join(".github", "agents", "scanner-update.agent.md"),
-    os.path.join(".github", "hooks", "session.json"),
-    os.path.join(".github", "hooks", "access-log.json"),
-    os.path.join(".github", "hooks", "precompact.json"),
+    os.path.join(".github", "instructions", "hooks.instructions.md"),
+    os.path.join(".github", "instructions", "tests.instructions.md"),
+    os.path.join(".github", "instructions", "templates.instructions.md"),
+    os.path.join(".github", "skills", "systematic-debugging", "SKILL.md"),
+    os.path.join(".github", "skills", "verification-before-completion", "SKILL.md"),
+    os.path.join(".github", "skills", "frontend-design", "SKILL.md"),
+    os.path.join(".github", "skills", "proactive-initiative", "SKILL.md"),
     os.path.join(".github", "copilot-instructions.md"),
 ]
 
@@ -85,14 +87,14 @@ class TestInit(unittest.TestCase):
         # Pre-create one file
         ai_dir = os.path.join(self.tmpdir, ".ai")
         os.makedirs(ai_dir, exist_ok=True)
-        rules_path = os.path.join(ai_dir, "rules.md")
-        with open(rules_path, "w") as f:
-            f.write("custom rules")
+        overview_path = os.path.join(ai_dir, "overview.md")
+        with open(overview_path, "w") as f:
+            f.write("custom overview")
         code, out, _ = self._capture_run()
         self.assertEqual(code, 0)
         # Pre-created file should be skipped and content unchanged
-        with open(rules_path) as f:
-            self.assertEqual(f.read(), "custom rules")
+        with open(overview_path) as f:
+            self.assertEqual(f.read(), "custom overview")
         self.assertIn("[skip]", out)
         self.assertIn("[create]", out)
 
@@ -105,17 +107,9 @@ class TestInit(unittest.TestCase):
     def test_template_files_have_expected_content(self):
         _git_init(self.tmpdir)
         self._capture_run()
-        # rules.md should contain "## Code Style"
-        rules = os.path.join(self.tmpdir, ".ai", "rules.md")
-        with open(rules) as f:
-            content = f.read()
-        self.assertIn("## Code Style", content)
-        # session.json should be valid JSON with SessionStart key
-        import json
-        session = os.path.join(self.tmpdir, ".github", "hooks", "session.json")
-        with open(session) as f:
-            data = json.load(f)
-        self.assertIn("SessionStart", data["hooks"])
+        # overview.md should exist
+        overview = os.path.join(self.tmpdir, ".ai", "overview.md")
+        self.assertTrue(os.path.exists(overview))
 
 
 if __name__ == "__main__":
