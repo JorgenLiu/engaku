@@ -20,8 +20,8 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/YOUR_USERNAME/engaku"
-Repository = "https://github.com/YOUR_USERNAME/engaku"
+Homepage = "https://github.com/JorgenLiu/engaku"
+Repository = "https://github.com/JorgenLiu/engaku"
 
 [project.scripts]
 engaku = "engaku.cli:main"
@@ -30,4 +30,12 @@ engaku = "engaku.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"engaku.templates" = ["*.md", "*.json"]
+"engaku" = [
+    "templates/*.md",
+    "templates/*.json",
+    "templates/agents/*.md",
+    "templates/ai/*.md",
+    "templates/ai/*.json",
+    "templates/instructions/*.md",
+    "templates/skills/*/*.md",
+]

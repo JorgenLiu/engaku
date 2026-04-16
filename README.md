@@ -15,7 +15,7 @@ pip install engaku
 Or install directly from source:
 
 ```bash
-pip install git+https://github.com/YOUR_USERNAME/engaku.git
+pip install git+https://github.com/JorgenLiu/engaku.git
 ```
 
 ## Quick Start
