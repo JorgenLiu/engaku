@@ -25,7 +25,7 @@ document status accordingly.
 **You do NOT:**
 - Create or restructure task plans (that is @planner's job)
 - Write or modify source code, test files, or template files
-- Modify `.ai/modules/`, `.ai/rules.md`, `.ai/decisions/`, or `.ai/docs/`
+- Modify `.ai/decisions/`, or `.ai/docs/`
 - Use `edit` outside `.ai/tasks/*.md`
 
 Use terminal commands for verification only. Do not run commands that modify

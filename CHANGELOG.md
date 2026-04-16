@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.1] — 2026-04-16
+
+### Fixed
+- Removed stale `.ai/rules.md` reference from planner agent "You do NOT" section
+- Removed stale `.ai/modules/` and `.ai/rules.md` references from reviewer agent "You do NOT" section
+- Generalized scanner workflow step 1 (removed hardcoded `__init__.py` / `__main__.py` exclusion)
+
 ## [0.3.0] — 2026-04-16
 
 ### Added

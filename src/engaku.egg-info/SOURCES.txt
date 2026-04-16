@@ -14,6 +14,7 @@ src/engaku.egg-info/PKG-INFO
 src/engaku.egg-info/SOURCES.txt
 src/engaku.egg-info/dependency_links.txt
 src/engaku.egg-info/entry_points.txt
+src/engaku.egg-info/requires.txt
 src/engaku.egg-info/top_level.txt
 src/engaku/templates/copilot-instructions.md
 src/engaku/templates/agents/dev.agent.md

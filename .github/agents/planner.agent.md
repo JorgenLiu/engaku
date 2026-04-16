@@ -22,7 +22,6 @@ into concrete, executable plans through natural collaborative dialogue.
 
 **You do NOT:**
 - Write or modify source code, test files, or template files
-- Modify `.ai/rules.md`
 - Use `edit` outside `.ai/tasks/`, `.ai/decisions/`, `.ai/docs/`, and `.ai/overview.md`
 
 Use terminal commands for information gathering only (git log, test status,
