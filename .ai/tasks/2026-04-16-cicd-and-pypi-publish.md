@@ -1,7 +1,7 @@
 ---
 plan_id: 2026-04-16-cicd-and-pypi-publish
 title: GitHub CI/CD and PyPI publish
-status: in-progress
+status: done
 created: 2026-04-16
 ---
 
@@ -117,7 +117,7 @@ replaced with `JorgenLiu` before the first publish.
     - Inspect sdist contents: `tar tzf dist/engaku-0.2.0.tar.gz | grep -E "templates|SKILL|agent"` to confirm template files are bundled
   - Verify: `ls dist/ | grep 0.2.0` → both sdist and wheel present; `pip install dist/engaku-0.2.0-py3-none-any.whl --force-reinstall -q && engaku --version` → prints `engaku 0.2.0`
 
-- [ ] 5. **Commit and push, then create and push release tag**
+- [x] 5. **Commit and push, then create and push release tag**
   - Files: (all changed files)
   - Steps:
     - Stage and commit: `git add .github/workflows/ pyproject.toml README.md && git commit -m "ci: add CI/CD workflows and fix metadata placeholders"`
