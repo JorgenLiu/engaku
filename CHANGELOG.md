@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.2] — 2026-04-16
+
+### Fixed
+- Template instruction stubs (`hooks.instructions.md`, `templates.instructions.md`,
+  `tests.instructions.md`) no longer contain engaku-specific conventions; replaced
+  with generic placeholder stubs so target projects receive clean, fillable files
+  after `engaku init`
+
 ## [0.3.1] — 2026-04-16
 
 ### Fixed
