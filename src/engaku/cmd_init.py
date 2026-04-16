@@ -16,10 +16,6 @@ Files created (never overwritten if they already exist):
       planner.agent.md
       reviewer.agent.md
       scanner.agent.md
-    instructions/
-      hooks.instructions.md
-      tests.instructions.md
-      templates.instructions.md
     skills/
       systematic-debugging/SKILL.md
       verification-before-completion/SKILL.md
@@ -142,15 +138,6 @@ def run(cwd=None):
     for name in ("dev.agent.md", "planner.agent.md",
                    "reviewer.agent.md", "scanner.agent.md"):
         _copy_template(os.path.join(tpl, "agents", name), os.path.join(agents_dir, name), out)
-
-    # ── .github/instructions/ ─────────────────────────────────────────────
-    instructions_dir = os.path.join(cwd, ".github", "instructions")
-    for name in ("hooks.instructions.md", "tests.instructions.md", "templates.instructions.md"):
-        _copy_template(
-            os.path.join(tpl, "instructions", name),
-            os.path.join(instructions_dir, name),
-            out,
-        )
 
     # ── .github/skills/ ──────────────────────────────────────────────────────
     skills_dir = os.path.join(cwd, ".github", "skills")

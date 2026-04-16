@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.4.0] — 2026-04-16
+
+### Removed
+- Pre-installed `.github/instructions/` stubs (`hooks.instructions.md`, `tests.instructions.md`, `templates.instructions.md`) — the scanner agent handles instruction generation per-project
+
+### Fixed
+- `copilot-instructions.md` template no longer contains engaku-specific bullets (`engaku apply`, hook exit rules, live-vs-template sync rule)
+- `overview.md` template no longer contains prefilled `src/`/`tests/` directory examples
+
 ## [0.3.2] — 2026-04-16
 
 ### Fixed

@@ -1,7 +1,7 @@
 ---
 plan_id: 2026-04-16-agent-cleanup-v0.3.1
 title: Agent definition cleanup & v0.3.1 release
-status: in-progress
+status: done
 created: 2026-04-16
 ---
 

@@ -7,8 +7,7 @@ Example: "Acme API is a Python/FastAPI service that powers the Acme mobile app. 
 ## Directory Structure
 List key directories and their roles (one line each).
 
-    src/          Application source code
-    tests/        Unit and integration tests
+<!-- List key directories and their roles (one line each). -->
 
 ## Constraints
 List hard technical constraints the AI must always respect.
