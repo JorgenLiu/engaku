@@ -26,6 +26,8 @@ EXPECTED_FILES = [
     os.path.join(".github", "skills", "verification-before-completion", "SKILL.md"),
     os.path.join(".github", "skills", "frontend-design", "SKILL.md"),
     os.path.join(".github", "skills", "proactive-initiative", "SKILL.md"),
+    os.path.join(".github", "skills", "mcp-builder", "SKILL.md"),
+    os.path.join(".github", "skills", "doc-coauthoring", "SKILL.md"),
     os.path.join(".github", "copilot-instructions.md"),
 ]
 

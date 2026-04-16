@@ -14,7 +14,7 @@
 - All user-facing strings in English.
 
 ## Project Constraints
-- Distribution: `pip install git+https://...` for MVP, PyPI later.
+- Distribution: `pip install engaku` (PyPI) or `pip install git+https://github.com/JorgenLiu/engaku.git` (from source).
 - `cmd_*.py` modules each have a `run()` + `main()` entry point; `cli.py` routes subcommands via lazy import.
 - Test files use stdlib `unittest`; `sys.path.insert` for src layout; no pytest fixtures.
 

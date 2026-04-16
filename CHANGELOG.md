@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.3.0] — 2026-04-16
+
+### Added
+- `SubagentStart` hook support in `engaku inject` — injects overview + active-task
+  context at the start of every reviewer subagent session
+- `proactive-initiative` skill bundled by `engaku init`
+- `mcp-builder` skill bundled by `engaku init` — adapted from anthropics/skills;
+  guides building MCP servers in Python (FastMCP) or TypeScript (MCP SDK)
+- `doc-coauthoring` skill bundled by `engaku init` — structured 3-stage workflow
+  for co-authoring design docs, ADRs, and task plans
+- GitHub Actions CI workflow (`.github/workflows/ci.yml`) — matrix Python 3.8/3.9/3.11
+- GitHub Actions publish workflow (`.github/workflows/publish.yml`) — OIDC Trusted
+  Publisher, triggers on `v*.*.*` tags
+
+### Fixed
+- `pyproject.toml` package-data now bundles all template subdirectories correctly
+  (was only matching top-level `templates/*.md`)
+- `classifiers` list correctly placed under `[project]` (regression from CI-fix commit)
+
 ## [0.2.0] — 2026-04-15
 
 ### Added

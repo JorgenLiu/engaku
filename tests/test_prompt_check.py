@@ -136,13 +136,13 @@ class TestPromptCheck(unittest.TestCase):
 
     def test_always_alone_no_trigger(self):
         """Bare 'always' without a directive verb should not trigger."""
-        code, out = _run_with_prompt("always")
+        code, out = self._run("always")
         self.assertEqual(code, 0)
         self.assertNotIn("copilot-instructions.md", json.loads(out).get("systemMessage", ""))
 
     def test_always_in_question_no_trigger(self):
         """'always' in a normal question should not trigger keyword match."""
-        code, out = _run_with_prompt("why does this always fail?")
+        code, out = self._run("why does this always fail?")
         self.assertEqual(code, 0)
         self.assertNotIn("copilot-instructions.md", json.loads(out).get("systemMessage", ""))
 

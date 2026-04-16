@@ -25,6 +25,8 @@ Files created (never overwritten if they already exist):
       verification-before-completion/SKILL.md
       frontend-design/SKILL.md
       proactive-initiative/SKILL.md
+      mcp-builder/SKILL.md
+      doc-coauthoring/SKILL.md
     copilot-instructions.md
 """
 import os
@@ -152,7 +154,7 @@ def run(cwd=None):
 
     # ── .github/skills/ ──────────────────────────────────────────────────────
     skills_dir = os.path.join(cwd, ".github", "skills")
-    for skill in ("systematic-debugging", "verification-before-completion", "frontend-design", "proactive-initiative"):
+    for skill in ("systematic-debugging", "verification-before-completion", "frontend-design", "proactive-initiative", "mcp-builder", "doc-coauthoring"):
         _copy_template(
             os.path.join(tpl, "skills", skill, "SKILL.md"),
             os.path.join(skills_dir, skill, "SKILL.md"),
