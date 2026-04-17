@@ -8,6 +8,7 @@ src/engaku/cmd_init.py
 src/engaku/cmd_inject.py
 src/engaku/cmd_prompt_check.py
 src/engaku/cmd_task_review.py
+src/engaku/cmd_update.py
 src/engaku/constants.py
 src/engaku/utils.py
 src/engaku.egg-info/PKG-INFO
@@ -23,10 +24,10 @@ src/engaku/templates/agents/reviewer.agent.md
 src/engaku/templates/agents/scanner.agent.md
 src/engaku/templates/ai/engaku.json
 src/engaku/templates/ai/overview.md
-src/engaku/templates/instructions/hooks.instructions.md
-src/engaku/templates/instructions/templates.instructions.md
-src/engaku/templates/instructions/tests.instructions.md
+src/engaku/templates/skills/brainstorming/SKILL.md
+src/engaku/templates/skills/doc-coauthoring/SKILL.md
 src/engaku/templates/skills/frontend-design/SKILL.md
+src/engaku/templates/skills/mcp-builder/SKILL.md
 src/engaku/templates/skills/proactive-initiative/SKILL.md
 src/engaku/templates/skills/systematic-debugging/SKILL.md
 src/engaku/templates/skills/verification-before-completion/SKILL.md
@@ -35,3 +36,4 @@ tests/test_init.py
 tests/test_inject.py
 tests/test_prompt_check.py
 tests/test_task_review.py
+tests/test_update.py

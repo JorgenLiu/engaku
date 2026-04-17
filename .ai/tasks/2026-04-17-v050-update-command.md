@@ -1,7 +1,7 @@
 ---
 plan_id: 2026-04-17-v050-update-command
 title: "v0.5.0: engaku update + engaku.json defaults + brainstorming skill"
-status: in-progress
+status: done
 created: 2026-04-17
 ---
 
@@ -154,7 +154,7 @@ Adapt from `~/.copilot/skills/brainstorming/SKILL.md`:
       e. `test_non_git_repo_returns_error` — no git init, returns 1
   - Verify: `python -m unittest tests.test_update -v 2>&1 | tail -5`
 
-- [ ] 8. **Bump version to 0.5.0 and update CHANGELOG**
+- [x] 8. **Bump version to 0.5.0 and update CHANGELOG**
   - Files: `src/engaku/__init__.py`, `pyproject.toml`, `CHANGELOG.md`
   - Steps:
     - `__init__.py`: `"0.4.0"` → `"0.5.0"`
@@ -167,12 +167,12 @@ Adapt from `~/.copilot/skills/brainstorming/SKILL.md`:
         assignments for all 4 agents
   - Verify: `python -c "from engaku import __version__; assert __version__ == '0.5.0'; print('PASS')"`
 
-- [ ] 9. **Run full test suite**
+- [x] 9. **Run full test suite**
   - Steps:
     - `python -m unittest discover -s tests -v`
   - Verify: all tests pass, exit 0
 
-- [ ] 10. **Commit, tag v0.5.0, push**
+- [x] 10. **Commit, tag v0.5.0, push**
   - Steps:
     - `git add -A && git commit -m "feat: engaku update command, engaku.json defaults, brainstorming skill (v0.5.0)"`
     - `git tag v0.5.0`
