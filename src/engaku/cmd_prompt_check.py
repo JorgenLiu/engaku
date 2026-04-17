@@ -107,7 +107,7 @@ def run(cwd=None):
     if active_task:
         title, unchecked = active_task
         task_lines = ["Active task: {}".format(title)]
-        task_lines.extend(unchecked[:5])
+        task_lines.extend(unchecked)
         parts.append("\n".join(task_lines))
 
     if parts:

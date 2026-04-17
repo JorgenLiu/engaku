@@ -56,7 +56,13 @@ Report format per task:
 
 ## After verification
 
-- **All tasks PASS** → set `status: done` in the task file's frontmatter.
+- **All tasks PASS:**
+  - If task has **no `## Release` section**: run
+    `git add -A && git commit -m "{task title from frontmatter}"`, then set
+    `status: done`.
+  - If task has a **`## Release` section**: execute each step in `## Release`
+    in order (tick each `- [ ]` → `[x]` as it completes), then set
+    `status: done`.
 - **Any task FAIL** → reset that task's `[x]` to `[ ]`, add an inline HTML
   comment explaining the failure (e.g.
   `<!-- verify failed: pytest exited 1 -->`), leave `status: in-progress`.
@@ -67,6 +73,8 @@ Report format per task:
   dev agent's prior output as proof. Run the command yourself.
 - **One task at a time.** Verify sequentially, not in bulk.
 - **Do NOT fix failing code.** Report and reset only. Fixing is @dev's job.
-- **Terminal for verification only.** Never run commands that modify project
-  state during verification (no writes, no package installs).
+- **Terminal for verification and post-PASS actions.** During verification,
+  never run commands that modify project state. After all tasks PASS, you
+  may run commit, tag, push, and publish commands as specified in the task's
+  `## Release` section or the default commit command.
 - **Edit scope: `.ai/tasks/*.md` exclusively.** Do not edit any other files.

@@ -6,7 +6,7 @@ import unittest
 # Add src to path for direct test execution
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from engaku.cmd_inject import run, _find_active_task
+from engaku.cmd_inject import run, _find_active_task, _extract_task_compact_body
 
 
 class TestInject(unittest.TestCase):
@@ -193,11 +193,12 @@ class TestFindActiveTask(unittest.TestCase):
         )
         result = _find_active_task(self.tmpdir)
         self.assertIsNotNone(result)
-        title, unchecked = result
+        title, unchecked, body = result
         self.assertEqual(title, "My Task")
         self.assertIn("- [ ] Todo A", unchecked)
         self.assertIn("- [ ] Todo B", unchecked)
         self.assertNotIn("- [x] Done", unchecked)
+        self.assertIn("- [x] Done", body)
 
     def test_no_frontmatter_skipped(self):
         self._write(
@@ -214,7 +215,7 @@ class TestFindActiveTask(unittest.TestCase):
         )
         result = _find_active_task(self.tmpdir)
         self.assertIsNotNone(result)
-        title, _ = result
+        title, _, _ = result
         self.assertEqual(title, "my-task-file")
 
     def test_returns_first_in_progress_alphabetically(self):
@@ -228,8 +229,109 @@ class TestFindActiveTask(unittest.TestCase):
         )
         result = _find_active_task(self.tmpdir)
         self.assertIsNotNone(result)
-        title, _ = result
+        title, _, _ = result
         self.assertEqual(title, "First")
+
+
+class TestExtractTaskCompactBody(unittest.TestCase):
+
+    def test_includes_key_sections_and_checkboxes(self):
+        body = (
+            "## Background\nThis work is needed for testing.\n\n"
+            "## Design\nKey technical decisions here.\n\n"
+            "## File Map\n- Modify: src/foo.py\n\n"
+            "## Tasks\n\n- [x] 1. **Done step**\n  - Verify: `echo done`\n"
+            "- [ ] 2. **Pending step**\n  - Verify: `echo pending`\n\n"
+            "## Out of Scope\nDo not touch the database.\n"
+        )
+        result = _extract_task_compact_body(body)
+        self.assertIn("## Background", result)
+        self.assertIn("This work is needed for testing.", result)
+        self.assertIn("## Design", result)
+        self.assertIn("Key technical decisions here.", result)
+        self.assertIn("## File Map", result)
+        self.assertIn("Modify: src/foo.py", result)
+        self.assertIn("- [x] 1.", result)
+        self.assertIn("- [ ] 2.", result)
+        self.assertNotIn("## Out of Scope", result)
+        self.assertNotIn("Do not touch the database.", result)
+
+    def test_empty_body_returns_empty_string(self):
+        self.assertEqual(_extract_task_compact_body(""), "")
+
+    def test_no_matching_sections(self):
+        body = "## Tasks\n\n- [ ] Step one\n"
+        result = _extract_task_compact_body(body)
+        self.assertIn("- [ ] Step one", result)
+        self.assertNotIn("## Tasks", result)
+
+
+class TestInjectPreCompactWithTask(unittest.TestCase):
+
+    def setUp(self):
+        import tempfile
+        self.tmpdir = tempfile.mkdtemp()
+        self.orig_cwd = os.getcwd()
+        os.chdir(self.tmpdir)
+        os.makedirs(".ai")
+
+    def tearDown(self):
+        os.chdir(self.orig_cwd)
+        import shutil
+        shutil.rmtree(self.tmpdir)
+
+    def _write(self, path, content):
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(content)
+
+    def _capture_run_with_stdin(self, stdin_json):
+        import io
+        buf = io.StringIO()
+        orig_stdout = sys.stdout
+        orig_stdin = sys.stdin
+        sys.stdout = buf
+        sys.stdin = io.StringIO(json.dumps(stdin_json))
+        try:
+            result = run()
+        finally:
+            sys.stdout = orig_stdout
+            sys.stdin = orig_stdin
+        return result, buf.getvalue()
+
+    def test_precompact_with_task_includes_compact_body(self):
+        self._write(".ai/overview.md", "# Overview")
+        os.makedirs(".ai/tasks")
+        self._write(
+            ".ai/tasks/task-001.md",
+            "---\ntitle: My Feature\nstatus: in-progress\n---\n\n"
+            "## Background\nNeeded for X.\n\n## Design\nUse approach Y.\n\n"
+            "## Tasks\n\n- [x] Done step\n- [ ] Pending step\n",
+        )
+        code, output = self._capture_run_with_stdin({"hookEventName": "PreCompact"})
+        self.assertEqual(code, 0)
+        data = json.loads(output)
+        msg = data["systemMessage"]
+        self.assertIn("## Background", msg)
+        self.assertIn("Needed for X.", msg)
+        self.assertIn("- [x] Done step", msg)
+        self.assertIn("- [ ] Pending step", msg)
+
+    def test_session_start_with_task_includes_only_unchecked(self):
+        self._write(".ai/overview.md", "# Overview")
+        os.makedirs(".ai/tasks")
+        self._write(
+            ".ai/tasks/task-001.md",
+            "---\ntitle: My Feature\nstatus: in-progress\n---\n\n"
+            "## Background\nNeeded for X.\n\n## Tasks\n\n"
+            "- [x] Done step\n- [ ] Pending step\n",
+        )
+        code, output = self._capture_run_with_stdin({"hookEventName": "SessionStart"})
+        self.assertEqual(code, 0)
+        data = json.loads(output)
+        ctx = data["hookSpecificOutput"]["additionalContext"]
+        self.assertIn("- [ ] Pending step", ctx)
+        self.assertNotIn("- [x] Done step", ctx)
+        self.assertNotIn("## Background", ctx)
 
 
 if __name__ == "__main__":

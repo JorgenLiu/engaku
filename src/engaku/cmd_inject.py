@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import sys
 
 from engaku.utils import parse_frontmatter, read_hook_input
@@ -41,8 +42,28 @@ def _find_active_task(cwd):
         if title is None:
             title = filename[:-3]
         unchecked = [l for l in body.splitlines() if l.strip().startswith("- [ ]")]
-        return (title, unchecked)
+        return (title, unchecked, body)
     return None
+
+
+def _extract_task_compact_body(body):
+    """Extract key sections and all checkbox lines for PreCompact injection."""
+    parts = []
+    for heading in ("Background", "Design", "File Map"):
+        m = re.search(
+            r"^## {}\s*\n.*?(?=^## |\Z)".format(re.escape(heading)),
+            body,
+            re.MULTILINE | re.DOTALL,
+        )
+        if m:
+            parts.append(m.group(0).rstrip())
+    checkbox_lines = [
+        l for l in body.splitlines()
+        if re.match(r"\s*- \[[x ]\]", l)
+    ]
+    if checkbox_lines:
+        parts.append("\n".join(checkbox_lines))
+    return "\n\n".join(parts) if parts else ""
 
 
 def run(cwd=None):
@@ -50,6 +71,9 @@ def run(cwd=None):
         cwd = os.getcwd()
     ai_dir = os.path.join(cwd, ".ai")
     overview_path = os.path.join(ai_dir, "overview.md")
+
+    hook_input = read_hook_input()
+    event = hook_input.get("hookEventName", "SessionStart")
 
     context_parts = []
 
@@ -68,18 +92,20 @@ def run(cwd=None):
 
     active_task = _find_active_task(cwd)
     if active_task:
-        title, unchecked = active_task
-        task_lines = ["<active-task>", "## {}".format(title)]
-        task_lines.extend(unchecked)
-        task_lines.append("</active-task>")
+        title, unchecked, body = active_task
+        if event == "PreCompact":
+            compact_body = _extract_task_compact_body(body)
+            task_lines = ["<active-task>", "## {}".format(title)]
+            if compact_body:
+                task_lines.append(compact_body)
+            task_lines.append("</active-task>")
+        else:
+            task_lines = ["<active-task>", "## {}".format(title)]
+            task_lines.extend(unchecked)
+            task_lines.append("</active-task>")
         parts.append("\n".join(task_lines))
 
     additional_context = "\n\n".join(parts)
-
-    # Determine event from stdin so PreCompact can use a different output format.
-    # PreCompact uses the common output format (systemMessage), not hookSpecificOutput.
-    hook_input = read_hook_input()
-    event = hook_input.get("hookEventName", "SessionStart")
 
     if event == "PreCompact":
         output = {"systemMessage": additional_context}
@@ -91,7 +117,6 @@ def run(cwd=None):
             }
         }
     else:
-        # SessionStart (and default)
         output = {
             "hookSpecificOutput": {
                 "hookEventName": "SessionStart",

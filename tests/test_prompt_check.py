@@ -183,13 +183,13 @@ class TestPromptCheckActiveTask(unittest.TestCase):
         self.assertIn("Step 2: update tests", data["systemMessage"])
         self.assertNotIn("Step 1 done", data["systemMessage"])
 
-    def test_active_task_max_five_unchecked(self):
+    def test_active_task_all_unchecked_shown(self):
         body = "".join("- [ ] Step {}\n".format(i) for i in range(1, 9))
         self._write_task("task1.md", "in-progress", "Big task", body)
         _, out = _run_with_prompt("go", cwd=self.tmpdir)
         msg = json.loads(out)["systemMessage"]
-        self.assertIn("Step 5", msg)
-        self.assertNotIn("Step 6", msg)
+        for i in range(1, 9):
+            self.assertIn("Step {}".format(i), msg)
 
     def test_no_active_task_no_system_message_for_plain_prompt(self):
         self._write_task("task1.md", "done", "Old task", "- [x] Done\n")
