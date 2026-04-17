@@ -45,6 +45,12 @@ def main():
         help="Apply .ai/engaku.json model config to .github/agents/ frontmatter",
     )
 
+    # engaku update
+    subparsers.add_parser(
+        "update",
+        help="Update .github/skills/ from bundled templates (overwrites existing)",
+    )
+
     args = parser.parse_args()
 
     if args.command == "init":
@@ -61,4 +67,7 @@ def main():
         sys.exit(run())
     elif args.command == "apply":
         from engaku.cmd_apply import run
+        sys.exit(run())
+    elif args.command == "update":
+        from engaku.cmd_update import run
         sys.exit(run())

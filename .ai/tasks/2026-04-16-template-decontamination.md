@@ -1,7 +1,7 @@
 ---
 plan_id: 2026-04-16-template-decontamination
 title: Remove engaku-specific content from all template files
-status: in-progress
+status: done
 created: 2026-04-16
 ---
 
@@ -63,7 +63,7 @@ confusing.
 
 ## Tasks
 
-- [ ] 1. **Delete template instruction stubs**
+- [x] 1. **Delete template instruction stubs**
   - Files: `src/engaku/templates/instructions/hooks.instructions.md`,
     `src/engaku/templates/instructions/templates.instructions.md`,
     `src/engaku/templates/instructions/tests.instructions.md`
@@ -74,7 +74,7 @@ confusing.
     - `rmdir src/engaku/templates/instructions`  (or `rm -r` if .gitkeep exists)
   - Verify: `! test -d src/engaku/templates/instructions && echo PASS`
 
-- [ ] 2. **Remove instructions copy loop from cmd_init.py**
+- [x] 2. **Remove instructions copy loop from cmd_init.py**
   - Files: `src/engaku/cmd_init.py`
   - Steps:
     - Delete the `# ── .github/instructions/` block (lines ~148-155) that
@@ -82,7 +82,7 @@ confusing.
     - Remove the 3 instruction filenames from the module docstring at the top
   - Verify: `python -c "import ast; ast.parse(open('src/engaku/cmd_init.py').read()); print('PASS')"`
 
-- [ ] 3. **Remove instruction paths from test_init.py EXPECTED_FILES**
+- [x] 3. **Remove instruction paths from test_init.py EXPECTED_FILES**
   - Files: `tests/test_init.py`
   - Steps:
     - Delete the 3 lines referencing `hooks.instructions.md`,
@@ -91,7 +91,7 @@ confusing.
   - Verify: `python -m pytest tests/test_init.py -v 2>&1 | tail -5`
     (or `python -m unittest tests.test_init -v`)
 
-- [ ] 4. **Clean copilot-instructions.md template**
+- [x] 4. **Clean copilot-instructions.md template**
   - Files: `src/engaku/templates/copilot-instructions.md`
   - Steps:
     - Remove bullet: "When updating any agent or hook file, always update
@@ -100,7 +100,7 @@ confusing.
     - Remove bullet: "Do not let any hook command exit non-zero…"
   - Verify: `! grep -q 'engaku' src/engaku/templates/copilot-instructions.md && echo PASS`
 
-- [ ] 5. **Clean overview.md template**
+- [x] 5. **Clean overview.md template**
   - Files: `src/engaku/templates/ai/overview.md`
   - Steps:
     - Replace the prefilled `src/` and `tests/` directory lines with a
@@ -109,7 +109,7 @@ confusing.
     - Keep the `## Directory Structure` heading
   - Verify: `! grep -q 'Application source code' src/engaku/templates/ai/overview.md && echo PASS`
 
-- [ ] 6. **Bump version to 0.4.0 and update CHANGELOG**
+- [x] 6. **Bump version to 0.4.0 and update CHANGELOG**
   - Files: `pyproject.toml`, `src/engaku/__init__.py`, `CHANGELOG.md`
   - Steps:
     - `pyproject.toml`: `version = "0.3.2"` → `"0.4.0"`
@@ -121,12 +121,12 @@ confusing.
         longer contain engaku-specific content
   - Verify: `python -c "from engaku import __version__; assert __version__ == '0.4.0'; print('PASS')"`
 
-- [ ] 7. **Run full test suite**
+- [x] 7. **Run full test suite**
   - Steps:
     - `cd /Users/jordan.liu/dev/engaku && python -m pytest tests/ -v`
   - Verify: all tests pass (exit 0)
 
-- [ ] 8. **Commit, tag v0.4.0, push**
+- [x] 8. **Commit, tag v0.4.0, push**
   - Steps:
     - `git add -A && git commit -m "feat: remove engaku-specific content from templates"`
     - `git tag v0.4.0`

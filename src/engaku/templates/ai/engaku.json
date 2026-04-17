@@ -1,1 +1,8 @@
-{"agents": {}}
+{
+  "agents": {
+    "dev": "Claude Sonnet 4.6 (copilot)",
+    "planner": "Claude Opus 4.6 (copilot)",
+    "reviewer": "Claude Sonnet 4.6 (copilot)",
+    "scanner": "Claude Opus 4.6 (copilot)"
+  }
+}

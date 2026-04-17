@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.5.0] — 2026-04-17
+
+### Added
+- `engaku update` command — syncs `.github/agents/` and `.github/skills/` from the latest bundled templates, then auto-applies `engaku.json` model config
+- `brainstorming` skill bundled by `engaku init` and `engaku update`
+
+### Fixed
+- `engaku.json` template now ships with default model assignments for all 4 agents (dev/reviewer = Sonnet, planner/scanner = Opus)
+
 ## [0.4.0] — 2026-04-16
 
 ### Removed

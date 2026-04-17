@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "engaku"
-version = "0.4.0"
+version = "0.5.0"
 description = "AI persistent memory layer for VS Code Copilot"
 readme = "README.md"
 license = {text = "MIT"}

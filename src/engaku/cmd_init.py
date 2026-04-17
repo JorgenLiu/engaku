@@ -141,7 +141,7 @@ def run(cwd=None):
 
     # ── .github/skills/ ──────────────────────────────────────────────────────
     skills_dir = os.path.join(cwd, ".github", "skills")
-    for skill in ("systematic-debugging", "verification-before-completion", "frontend-design", "proactive-initiative", "mcp-builder", "doc-coauthoring"):
+    for skill in ("systematic-debugging", "verification-before-completion", "frontend-design", "proactive-initiative", "mcp-builder", "doc-coauthoring", "brainstorming"):
         _copy_template(
             os.path.join(tpl, "skills", skill, "SKILL.md"),
             os.path.join(skills_dir, skill, "SKILL.md"),
