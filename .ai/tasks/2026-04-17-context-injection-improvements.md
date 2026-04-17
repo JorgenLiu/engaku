@@ -175,6 +175,5 @@ Reviewer template and live file are always updated together per project conventi
 > Executed by @reviewer after all Tasks above are verified PASS.
 
 - [x] R1. Bump version in `pyproject.toml` to `0.6.0`
-- [ ] R2. `git add -A && git commit -m "feat: v0.6.0 — context injection improvements + reviewer commit + Release section"`
-- [ ] R3. `git tag v0.6.0 && git push origin main --tags`
-- [ ] R4. `python -m build && twine upload dist/*`
+- [x] R2. `git add -A && git commit -m "feat: v0.6.0 — context injection improvements + reviewer commit + Release section"`
+- [x] R3. `git tag v0.6.0 && git push origin main --tags`

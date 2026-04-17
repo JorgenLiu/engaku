@@ -22,3 +22,4 @@
 - Do not add third-party dependencies to `pyproject.toml`.
 - Do not use Python 3.9+ syntax.
 - Do not overwrite existing `.ai/` or `.github/` files during `engaku init`.
+- Do not run `twine upload` or push build artefacts to PyPI manually. PyPI publishing is handled automatically by GitHub Actions on `v*.*.*` tag push.
