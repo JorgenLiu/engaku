@@ -91,15 +91,6 @@ if a longer document exists.
 
 ## Out of Scope
 Anything explicitly excluded from this plan.
-
-## Release
-> Executed by @reviewer after all Tasks above are verified PASS.
-> Place all irreversible operations here (git push, git tag, PyPI publish,
-> deployment commands), never in ## Tasks.
-
-- [ ] R1. {commit command}
-- [ ] R2. {tag + push command}
-- [ ] R3. {publish command}
 ```
 
 ### Task quality rules
@@ -109,8 +100,7 @@ Anything explicitly excluded from this plan.
 - Prefer: write failing test → implement → verify → next task.
 - Avoid vague steps like "add validation" or "improve error handling."
 - `status` values: `in-progress`, `abandoned`. (`done` is set by @reviewer after verification.)
-- **Irreversible ops in `## Release`** — git push, git tag, PyPI publish,
-  and deployment commands go in `## Release`, never in `## Tasks`.
+- When completed work will change `.ai/overview.md` content (project architecture, directory structure, or major features), include an overview update step with the exact new text.
 
 ## Decision file format
 

@@ -55,9 +55,9 @@ After running `init`, VS Code Agent Hooks are active. The `@dev`, `@planner`, `@
 
 After `engaku init`, four Agent Hooks fire automatically:
 
-- **`SessionStart`** → `engaku inject`: injects `overview.md` and the current active-task context at the start of every session.
-- **`PreCompact`** → `engaku inject`: re-injects context before conversation compaction so the agent doesn't lose project memory.
-- **`UserPromptSubmit`** → `engaku prompt-check`: scans each user prompt for new rules or constraints and injects the active-task's unchecked steps as a system message so the agent always knows what to do next.
+- **`SessionStart`** → `engaku inject`: injects `overview.md` and the active-task's remaining unchecked steps at the start of every session.
+- **`PreCompact`** → `engaku inject`: injects the full task body (Background, Design, File Map, and all checkbox lines) before conversation compaction so the compact model retains full task context.
+- **`UserPromptSubmit`** → `engaku prompt-check`: scans each user prompt for new rules or constraints and injects all remaining unchecked task steps as a system message so the agent always knows what to do next.
 - **`Stop`** → `engaku task-review`: after each agent turn, checks whether all steps in an in-progress task plan are ticked and emits a handoff reminder if so.
 
 ## Requirements

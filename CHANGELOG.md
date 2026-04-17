@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0] — 2026-04-17
+
+### Changed
+- Removed `## Release` section from task file format and reviewer protocol
+- Reviewer now always runs `git add -A && git commit` after all Tasks PASS — no branching on Release section
+- Removed `## Release` prohibition from dev agent
+
 ## [0.6.0] — 2026-04-17
 
 ### Added

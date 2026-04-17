@@ -35,5 +35,3 @@ Execute the user's development task.
 **Before responding that work is done** (applies to every session where you edited source files):
 
 1. **Update project-level files** (`.ai/overview.md`) if the changes affect architecture or constraints. Do NOT modify `.ai/decisions/` or change the `status:` field or structure of `.ai/tasks/` files — `status:` is @reviewer's responsibility; task structure is @planner's responsibility. You MAY tick completed task checkboxes `[ ]` → `[x]` as you finish each step.
-
-2. **Do NOT execute steps listed under `## Release` in any task file.** That section is reserved for @reviewer to run after verification.
