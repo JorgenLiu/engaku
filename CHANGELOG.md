@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.0] — 2026-04-17
+
+### Added
+- `PreCompact` hook now injects the full task body (Background, Design, File Map, and all checkbox lines) instead of only unchecked steps, so the compact model retains full task context
+- `## Release` section in task format — irreversible operations (git push, tag, publish) are gated here; planner documents them, reviewer executes them after all Tasks PASS
+- Reviewer agent now runs `git add -A && git commit` after all Tasks PASS (or executes `## Release` steps if the section exists) before setting `status: done`
+
+### Changed
+- `UserPromptSubmit` hook no longer caps injected task steps at 5 — all remaining unchecked steps are shown on every turn
+
+### Fixed
+- `__version__` in `__init__.py` was out of sync with `pyproject.toml`; both now reflect the correct release version
+
 ## [0.5.0] — 2026-04-17
 
 ### Added

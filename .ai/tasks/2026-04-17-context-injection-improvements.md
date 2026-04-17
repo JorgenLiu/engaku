@@ -1,7 +1,7 @@
 ---
 plan_id: 2026-04-17-context-injection-improvements
 title: "Context injection improvements + reviewer commit + Release section"
-status: in-progress
+status: done
 created: 2026-04-17
 ---
 
