@@ -3,6 +3,15 @@ name: scanner
 description: Repository conventions scanner. Analyses the codebase, proposes .instructions.md groupings, and writes .github/instructions/ files after user approval.
 user-invocable: true
 tools: ['read', 'search', 'edit']
+hooks:
+  SessionStart:
+    - type: command
+      command: engaku inject
+      timeout: 5
+  PreCompact:
+    - type: command
+      command: engaku inject
+      timeout: 5
 ---
 
 Scan this repository and create `.github/instructions/*.instructions.md` files that capture project conventions for GitHub Copilot.

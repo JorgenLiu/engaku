@@ -27,6 +27,7 @@ EXPECTED_FILES = [
     os.path.join(".github", "skills", "doc-coauthoring", "SKILL.md"),
     os.path.join(".github", "skills", "brainstorming", "SKILL.md"),
     os.path.join(".github", "copilot-instructions.md"),
+    os.path.join(".github", "instructions", "lessons.instructions.md"),
 ]
 
 
@@ -110,6 +111,18 @@ class TestInit(unittest.TestCase):
         # overview.md should exist
         overview = os.path.join(self.tmpdir, ".ai", "overview.md")
         self.assertTrue(os.path.exists(overview))
+
+    def test_creates_lessons_instructions(self):
+        """engaku init creates lessons.instructions.md with applyTo frontmatter."""
+        _git_init(self.tmpdir)
+        self._capture_run()
+        lessons_path = os.path.join(
+            self.tmpdir, ".github", "instructions", "lessons.instructions.md"
+        )
+        self.assertTrue(os.path.exists(lessons_path), "lessons.instructions.md not created")
+        with open(lessons_path) as f:
+            content = f.read()
+        self.assertIn("applyTo", content)
 
 
 if __name__ == "__main__":

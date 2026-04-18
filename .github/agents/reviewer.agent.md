@@ -7,6 +7,14 @@ description: >-
   Task verification agent. Verifies completed tasks against their
   acceptance criteria, updates task document status.
 hooks:
+  SessionStart:
+    - type: command
+      command: engaku inject
+      timeout: 5
+  PreCompact:
+    - type: command
+      command: engaku inject
+      timeout: 5
   SubagentStart:
     - type: command
       command: engaku inject

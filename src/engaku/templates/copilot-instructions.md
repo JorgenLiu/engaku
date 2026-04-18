@@ -5,3 +5,7 @@
 - If the user expressed a new constraint or preference, update this file.
 - If a significant architecture decision was made, record it in `.ai/decisions/`.
 - Do not add agent-specific rules here — this file is global and applies to all agents. Agent-specific behaviour belongs in the agent's own `.agent.md` file.
+
+## Lessons
+
+When you encounter an environment error, command failure, or repeated mistake, append a one-line lesson to `.github/instructions/lessons.instructions.md` under the `## Lessons` heading. Keep entries concise (one line each). Do not duplicate existing entries.

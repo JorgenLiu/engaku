@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.8.0] — 2026-04-18
+
+### Added
+- `lessons.instructions.md` template: auto-injected into all sessions via `applyTo: "**"`, giving agents a persistent place to record failure lessons
+- `SessionStart` and `PreCompact` hooks added to planner, reviewer, and scanner agents so all agents receive project-context injection regardless of how they are invoked
+- Verification principle added to planner agent: fetch documentation or source code before asserting facts about external systems
+
+### Changed
+- `copilot-instructions.md` template gains a `## Lessons` rule instructing agents to append one-line entries to `lessons.instructions.md` when they encounter errors or repeated mistakes
+
 ## [0.7.0] — 2026-04-17
 
 ### Changed

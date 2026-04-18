@@ -9,6 +9,10 @@
 - Do not let any hook command exit non-zero unless it is intentionally blocking.
 - Do not add agent-specific rules here — this file is global and applies to all agents. Agent-specific behaviour belongs in the agent's own `.agent.md` file.
 
+## Lessons
+
+When you encounter an environment error, command failure, or repeated mistake, append a one-line lesson to `.github/instructions/lessons.instructions.md` under the `## Lessons` heading. Keep entries concise (one line each). Do not duplicate existing entries.
+
 ## Code Style
 - Python >=3.8. No 3.9+ syntax: no `str.removeprefix()`, no `dict | dict`, no `match/case`, no `X | Y` type annotations.
 - Zero third-party dependencies. stdlib only.

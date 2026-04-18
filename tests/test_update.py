@@ -124,6 +124,19 @@ class TestUpdate(unittest.TestCase):
             content = f.read()
         self.assertIn("test-model", content, "model config should be applied to agent frontmatter")
 
+    def test_creates_lessons_instructions(self):
+        """engaku update creates lessons.instructions.md if missing."""
+        _git_init(self.tmpdir)
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        lessons_path = os.path.join(
+            self.tmpdir, ".github", "instructions", "lessons.instructions.md"
+        )
+        self.assertTrue(os.path.exists(lessons_path), "lessons.instructions.md not created")
+        with open(lessons_path) as f:
+            content = f.read()
+        self.assertIn("applyTo", content)
+
     def test_non_git_repo_returns_error(self):
         # tmpdir has no .git → should fail
         code, _, err = self._capture_run()
@@ -147,9 +160,9 @@ class TestUpdate(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertIn("Done.", out)
         # All files are new → no [update] lines for agent/skill files
-        # (+1 for .vscode/settings.json created by _ensure_vscode_setting)
+        # (+1 for .vscode/settings.json, +1 for lessons.instructions.md)
         created = out.count("[create]")
-        self.assertEqual(created, len(_AGENTS) + len(_SKILLS) + 1)
+        self.assertEqual(created, len(_AGENTS) + len(_SKILLS) + 2)
 
 
 if __name__ == "__main__":

@@ -23,6 +23,8 @@ Files created (never overwritten if they already exist):
       proactive-initiative/SKILL.md
       mcp-builder/SKILL.md
       doc-coauthoring/SKILL.md
+    instructions/
+      lessons.instructions.md
     copilot-instructions.md
 """
 import os
@@ -147,6 +149,14 @@ def run(cwd=None):
             os.path.join(skills_dir, skill, "SKILL.md"),
             out,
         )
+
+    # ── .github/instructions/ ─────────────────────────────────────────────────
+    instructions_dir = os.path.join(cwd, ".github", "instructions")
+    _copy_template(
+        os.path.join(tpl, "instructions", "lessons.instructions.md"),
+        os.path.join(instructions_dir, "lessons.instructions.md"),
+        out,
+    )
 
     # ── .github/copilot-instructions.md ──────────────────────────────────────
     _copy_template(

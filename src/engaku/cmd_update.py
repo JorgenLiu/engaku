@@ -96,6 +96,14 @@ def run(cwd=None):
             out,
         )
 
+    # ── .github/instructions/ ── create lessons stub if missing ──────────────
+    from engaku.cmd_init import _copy_template
+    _copy_template(
+        os.path.join(tpl, "instructions", "lessons.instructions.md"),
+        os.path.join(cwd, ".github", "instructions", "lessons.instructions.md"),
+        out,
+    )
+
     # ── .vscode/settings.json ── ensure hook setting is present ─────────────
     from engaku.cmd_init import _ensure_vscode_setting
     _ensure_vscode_setting(cwd, "chat.useCustomAgentHooks", True, out)
