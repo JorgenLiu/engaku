@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.0] — 2026-04-20
+
+### Changed
+- Scanner grouping heuristic is now scale-aware: hard "3–6 groups" cap replaced with a responsibility-boundary-driven heuristic (2–4 groups typical for small repos; no cap for larger repos)
+
+### Note
+- Final release with `requires-python = ">=3.8"`; next release targets Python 3.11+
+
 ## [0.8.0] — 2026-04-18
 
 ### Added

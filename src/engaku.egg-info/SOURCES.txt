@@ -24,6 +24,7 @@ src/engaku/templates/agents/reviewer.agent.md
 src/engaku/templates/agents/scanner.agent.md
 src/engaku/templates/ai/engaku.json
 src/engaku/templates/ai/overview.md
+src/engaku/templates/instructions/lessons.instructions.md
 src/engaku/templates/skills/brainstorming/SKILL.md
 src/engaku/templates/skills/doc-coauthoring/SKILL.md
 src/engaku/templates/skills/frontend-design/SKILL.md

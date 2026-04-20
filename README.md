@@ -64,3 +64,5 @@ After `engaku init`, four Agent Hooks fire automatically:
 
 - Python ≥ 3.8 (stdlib only, no third-party dependencies)
 - VS Code with GitHub Copilot
+
+> **Python 3.8 baseline:** v1.0.x is the final release supporting Python 3.8. Users on constrained environments can pin with `pip install "engaku<1.1"`. Later releases require Python 3.11+.
