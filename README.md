@@ -25,7 +25,7 @@ pip install git+https://github.com/JorgenLiu/engaku.git
 engaku init
 ```
 
-After running `init`, VS Code Agent Hooks are active. The `@dev`, `@planner`, `@reviewer`, and `@scanner` agents are available via `.github/agents/`. No further manual steps are needed — hooks fire automatically on SessionStart, UserPromptSubmit, Stop, and PreCompact.
+After running `init`, VS Code Agent Hooks are active. The `@coder`, `@planner`, `@reviewer`, and `@scanner` agents are available via `.github/agents/`. No further manual steps are needed — hooks fire automatically on SessionStart, UserPromptSubmit, Stop, and PreCompact.
 
 ## What `engaku init` creates
 
@@ -36,9 +36,11 @@ After running `init`, VS Code Agent Hooks are active. The `@dev`, `@planner`, `@
   decisions/        — architecture decision records
 .github/
   copilot-instructions.md   — global agent rules
-  agents/           — dev, planner, reviewer, scanner agent definitions
+  agents/           — coder, planner, reviewer, scanner agent definitions
   instructions/     — .instructions.md stubs for hooks, templates, tests
-  skills/           — bundled skills (systematic-debugging, verification-before-completion, frontend-design)
+  skills/           — bundled skills (systematic-debugging, verification-before-completion, etc.)
+.vscode/
+  mcp.json          — MCP server configuration (chrome-devtools, context7, dbhub)
 ```
 
 ## Subcommands
@@ -66,3 +68,66 @@ After `engaku init`, four Agent Hooks fire automatically:
 - VS Code with GitHub Copilot
 
 > **Python 3.8 baseline:** v1.0.x is the final release supporting Python 3.8. Users on constrained environments can pin with `pip install "engaku<1.1"`. Later releases require Python 3.11+.
+
+## MCP Servers
+
+`engaku init` creates `.vscode/mcp.json` with three preconfigured MCP servers that give VS Code Copilot structured tool access to browser automation, live library documentation, and databases. Use `engaku init --no-mcp` to skip this entirely.
+
+`engaku update` adds any missing server entries to an existing `.vscode/mcp.json` without overwriting your customizations.
+
+### chrome-devtools-mcp
+
+[github.com/ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp) — Browser automation and DevTools via Puppeteer. Provides screenshot capture, page navigation, element interaction, JavaScript evaluation, Lighthouse performance audits, and network request inspection.
+
+**Prerequisites:** Node.js + Chrome
+
+```json
+{
+  "chrome-devtools": {
+    "command": "npx",
+    "args": ["-y", "chrome-devtools-mcp@latest", "--headless"]
+  }
+}
+```
+
+### context7
+
+[github.com/upstash/context7](https://github.com/upstash/context7) — Live, version-specific library documentation. Two tools: `resolve-library-id` (search by name) and `query-docs` (fetch current docs). HTTP remote mode — no local process needed.
+
+**Prerequisites:** None (network access only). Set `CONTEXT7_API_KEY` env var for higher rate limits.
+
+```json
+{
+  "context7": {
+    "type": "http",
+    "url": "https://mcp.context7.com/mcp"
+  }
+}
+```
+
+### dbhub
+
+[github.com/bytebase/dbhub](https://github.com/bytebase/dbhub) — Multi-database access supporting PostgreSQL, MySQL, MariaDB, SQL Server, and SQLite. Two tools: `search_objects` (schema exploration) and `execute_sql` (query execution).
+
+**Prerequisites:** Node.js. Requires a DSN connection string (VS Code prompts on first use).
+
+```json
+{
+  "dbhub": {
+    "command": "npx",
+    "args": ["@bytebase/dbhub@latest", "--dsn", "${input:dbDsn}"]
+  }
+}
+```
+
+**DSN formats:**
+
+| Database | Format |
+|----------|--------|
+| PostgreSQL | `postgres://user:pass@host:5432/db?sslmode=disable` |
+| MySQL | `mysql://user:pass@host:3306/db` |
+| MariaDB | `mariadb://user:pass@host:3306/db` |
+| SQL Server | `sqlserver://user:pass@host:1433/db` |
+| SQLite | `sqlite:///absolute/path/to/file.db` |
+
+For passwords with special characters (`:`, `@`, `#`), use environment variables (`DB_TYPE`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) in the server's `env` block instead of encoding them in the DSN.

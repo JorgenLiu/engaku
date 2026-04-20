@@ -54,7 +54,7 @@ class TestUpdate(unittest.TestCase):
             sys.stdout = orig
 
         # Corrupt one agent file
-        agent_path = os.path.join(self.tmpdir, ".github", "agents", "dev.agent.md")
+        agent_path = os.path.join(self.tmpdir, ".github", "agents", "coder.agent.md")
         with open(agent_path, "w") as f:
             f.write("CORRUPTED")
 
@@ -113,13 +113,13 @@ class TestUpdate(unittest.TestCase):
         os.makedirs(ai_dir, exist_ok=True)
         config_path = os.path.join(ai_dir, "engaku.json")
         with open(config_path, "w") as f:
-            json.dump({"agents": {"dev": "test-model"}}, f)
+            json.dump({"agents": {"coder": "test-model"}}, f)
 
         code, _, _ = self._capture_run()
         self.assertEqual(code, 0)
 
-        # dev.agent.md should have the model field
-        agent_path = os.path.join(self.tmpdir, ".github", "agents", "dev.agent.md")
+        # coder.agent.md should have the model field
+        agent_path = os.path.join(self.tmpdir, ".github", "agents", "coder.agent.md")
         with open(agent_path) as f:
             content = f.read()
         self.assertIn("test-model", content, "model config should be applied to agent frontmatter")
@@ -163,6 +163,61 @@ class TestUpdate(unittest.TestCase):
         # (+1 for .vscode/settings.json, +1 for lessons.instructions.md)
         created = out.count("[create]")
         self.assertEqual(created, len(_AGENTS) + len(_SKILLS) + 2)
+
+    def test_update_merges_mcp_servers(self):
+        """run init, remove one server from mcp.json, run update, verify restored."""
+        import json
+        _git_init(self.tmpdir)
+        from engaku.cmd_init import run as init_run
+        import io
+        buf = io.StringIO()
+        orig = sys.stdout
+        sys.stdout = buf
+        try:
+            init_run(cwd=self.tmpdir)
+        finally:
+            sys.stdout = orig
+
+        # Remove one server from mcp.json
+        mcp_path = os.path.join(self.tmpdir, ".vscode", "mcp.json")
+        with open(mcp_path) as f:
+            data = json.load(f)
+        # Add a custom server and remove context7
+        data["servers"]["my-custom"] = {"command": "echo", "args": ["hi"]}
+        del data["servers"]["context7"]
+        with open(mcp_path, "w") as f:
+            json.dump(data, f, indent=2)
+
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+
+        with open(mcp_path) as f:
+            result = json.load(f)
+        # context7 should be restored
+        self.assertIn("context7", result["servers"], "context7 should be merged back")
+        # custom server should be preserved
+        self.assertIn("my-custom", result["servers"], "custom server should be preserved")
+        self.assertIn("[update]", out)
+
+    def test_update_skips_mcp_when_no_mcp_json(self):
+        """run init with no_mcp, run update, mcp.json should not be created."""
+        _git_init(self.tmpdir)
+        from engaku.cmd_init import run as init_run
+        import io
+        buf = io.StringIO()
+        orig = sys.stdout
+        sys.stdout = buf
+        try:
+            init_run(cwd=self.tmpdir, no_mcp=True)
+        finally:
+            sys.stdout = orig
+
+        mcp_path = os.path.join(self.tmpdir, ".vscode", "mcp.json")
+        self.assertFalse(os.path.exists(mcp_path), "mcp.json should not exist after init --no-mcp")
+
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        self.assertFalse(os.path.exists(mcp_path), "mcp.json should not be created by update")
 
 
 if __name__ == "__main__":

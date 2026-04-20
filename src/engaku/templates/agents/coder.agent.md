@@ -1,6 +1,5 @@
 ---
-name: dev
-model: ['Claude Sonnet 4.6 (copilot)']
+name: coder
 description: Standard development task executor. Follows project rules and maintains knowledge after each task.
 tools: ['agent', 'edit', 'read', 'search', 'execute']
 hooks:

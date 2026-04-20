@@ -23,10 +23,13 @@ _SKILLS = (
     "mcp-builder",
     "doc-coauthoring",
     "brainstorming",
+    "chrome-devtools",
+    "context7",
+    "database",
 )
 
 _AGENTS = (
-    "dev.agent.md",
+    "coder.agent.md",
     "planner.agent.md",
     "reviewer.agent.md",
     "scanner.agent.md",
@@ -107,6 +110,46 @@ def run(cwd=None):
     # ── .vscode/settings.json ── ensure hook setting is present ─────────────
     from engaku.cmd_init import _ensure_vscode_setting
     _ensure_vscode_setting(cwd, "chat.useCustomAgentHooks", True, out)
+
+    # ── .vscode/mcp.json ── merge new server entries if file exists ──────────
+    import json
+    mcp_path = os.path.join(cwd, ".vscode", "mcp.json")
+    if os.path.isfile(mcp_path):
+        tpl_mcp_path = os.path.join(tpl, "mcp.json")
+        try:
+            with open(mcp_path, "r", encoding="utf-8") as f:
+                user_mcp = json.load(f)
+            with open(tpl_mcp_path, "r", encoding="utf-8") as f:
+                tpl_mcp = json.load(f)
+        except (ValueError, OSError):
+            user_mcp = None
+            tpl_mcp = None
+
+        if user_mcp is not None and tpl_mcp is not None:
+            changed = False
+            # Merge servers
+            user_servers = user_mcp.setdefault("servers", {})
+            for key, val in tpl_mcp.get("servers", {}).items():
+                if key not in user_servers:
+                    user_servers[key] = val
+                    changed = True
+            # Merge inputs
+            user_inputs = user_mcp.setdefault("inputs", [])
+            existing_ids = set()
+            for inp in user_inputs:
+                if isinstance(inp, dict) and "id" in inp:
+                    existing_ids.add(inp["id"])
+            for inp in tpl_mcp.get("inputs", []):
+                if isinstance(inp, dict) and inp.get("id") not in existing_ids:
+                    user_inputs.append(inp)
+                    changed = True
+            if changed:
+                with open(mcp_path, "w", encoding="utf-8") as f:
+                    json.dump(user_mcp, f, indent=2)
+                    f.write("\n")
+                out.append("[update]  {}".format(mcp_path))
+            else:
+                out.append("[skip]    {}".format(mcp_path))
 
     for line in out:
         sys.stdout.write(line + "\n")

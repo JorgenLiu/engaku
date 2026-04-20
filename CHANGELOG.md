@@ -1,12 +1,23 @@
 # Changelog
 
+## [1.1.0] — 2026-04-20
+
+### Added
+- `.vscode/mcp.json` generation with three MCP servers: chrome-devtools-mcp (browser automation), context7 (live library docs), dbhub (multi-database access)
+- `--no-mcp` flag for `engaku init` to skip `.vscode/mcp.json` and MCP-related skills
+- Three new bundled skills: `chrome-devtools`, `context7`, `database`
+- `engaku update` merges new MCP server entries into existing `.vscode/mcp.json`
+
+### Changed
+- `dev` agent renamed to `coder` across templates and live `.github/agents/`
+
 ## [1.0.0] — 2026-04-20
 
 ### Changed
 - Scanner grouping heuristic is now scale-aware: hard "3–6 groups" cap replaced with a responsibility-boundary-driven heuristic (2–4 groups typical for small repos; no cap for larger repos)
 
 ### Note
-- Final release with `requires-python = ">=3.8"`; next release targets Python 3.11+
+- Final release with `requires-python = ">=3.8"`; Python 3.11 migration deferred; v1.1.x continues on Python 3.8
 
 ## [0.8.0] — 2026-04-18
 

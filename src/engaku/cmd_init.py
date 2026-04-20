@@ -1,5 +1,4 @@
-"""
-engaku init
+"""engaku init
 Initialize .ai/ knowledge structure and .github/ hooks + agents in the current
 git repository.
 
@@ -12,7 +11,7 @@ Files created (never overwritten if they already exist):
     docs/.gitkeep
   .github/
     agents/
-      dev.agent.md
+      coder.agent.md
       planner.agent.md
       reviewer.agent.md
       scanner.agent.md
@@ -23,9 +22,15 @@ Files created (never overwritten if they already exist):
       proactive-initiative/SKILL.md
       mcp-builder/SKILL.md
       doc-coauthoring/SKILL.md
+      brainstorming/SKILL.md
+      chrome-devtools/SKILL.md  (--no-mcp skips)
+      context7/SKILL.md         (--no-mcp skips)
+      database/SKILL.md         (--no-mcp skips)
     instructions/
       lessons.instructions.md
     copilot-instructions.md
+  .vscode/
+    mcp.json                   (--no-mcp skips)
 """
 import os
 import shutil
@@ -106,7 +111,7 @@ def _ensure_vscode_setting(cwd, key, value, out):
     out.append("[create] {} ({} = {})".format(settings_path, key, json.dumps(value)))
 
 
-def run(cwd=None):
+def run(cwd=None, no_mcp=False):
     if cwd is None:
         cwd = os.getcwd()
 
@@ -137,7 +142,7 @@ def run(cwd=None):
 
     # ── .github/agents/ ──────────────────────────────────────────────────────
     agents_dir = os.path.join(cwd, ".github", "agents")
-    for name in ("dev.agent.md", "planner.agent.md",
+    for name in ("coder.agent.md", "planner.agent.md",
                    "reviewer.agent.md", "scanner.agent.md"):
         _copy_template(os.path.join(tpl, "agents", name), os.path.join(agents_dir, name), out)
 
@@ -164,8 +169,25 @@ def run(cwd=None):
         os.path.join(cwd, ".github", "copilot-instructions.md"),
         out,
     )
+    # ── .github/skills/ (MCP-related, conditional) ────────────────────────────
+    if not no_mcp:
+        for skill in ("chrome-devtools", "context7", "database"):
+            _copy_template(
+                os.path.join(tpl, "skills", skill, "SKILL.md"),
+                os.path.join(skills_dir, skill, "SKILL.md"),
+                out,
+            )
+
     # ── .vscode/settings.json ── enable agent-scoped hooks (Preview) ─────────
     _ensure_vscode_setting(cwd, "chat.useCustomAgentHooks", True, out)
+
+    # ── .vscode/mcp.json ── MCP server configuration ────────────────────────
+    if not no_mcp:
+        _copy_template(
+            os.path.join(tpl, "mcp.json"),
+            os.path.join(cwd, ".vscode", "mcp.json"),
+            out,
+        )
 
     for line in out:
         sys.stdout.write(line + "\n")

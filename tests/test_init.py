@@ -15,7 +15,7 @@ EXPECTED_FILES = [
     os.path.join(".ai", "decisions", ".gitkeep"),
     os.path.join(".ai", "tasks", ".gitkeep"),
     os.path.join(".ai", "docs", ".gitkeep"),
-    os.path.join(".github", "agents", "dev.agent.md"),
+    os.path.join(".github", "agents", "coder.agent.md"),
     os.path.join(".github", "agents", "planner.agent.md"),
     os.path.join(".github", "agents", "reviewer.agent.md"),
     os.path.join(".github", "agents", "scanner.agent.md"),
@@ -26,8 +26,12 @@ EXPECTED_FILES = [
     os.path.join(".github", "skills", "mcp-builder", "SKILL.md"),
     os.path.join(".github", "skills", "doc-coauthoring", "SKILL.md"),
     os.path.join(".github", "skills", "brainstorming", "SKILL.md"),
+    os.path.join(".github", "skills", "chrome-devtools", "SKILL.md"),
+    os.path.join(".github", "skills", "context7", "SKILL.md"),
+    os.path.join(".github", "skills", "database", "SKILL.md"),
     os.path.join(".github", "copilot-instructions.md"),
     os.path.join(".github", "instructions", "lessons.instructions.md"),
+    os.path.join(".vscode", "mcp.json"),
 ]
 
 
@@ -49,14 +53,14 @@ class TestInit(unittest.TestCase):
         import shutil
         shutil.rmtree(self.tmpdir)
 
-    def _capture_run(self, cwd=None):
+    def _capture_run(self, cwd=None, no_mcp=False):
         import io
         buf_out = io.StringIO()
         buf_err = io.StringIO()
         orig_out, orig_err = sys.stdout, sys.stderr
         sys.stdout, sys.stderr = buf_out, buf_err
         try:
-            code = run(cwd=cwd or self.tmpdir)
+            code = run(cwd=cwd or self.tmpdir, no_mcp=no_mcp)
         finally:
             sys.stdout, sys.stderr = orig_out, orig_err
         return code, buf_out.getvalue(), buf_err.getvalue()
@@ -123,6 +127,36 @@ class TestInit(unittest.TestCase):
         with open(lessons_path) as f:
             content = f.read()
         self.assertIn("applyTo", content)
+
+    def test_no_mcp_flag_skips_mcp_files(self):
+        """engaku init --no-mcp skips mcp.json and MCP-related skills."""
+        _git_init(self.tmpdir)
+        code, out, _ = self._capture_run(no_mcp=True)
+        self.assertEqual(code, 0)
+        # mcp.json should NOT exist
+        mcp_path = os.path.join(self.tmpdir, ".vscode", "mcp.json")
+        self.assertFalse(os.path.exists(mcp_path), "mcp.json should not exist with --no-mcp")
+        # MCP-related skills should NOT exist
+        for skill in ("chrome-devtools", "context7", "database"):
+            skill_path = os.path.join(self.tmpdir, ".github", "skills", skill, "SKILL.md")
+            self.assertFalse(os.path.exists(skill_path), "{} should not exist with --no-mcp".format(skill))
+        # Non-MCP skills should still exist
+        sd_path = os.path.join(self.tmpdir, ".github", "skills", "systematic-debugging", "SKILL.md")
+        self.assertTrue(os.path.exists(sd_path), "systematic-debugging should exist with --no-mcp")
+
+    def test_mcp_json_is_valid(self):
+        """engaku init creates a valid mcp.json with all three servers."""
+        import json
+        _git_init(self.tmpdir)
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        mcp_path = os.path.join(self.tmpdir, ".vscode", "mcp.json")
+        self.assertTrue(os.path.exists(mcp_path), "mcp.json should be created")
+        with open(mcp_path) as f:
+            data = json.load(f)
+        self.assertIn("servers", data)
+        for server in ("chrome-devtools", "context7", "dbhub"):
+            self.assertIn(server, data["servers"], "Missing server: {}".format(server))
 
 
 if __name__ == "__main__":

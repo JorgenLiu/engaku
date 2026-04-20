@@ -16,9 +16,13 @@ def main():
     subparsers.required = True
 
     # engaku init
-    subparsers.add_parser(
+    init_parser = subparsers.add_parser(
         "init",
         help="Initialize .ai/ knowledge structure and .github/ hooks/agents in target repo",
+    )
+    init_parser.add_argument(
+        "--no-mcp", action="store_true",
+        help="Skip .vscode/mcp.json and MCP-related skills",
     )
 
     # engaku inject
@@ -55,7 +59,7 @@ def main():
 
     if args.command == "init":
         from engaku.cmd_init import run
-        sys.exit(run())
+        sys.exit(run(no_mcp=args.no_mcp))
     elif args.command == "inject":
         from engaku.cmd_inject import run
         sys.exit(run())
