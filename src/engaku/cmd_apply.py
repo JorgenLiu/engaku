@@ -101,7 +101,7 @@ def run(cwd=None):
         agent_path = os.path.join(agents_dir, "{}.agent.md".format(agent_name))
         if not os.path.isfile(agent_path):
             sys.stdout.write(
-                "  [skip]    {}.agent.md (file not found)\n".format(agent_name)
+                "[skip]    {}.agent.md (file not found)\n".format(agent_name)
             )
             skipped += 1
             continue
@@ -109,12 +109,12 @@ def run(cwd=None):
         updated, reason = _update_agent_model(agent_path, model)
         if updated:
             sys.stdout.write(
-                "  [updated] {}.agent.md -> {}\n".format(agent_name, model)
+                "[updated] {}.agent.md -> {}\n".format(agent_name, model)
             )
             changed += 1
         else:
             sys.stdout.write(
-                "  [skip]    {}.agent.md ({})\n".format(agent_name, reason)
+                "[skip]    {}.agent.md ({})\n".format(agent_name, reason)
             )
             skipped += 1
 

@@ -6,18 +6,20 @@ import sys
 from engaku.utils import parse_frontmatter, read_hook_input
 
 
-def _find_active_task(cwd):
-    """Scan .ai/tasks/*.md for first file with status: in-progress.
+def _find_active_tasks(cwd):
+    """Scan .ai/tasks/*.md for all files with status: in-progress.
 
-    Returns (title, unchecked_lines) tuple or None.
+    Returns list of (title, unchecked_lines, body, filename, state) tuples.
+    state is "needs-work" if unchecked lines exist, else "needs-review".
     """
     tasks_dir = os.path.join(cwd, ".ai", "tasks")
     if not os.path.isdir(tasks_dir):
-        return None
+        return []
     try:
         entries = sorted(os.listdir(tasks_dir))
     except OSError:
-        return None
+        return []
+    results = []
     for filename in entries:
         if not filename.endswith(".md"):
             continue
@@ -42,8 +44,9 @@ def _find_active_task(cwd):
         if title is None:
             title = filename[:-3]
         unchecked = [l for l in body.splitlines() if l.strip().startswith("- [ ]")]
-        return (title, unchecked, body)
-    return None
+        state = "needs-work" if unchecked else "needs-review"
+        results.append((title, unchecked, body, filename, state))
+    return results
 
 
 def _extract_task_compact_body(body):
@@ -90,20 +93,32 @@ def run(cwd=None):
     if project_context:
         parts.append(project_context)
 
-    active_task = _find_active_task(cwd)
-    if active_task:
-        title, unchecked, body = active_task
-        if event == "PreCompact":
-            compact_body = _extract_task_compact_body(body)
-            task_lines = ["<active-task>", "## {}".format(title)]
-            if compact_body:
-                task_lines.append(compact_body)
-            task_lines.append("</active-task>")
-        else:
-            task_lines = ["<active-task>", "## {}".format(title)]
-            task_lines.extend(unchecked)
-            task_lines.append("</active-task>")
-        parts.append("\n".join(task_lines))
+    active_tasks = _find_active_tasks(cwd)
+    if active_tasks:
+        task_blocks = []
+        for title, unchecked, body, filename, state in active_tasks:
+            if event == "PreCompact":
+                compact_body = _extract_task_compact_body(body)
+                inner_lines = ["## {}".format(title)]
+                if compact_body:
+                    inner_lines.append(compact_body)
+            else:
+                inner_lines = ["## {}".format(title)]
+                if state == "needs-review":
+                    inner_lines.append("All tasks completed. Awaiting reviewer verification.")
+                else:
+                    inner_lines.extend(unchecked)
+            task_blocks.append(
+                '<task file="{}" state="{}">'.format(filename, state)
+                + "\n"
+                + "\n".join(inner_lines)
+                + "\n</task>"
+            )
+        parts.append(
+            "<active-tasks>\n"
+            + "\n".join(task_blocks)
+            + "\n</active-tasks>"
+        )
 
     additional_context = "\n\n".join(parts)
 

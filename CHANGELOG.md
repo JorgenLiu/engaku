@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.1] — 2026-04-20
+
+### Fixed
+- Template `engaku.json` key `"dev"` renamed to `"coder"` so `engaku apply` correctly matches coder agent
+- `@dev` references replaced with `@coder` in reviewer agent template and live version
+- Output alignment standardized to 10-char left-aligned tags across `init`, `apply`, and `update`
+- Removed 2-space leading indent from `cmd_apply.py` output
+
+### Changed
+- `_find_active_task` refactored to `_find_active_tasks` — returns all in-progress tasks instead of only the first
+- Injection format changed from `<active-task>` to `<active-tasks>` with per-task `<task>` elements including `file` and `state` attributes
+- Tasks with all checkboxes complete but `status: in-progress` are classified as `needs-review`
+
 ## [1.1.0] — 2026-04-20
 
 ### Added

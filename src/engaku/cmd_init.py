@@ -58,13 +58,13 @@ def _is_git_repo(cwd):
 def _copy_template(src, dst, out):
     """Copy src to dst unless dst already exists. Prints [create] or [skip]."""
     if os.path.exists(dst):
-        out.append("[skip]   {}".format(dst))
+        out.append("[skip]    {}".format(dst))
         return
     dst_dir = os.path.dirname(dst)
     if dst_dir and not os.path.isdir(dst_dir):
         os.makedirs(dst_dir)
     shutil.copy2(src, dst)
-    out.append("[create] {}".format(dst))
+    out.append("[create]  {}".format(dst))
 
 
 def _touch_gitkeep(path, out):
@@ -73,10 +73,10 @@ def _touch_gitkeep(path, out):
         os.makedirs(path)
     gk = os.path.join(path, ".gitkeep")
     if os.path.exists(gk):
-        out.append("[skip]   {}".format(gk))
+        out.append("[skip]    {}".format(gk))
     else:
         open(gk, "w").close()
-        out.append("[create] {}".format(gk))
+        out.append("[create]  {}".format(gk))
 
 
 def _ensure_vscode_setting(cwd, key, value, out):
@@ -101,14 +101,14 @@ def _ensure_vscode_setting(cwd, key, value, out):
             settings = {}
 
     if settings.get(key) == value:
-        out.append("[skip]   {} ({} already set)".format(settings_path, key))
+        out.append("[skip]    {} ({} already set)".format(settings_path, key))
         return
 
     settings[key] = value
     with open(settings_path, "w", encoding="utf-8") as f:
         json.dump(settings, f, indent=2)
         f.write("\n")
-    out.append("[create] {} ({} = {})".format(settings_path, key, json.dumps(value)))
+    out.append("[create]  {} ({} = {})".format(settings_path, key, json.dumps(value)))
 
 
 def run(cwd=None, no_mcp=False):

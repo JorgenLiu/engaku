@@ -6,7 +6,7 @@ import unittest
 # Add src to path for direct test execution
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from engaku.cmd_inject import run, _find_active_task, _extract_task_compact_body
+from engaku.cmd_inject import run, _find_active_tasks, _extract_task_compact_body
 
 
 class TestInject(unittest.TestCase):
@@ -133,8 +133,9 @@ class TestInject(unittest.TestCase):
         self.assertEqual(code, 0)
         data = json.loads(output)
         ctx = data["hookSpecificOutput"]["additionalContext"]
-        self.assertIn("<active-task>", ctx)
-        self.assertIn("</active-task>", ctx)
+        self.assertIn("<active-tasks>", ctx)
+        self.assertIn("</active-tasks>", ctx)
+        self.assertIn('<task file="task-001.md" state="needs-work">', ctx)
         self.assertIn("## My Feature", ctx)
         self.assertIn("- [ ] Pending step one", ctx)
         self.assertIn("- [ ] Pending step two", ctx)
@@ -151,10 +152,10 @@ class TestInject(unittest.TestCase):
         self.assertEqual(code, 0)
         data = json.loads(output)
         ctx = data["hookSpecificOutput"]["additionalContext"]
-        self.assertNotIn("<active-task>", ctx)
+        self.assertNotIn("<active-tasks>", ctx)
 
 
-class TestFindActiveTask(unittest.TestCase):
+class TestFindActiveTasks(unittest.TestCase):
     def setUp(self):
         import tempfile
         self.tmpdir = tempfile.mkdtemp()
@@ -169,56 +170,58 @@ class TestFindActiveTask(unittest.TestCase):
         with open(full, "w", encoding="utf-8") as f:
             f.write(content)
 
-    def test_no_tasks_dir_returns_none(self):
-        result = _find_active_task(self.tmpdir)
-        self.assertIsNone(result)
+    def test_no_tasks_dir_returns_empty_list(self):
+        result = _find_active_tasks(self.tmpdir)
+        self.assertEqual(result, [])
 
-    def test_empty_tasks_dir_returns_none(self):
+    def test_empty_tasks_dir_returns_empty_list(self):
         os.makedirs(os.path.join(self.tmpdir, ".ai", "tasks"))
-        result = _find_active_task(self.tmpdir)
-        self.assertIsNone(result)
+        result = _find_active_tasks(self.tmpdir)
+        self.assertEqual(result, [])
 
-    def test_no_in_progress_returns_none(self):
+    def test_no_in_progress_returns_empty_list(self):
         self._write(
             ".ai/tasks/t.md",
             "---\ntitle: Done\nstatus: completed\n---\n\n- [ ] Step\n",
         )
-        result = _find_active_task(self.tmpdir)
-        self.assertIsNone(result)
+        result = _find_active_tasks(self.tmpdir)
+        self.assertEqual(result, [])
 
     def test_in_progress_returns_title_and_unchecked(self):
         self._write(
             ".ai/tasks/task-001.md",
             "---\ntitle: My Task\nstatus: in-progress\n---\n\n- [x] Done\n- [ ] Todo A\n- [ ] Todo B\n",
         )
-        result = _find_active_task(self.tmpdir)
-        self.assertIsNotNone(result)
-        title, unchecked, body = result
+        result = _find_active_tasks(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        title, unchecked, body, filename, state = result[0]
         self.assertEqual(title, "My Task")
         self.assertIn("- [ ] Todo A", unchecked)
         self.assertIn("- [ ] Todo B", unchecked)
         self.assertNotIn("- [x] Done", unchecked)
         self.assertIn("- [x] Done", body)
+        self.assertEqual(filename, "task-001.md")
+        self.assertEqual(state, "needs-work")
 
     def test_no_frontmatter_skipped(self):
         self._write(
             ".ai/tasks/notask.md",
             "status: in-progress\n\n- [ ] Step\n",
         )
-        result = _find_active_task(self.tmpdir)
-        self.assertIsNone(result)
+        result = _find_active_tasks(self.tmpdir)
+        self.assertEqual(result, [])
 
     def test_title_falls_back_to_filename(self):
         self._write(
             ".ai/tasks/my-task-file.md",
             "---\nstatus: in-progress\n---\n\n- [ ] Something\n",
         )
-        result = _find_active_task(self.tmpdir)
-        self.assertIsNotNone(result)
-        title, _, _ = result
+        result = _find_active_tasks(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        title, _, _, _, _ = result[0]
         self.assertEqual(title, "my-task-file")
 
-    def test_returns_first_in_progress_alphabetically(self):
+    def test_returns_all_in_progress_tasks(self):
         self._write(
             ".ai/tasks/aaa.md",
             "---\ntitle: First\nstatus: in-progress\n---\n\n- [ ] A\n",
@@ -227,10 +230,35 @@ class TestFindActiveTask(unittest.TestCase):
             ".ai/tasks/bbb.md",
             "---\ntitle: Second\nstatus: in-progress\n---\n\n- [ ] B\n",
         )
-        result = _find_active_task(self.tmpdir)
-        self.assertIsNotNone(result)
-        title, _, _ = result
-        self.assertEqual(title, "First")
+        result = _find_active_tasks(self.tmpdir)
+        self.assertEqual(len(result), 2)
+        titles = [r[0] for r in result]
+        self.assertEqual(titles, ["First", "Second"])
+
+    def test_needs_review_state_when_all_checked(self):
+        self._write(
+            ".ai/tasks/done.md",
+            "---\ntitle: Review Me\nstatus: in-progress\n---\n\n- [x] Step A\n- [x] Step B\n",
+        )
+        result = _find_active_tasks(self.tmpdir)
+        self.assertEqual(len(result), 1)
+        _, _, _, _, state = result[0]
+        self.assertEqual(state, "needs-review")
+
+    def test_mixed_needs_work_and_needs_review(self):
+        self._write(
+            ".ai/tasks/aaa.md",
+            "---\ntitle: Working\nstatus: in-progress\n---\n\n- [x] Done\n- [ ] Todo\n",
+        )
+        self._write(
+            ".ai/tasks/bbb.md",
+            "---\ntitle: Reviewing\nstatus: in-progress\n---\n\n- [x] All done\n",
+        )
+        result = _find_active_tasks(self.tmpdir)
+        self.assertEqual(len(result), 2)
+        states = {r[0]: r[4] for r in result}
+        self.assertEqual(states["Working"], "needs-work")
+        self.assertEqual(states["Reviewing"], "needs-review")
 
 
 class TestExtractTaskCompactBody(unittest.TestCase):
@@ -311,6 +339,7 @@ class TestInjectPreCompactWithTask(unittest.TestCase):
         self.assertEqual(code, 0)
         data = json.loads(output)
         msg = data["systemMessage"]
+        self.assertIn("<active-tasks>", msg)
         self.assertIn("## Background", msg)
         self.assertIn("Needed for X.", msg)
         self.assertIn("- [x] Done step", msg)
@@ -332,6 +361,41 @@ class TestInjectPreCompactWithTask(unittest.TestCase):
         self.assertIn("- [ ] Pending step", ctx)
         self.assertNotIn("- [x] Done step", ctx)
         self.assertNotIn("## Background", ctx)
+
+    def test_needs_review_task_emits_review_message(self):
+        self._write(".ai/overview.md", "# Overview")
+        os.makedirs(".ai/tasks")
+        self._write(
+            ".ai/tasks/task-001.md",
+            "---\ntitle: Done Feature\nstatus: in-progress\n---\n\n"
+            "## Tasks\n\n- [x] Step A\n- [x] Step B\n",
+        )
+        code, output = self._capture_run_with_stdin({"hookEventName": "SessionStart"})
+        self.assertEqual(code, 0)
+        data = json.loads(output)
+        ctx = data["hookSpecificOutput"]["additionalContext"]
+        self.assertIn('state="needs-review"', ctx)
+        self.assertIn("All tasks completed. Awaiting reviewer verification.", ctx)
+
+    def test_multiple_tasks_both_appear_in_output(self):
+        self._write(".ai/overview.md", "# Overview")
+        os.makedirs(".ai/tasks")
+        self._write(
+            ".ai/tasks/aaa.md",
+            "---\ntitle: Feature A\nstatus: in-progress\n---\n\n- [ ] Step A\n",
+        )
+        self._write(
+            ".ai/tasks/bbb.md",
+            "---\ntitle: Feature B\nstatus: in-progress\n---\n\n- [x] Done B\n",
+        )
+        code, output = self._capture_run_with_stdin({"hookEventName": "SessionStart"})
+        self.assertEqual(code, 0)
+        data = json.loads(output)
+        ctx = data["hookSpecificOutput"]["additionalContext"]
+        self.assertIn('<task file="aaa.md" state="needs-work">', ctx)
+        self.assertIn('<task file="bbb.md" state="needs-review">', ctx)
+        self.assertIn("## Feature A", ctx)
+        self.assertIn("## Feature B", ctx)
 
 
 if __name__ == "__main__":
