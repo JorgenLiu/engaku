@@ -5,7 +5,7 @@ description: >-
   Analysis, planning, and task management agent. Explores codebase,
   produces implementation plans, manages task lifecycle, and records
   architecture decisions. Does NOT write application code or dispatch subagents.
-tools: ['read', 'search', 'edit', 'execute', 'todo', 'web']
+tools: ['read', 'search', 'edit', 'execute', 'todo', 'web', 'context7/*', 'dbhub/*']
 hooks:
   SessionStart:
     - type: command

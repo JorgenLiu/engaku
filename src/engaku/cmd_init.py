@@ -67,6 +67,36 @@ def _copy_template(src, dst, out):
     out.append("[create]  {}".format(dst))
 
 
+def _write_engaku_json(cwd, no_mcp, out):
+    """Generate .ai/engaku.json, skipping if already exists."""
+    import json
+    dst = os.path.join(cwd, ".ai", "engaku.json")
+    if os.path.exists(dst):
+        out.append("[skip]    {}".format(dst))
+        return
+    data = {
+        "agents": {
+            "coder": "Claude Sonnet 4.6 (copilot)",
+            "planner": "Claude Opus 4.6 (copilot)",
+            "reviewer": "Claude Sonnet 4.6 (copilot)",
+            "scanner": "Claude Opus 4.6 (copilot)",
+        }
+    }
+    if not no_mcp:
+        data["mcp_tools"] = {
+            "coder": ["chrome-devtools/*", "context7/*", "dbhub/*"],
+            "planner": ["context7/*", "dbhub/*"],
+            "reviewer": ["chrome-devtools/*", "dbhub/*"],
+        }
+    dst_dir = os.path.dirname(dst)
+    if dst_dir and not os.path.isdir(dst_dir):
+        os.makedirs(dst_dir)
+    with open(dst, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
+        f.write("\n")
+    out.append("[create]  {}".format(dst))
+
+
 def _touch_gitkeep(path, out):
     """Create an empty .gitkeep inside path, creating path if needed."""
     if not os.path.isdir(path):
@@ -131,11 +161,7 @@ def run(cwd=None, no_mcp=False):
         os.path.join(cwd, ".ai", "overview.md"),
         out,
     )
-    _copy_template(
-        os.path.join(tpl, "ai", "engaku.json"),
-        os.path.join(cwd, ".ai", "engaku.json"),
-        out,
-    )
+    _write_engaku_json(cwd, no_mcp, out)
     _touch_gitkeep(os.path.join(cwd, ".ai", "decisions"), out)
     _touch_gitkeep(os.path.join(cwd, ".ai", "tasks"), out)
     _touch_gitkeep(os.path.join(cwd, ".ai", "docs"), out)
@@ -198,6 +224,18 @@ def run(cwd=None, no_mcp=False):
         "\nDone. {} file(s) created, {} skipped.\n"
         "Tip: Run the scanner agent in Copilot chat to generate .instructions.md files.\n".format(created, skipped)
     )
+
+    # ── apply model + MCP tool config ────────────────────────────────────────
+    import io as _io
+    from engaku import cmd_apply
+    _sink = _io.StringIO()
+    _orig_stdout = sys.stdout
+    sys.stdout = _sink
+    try:
+        cmd_apply.run(cwd)
+    finally:
+        sys.stdout = _orig_stdout
+
     return 0
 
 

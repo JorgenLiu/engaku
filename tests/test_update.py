@@ -199,6 +199,30 @@ class TestUpdate(unittest.TestCase):
         self.assertIn("my-custom", result["servers"], "custom server should be preserved")
         self.assertIn("[update]", out)
 
+    def test_update_injects_mcp_tools_into_agents(self):
+        """After update, agents have MCP tools from mcp_tools config re-injected."""
+        import json
+        _git_init(self.tmpdir)
+
+        # Create engaku.json with mcp_tools config
+        ai_dir = os.path.join(self.tmpdir, ".ai")
+        os.makedirs(ai_dir, exist_ok=True)
+        config_path = os.path.join(ai_dir, "engaku.json")
+        with open(config_path, "w") as f:
+            json.dump({
+                "agents": {"coder": "test-model"},
+                "mcp_tools": {"coder": ["context7/*", "dbhub/*"]},
+            }, f)
+
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+
+        agent_path = os.path.join(self.tmpdir, ".github", "agents", "coder.agent.md")
+        with open(agent_path) as f:
+            content = f.read()
+        self.assertIn("context7/*", content, "MCP tools should be injected after update")
+        self.assertIn("dbhub/*", content)
+
     def test_update_skips_mcp_when_no_mcp_json(self):
         """run init with no_mcp, run update, mcp.json should not be created."""
         _git_init(self.tmpdir)

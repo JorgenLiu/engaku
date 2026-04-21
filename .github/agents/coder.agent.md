@@ -2,7 +2,7 @@
 name: coder
 model: ['Claude Sonnet 4.6 (copilot)']
 description: Standard development task executor. Follows project rules and maintains knowledge after each task.
-tools: ['agent', 'edit', 'read', 'search', 'execute']
+tools: ['agent', 'edit', 'read', 'search', 'execute', 'chrome-devtools/*', 'context7/*', 'dbhub/*']
 hooks:
   Stop:
     - type: command

@@ -6,7 +6,7 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from engaku.cmd_apply import run, _update_agent_model
+from engaku.cmd_apply import run, _update_agent_model, _update_agent_tools
 
 
 class TestApply(unittest.TestCase):
@@ -26,6 +26,13 @@ class TestApply(unittest.TestCase):
     def _write_config(self, agents):
         with open(self.config_path, "w", encoding="utf-8") as f:
             json.dump({"agents": agents}, f)
+
+    def _write_config_full(self, agents, mcp_tools=None):
+        data = {"agents": agents}
+        if mcp_tools is not None:
+            data["mcp_tools"] = mcp_tools
+        with open(self.config_path, "w", encoding="utf-8") as f:
+            json.dump(data, f)
 
     def _write_agent(self, name, content):
         path = os.path.join(self.agents_dir, "{}.agent.md".format(name))
@@ -120,3 +127,61 @@ class TestApply(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertIn("[skip]", out)
         self.assertIn("no frontmatter", out)
+
+    # ── MCP tool injection ────────────────────────────────────────────────────
+
+    def test_mcp_tools_added_to_agent(self):
+        """Agent with no prior MCP entries gets them added."""
+        self._write_config_full(
+            {"coder": "claude-sonnet"},
+            mcp_tools={"coder": ["context7/*", "dbhub/*"]},
+        )
+        self._write_agent("coder", "---\nname: coder\ntools: ['edit', 'read']\n---\n\nBody.\n")
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        content = self._read_agent("coder")
+        self.assertIn("context7/*", content)
+        self.assertIn("dbhub/*", content)
+        self.assertIn("edit", content)
+        self.assertIn("read", content)
+
+    def test_mcp_tools_replace_stale_entries(self):
+        """Agent with stale MCP entries gets them replaced."""
+        self._write_config_full(
+            {"coder": "claude-sonnet"},
+            mcp_tools={"coder": ["context7/*"]},
+        )
+        self._write_agent(
+            "coder",
+            "---\nname: coder\ntools: ['edit', 'old-server/*']\n---\n\nBody.\n",
+        )
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        content = self._read_agent("coder")
+        self.assertIn("context7/*", content)
+        self.assertNotIn("old-server/*", content)
+        self.assertIn("edit", content)
+
+    def test_agent_not_in_mcp_tools_unchanged_when_no_mcp_entries(self):
+        """Agent not in mcp_tools with no existing MCP entries → tools field unchanged."""
+        self._write_config_full(
+            {"coder": "claude-sonnet"},
+            mcp_tools={},  # coder not listed
+        )
+        self._write_agent("coder", "---\nname: coder\ntools: ['edit', 'read']\n---\n\nBody.\n")
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        content = self._read_agent("coder")
+        # tools field must be unchanged (no MCP entries added)
+        self.assertIn("tools: ['edit', 'read']", content)
+        self.assertNotIn("/*", content)
+
+    def test_no_mcp_tools_key_is_noop(self):
+        """Config without mcp_tools key does not touch tools field (MCP entries preserved)."""
+        self._write_config({"coder": "claude-sonnet"})  # no mcp_tools key
+        self._write_agent("coder", "---\nname: coder\ntools: ['edit', 'old-mcp/*']\n---\n\nBody.\n")
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        content = self._read_agent("coder")
+        # tools field must be untouched — old-mcp/* should still be present
+        self.assertIn("old-mcp/*", content)

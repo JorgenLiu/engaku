@@ -66,6 +66,58 @@ def _update_agent_model(agent_path, model):
     return True, "ok"
 
 
+def _update_agent_tools(agent_path, mcp_tools_list):
+    """Replace MCP wildcard entries in agent tools: frontmatter field.
+
+    Strips any existing '<server>/*' entries and appends mcp_tools_list.
+    Returns (changed, reason).
+    """
+    with open(agent_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    if not content.startswith("---\n"):
+        return False, "no frontmatter"
+
+    close = content.find("\n---", 4)
+    if close == -1:
+        return False, "unclosed frontmatter"
+
+    after_close = content[close + 4:]
+    if after_close and after_close[0] not in ("\n", "\r"):
+        return False, "malformed frontmatter"
+
+    fm = content[4:close]
+    rest = content[close:]
+
+    tools_match = re.search(r"^tools:\s*(.+)$", fm, re.MULTILINE)
+    if not tools_match:
+        return False, "no tools field"
+
+    tools_str = tools_match.group(1).strip()
+    # Parse quoted entries from inline YAML list: ['a', 'b'] or ["a", "b"]
+    current_tools = re.findall(r"['\"]([^'\"]+)['\"]", tools_str)
+    # Strip existing MCP wildcard entries (entries containing '/')
+    non_mcp = [t for t in current_tools if "/" not in t]
+
+    new_tools = non_mcp + list(mcp_tools_list)
+    new_tools_str = "tools: [{}]".format(", ".join("'{}'".format(t) for t in new_tools))
+
+    new_fm = re.sub(
+        r"^tools:.*$",
+        new_tools_str,
+        fm,
+        count=1,
+        flags=re.MULTILINE,
+    )
+
+    if new_fm == fm:
+        return False, "no change"
+
+    with open(agent_path, "w", encoding="utf-8") as f:
+        f.write("---\n" + new_fm + rest)
+    return True, "ok"
+
+
 def run(cwd=None):
     if cwd is None:
         cwd = os.getcwd()
@@ -117,6 +169,21 @@ def run(cwd=None):
                 "[skip]    {}.agent.md ({})\n".format(agent_name, reason)
             )
             skipped += 1
+
+    # ── mcp_tools → .github/agents/ ──────────────────────────────────────────
+    if "mcp_tools" in config:
+        mcp_tools_config = config["mcp_tools"]
+        for agent_name in sorted(agents_config):
+            tools_list = mcp_tools_config.get(agent_name, [])
+            agent_path = os.path.join(agents_dir, "{}.agent.md".format(agent_name))
+            if not os.path.isfile(agent_path):
+                continue
+            updated, reason = _update_agent_tools(agent_path, tools_list)
+            if updated:
+                sys.stdout.write(
+                    "[updated] {}.agent.md tools -> {}\n".format(agent_name, tools_list)
+                )
+                changed += 1
 
     total_changed = changed
     total_skipped = skipped

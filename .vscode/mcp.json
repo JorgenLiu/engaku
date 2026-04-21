@@ -1,0 +1,23 @@
+{
+  "inputs": [
+    {
+      "type": "promptString",
+      "id": "dbDsn",
+      "description": "Database connection string for dbhub (e.g. postgresql://user:pass@host:5432/db). Leave empty to skip."
+    }
+  ],
+  "servers": {
+    "chrome-devtools": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp@latest", "--headless"]
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "dbhub": {
+      "command": "npx",
+      "args": ["@bytebase/dbhub@latest", "--dsn", "${input:dbDsn}"]
+    }
+  }
+}

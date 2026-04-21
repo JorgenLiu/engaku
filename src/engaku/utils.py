@@ -105,7 +105,10 @@ def load_config(cwd):
                 raw = json.loads(f.read())
         except (OSError, ValueError):
             pass
-    return {
+    result = {
         "agents": raw.get("agents", {}),
     }
+    if "mcp_tools" in raw:
+        result["mcp_tools"] = raw["mcp_tools"]
+    return result
 

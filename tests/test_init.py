@@ -158,6 +158,55 @@ class TestInit(unittest.TestCase):
         for server in ("chrome-devtools", "context7", "dbhub"):
             self.assertIn(server, data["servers"], "Missing server: {}".format(server))
 
+    def test_default_init_injects_mcp_tools_into_agents(self):
+        """Default init writes MCP tools into agent frontmatter via apply."""
+        _git_init(self.tmpdir)
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        coder_path = os.path.join(self.tmpdir, ".github", "agents", "coder.agent.md")
+        with open(coder_path) as f:
+            content = f.read()
+        self.assertIn("chrome-devtools/*", content)
+        self.assertIn("context7/*", content)
+        self.assertIn("dbhub/*", content)
+
+    def test_no_mcp_init_has_no_mcp_tools_in_agents(self):
+        """--no-mcp init does not inject MCP tools into agent frontmatter."""
+        _git_init(self.tmpdir)
+        code, _, _ = self._capture_run(no_mcp=True)
+        self.assertEqual(code, 0)
+        coder_path = os.path.join(self.tmpdir, ".github", "agents", "coder.agent.md")
+        with open(coder_path) as f:
+            content = f.read()
+        self.assertNotIn("chrome-devtools/*", content)
+        self.assertNotIn("context7/*", content)
+        self.assertNotIn("dbhub/*", content)
+
+    def test_engaku_json_shape_default(self):
+        """Default init generates engaku.json with agents and mcp_tools."""
+        import json
+        _git_init(self.tmpdir)
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        config_path = os.path.join(self.tmpdir, ".ai", "engaku.json")
+        with open(config_path) as f:
+            data = json.load(f)
+        self.assertIn("agents", data)
+        self.assertIn("mcp_tools", data)
+        self.assertEqual(len(data["mcp_tools"]["coder"]), 3)
+
+    def test_engaku_json_shape_no_mcp(self):
+        """--no-mcp init generates engaku.json without mcp_tools."""
+        import json
+        _git_init(self.tmpdir)
+        code, _, _ = self._capture_run(no_mcp=True)
+        self.assertEqual(code, 0)
+        config_path = os.path.join(self.tmpdir, ".ai", "engaku.json")
+        with open(config_path) as f:
+            data = json.load(f)
+        self.assertIn("agents", data)
+        self.assertNotIn("mcp_tools", data)
+
 
 if __name__ == "__main__":
     unittest.main()
