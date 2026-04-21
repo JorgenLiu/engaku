@@ -146,6 +146,30 @@ class TestUpdate(unittest.TestCase):
     def test_brainstorming_skill_included(self):
         self.assertIn("brainstorming", _SKILLS)
 
+    def test_karpathy_skill_included(self):
+        self.assertIn("karpathy-guidelines", _SKILLS)
+
+    def test_creates_karpathy_skill_in_fresh_repo(self):
+        """run update on a repo without karpathy-guidelines, verify skill is created."""
+        _git_init(self.tmpdir)
+        skill_path = os.path.join(
+            self.tmpdir, ".github", "skills", "karpathy-guidelines", "SKILL.md"
+        )
+        self.assertFalse(os.path.exists(skill_path))
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        self.assertTrue(os.path.exists(skill_path), "karpathy-guidelines/SKILL.md should be created")
+
+    def test_reviewer_agent_has_no_dev_agent_wording(self):
+        """After update, reviewer.agent.md must not contain 'dev agent' wording."""
+        _git_init(self.tmpdir)
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        reviewer_path = os.path.join(self.tmpdir, ".github", "agents", "reviewer.agent.md")
+        with open(reviewer_path) as f:
+            content = f.read()
+        self.assertNotIn("dev agent", content, "reviewer.agent.md must not mention 'dev agent'")
+
     def test_all_agents_updated(self):
         _git_init(self.tmpdir)
         code, out, _ = self._capture_run()

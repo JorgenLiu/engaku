@@ -26,6 +26,7 @@ _SKILLS = (
     "chrome-devtools",
     "context7",
     "database",
+    "karpathy-guidelines",
 )
 
 _AGENTS = (

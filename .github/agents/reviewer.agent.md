@@ -47,7 +47,7 @@ review. If only one exists, begin verification immediately.
 For each task marked `[x]`, in order:
 
 1. Read the task's **Verify** command.
-2. Run it now — do not trust prior output or the dev agent's claims.
+2. Run it now — do not trust prior output or the coder agent's claims.
 3. Read the full output and check the exit code.
 4. Compare the observed result against the expected outcome stated in the task.
 5. Verdict: **PASS** (evidence matches expectation) or **FAIL** (evidence
@@ -73,7 +73,7 @@ Report format per task (extract task number and title from the task document's
 ## Rules
 
 - **Evidence only.** Do not accept "should work", "looks correct", or the
-  dev agent's prior output as proof. Run the command yourself.
+  coder agent's prior output as proof. Run the command yourself.
 - **One task at a time.** Verify sequentially, not in bulk.
 - **Do NOT fix failing code.** Report and reset only. Fixing is @coder's job.
 - **Terminal for verification and post-PASS actions.** During verification,

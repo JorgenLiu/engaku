@@ -64,11 +64,11 @@ class TestApply(unittest.TestCase):
         self.assertIn("not found", err)
 
     def test_inserts_model_into_agent_without_model_field(self):
-        self._write_config({"dev": "claude-sonnet-4-5 (copilot)"})
-        self._write_agent("dev", "---\nname: dev\ntools: ['edit']\n---\n\nDo work.\n")
+        self._write_config({"coder": "claude-sonnet-4-5 (copilot)"})
+        self._write_agent("coder", "---\nname: coder\ntools: ['edit']\n---\n\nDo work.\n")
         code, out, _ = self._capture_run()
         self.assertEqual(code, 0)
-        self.assertIn("model: ['claude-sonnet-4-5 (copilot)']", self._read_agent("dev"))
+        self.assertIn("model: ['claude-sonnet-4-5 (copilot)']", self._read_agent("coder"))
         self.assertIn("[updated]", out)
 
     def test_updates_existing_model_field(self):
@@ -92,20 +92,20 @@ class TestApply(unittest.TestCase):
         self.assertIn("file not found", out)
 
     def test_model_inserted_after_name_field(self):
-        self._write_config({"dev": "claude-sonnet-4-5 (copilot)"})
-        self._write_agent("dev", "---\nname: dev\ndescription: A dev agent\n---\n\nBody.\n")
+        self._write_config({"coder": "claude-sonnet-4-5 (copilot)"})
+        self._write_agent("coder", "---\nname: coder\ndescription: A coder agent\n---\n\nBody.\n")
         self._capture_run()
-        lines = self._read_agent("dev").split("\n")
+        lines = self._read_agent("coder").split("\n")
         name_idx = next(i for i, l in enumerate(lines) if l.startswith("name:"))
         model_idx = next(i for i, l in enumerate(lines) if l.startswith("model:"))
         self.assertEqual(model_idx, name_idx + 1)
 
     def test_no_change_when_model_already_correct(self):
-        self._write_config({"dev": "claude-sonnet-4-5 (copilot)"})
-        original = "---\nname: dev\nmodel: ['claude-sonnet-4-5 (copilot)']\n---\n\nBody.\n"
-        self._write_agent("dev", original)
+        self._write_config({"coder": "claude-sonnet-4-5 (copilot)"})
+        original = "---\nname: coder\nmodel: ['claude-sonnet-4-5 (copilot)']\n---\n\nBody.\n"
+        self._write_agent("coder", original)
         self._capture_run()
-        self.assertEqual(self._read_agent("dev"), original)
+        self.assertEqual(self._read_agent("coder"), original)
 
     def test_empty_agents_config_exits_zero(self):
         with open(self.config_path, "w", encoding="utf-8") as f:
@@ -121,8 +121,8 @@ class TestApply(unittest.TestCase):
         self.assertIn("invalid JSON", err)
 
     def test_agent_without_frontmatter_is_skipped(self):
-        self._write_config({"dev": "claude-sonnet-4-5 (copilot)"})
-        self._write_agent("dev", "No frontmatter here.\n")
+        self._write_config({"coder": "claude-sonnet-4-5 (copilot)"})
+        self._write_agent("coder", "No frontmatter here.\n")
         code, out, _ = self._capture_run()
         self.assertEqual(code, 0)
         self.assertIn("[skip]", out)

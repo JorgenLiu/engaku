@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.3] — 2026-04-21
+
+### Changed
+- `engaku update` now syncs `karpathy-guidelines` skill (was missing from `_SKILLS`)
+- Reviewer agent template: replaced `dev agent` wording with `coder agent`
+- `tests/test_apply.py`: renamed `dev` sample fixtures to `coder` to match current defaults
+
 ## [1.1.2] — 2026-04-21
 
 ### Added

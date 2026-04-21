@@ -1,3 +1,4 @@
+LICENSE
 README.md
 pyproject.toml
 src/engaku/__init__.py
@@ -18,7 +19,8 @@ src/engaku.egg-info/entry_points.txt
 src/engaku.egg-info/requires.txt
 src/engaku.egg-info/top_level.txt
 src/engaku/templates/copilot-instructions.md
-src/engaku/templates/agents/dev.agent.md
+src/engaku/templates/mcp.json
+src/engaku/templates/agents/coder.agent.md
 src/engaku/templates/agents/planner.agent.md
 src/engaku/templates/agents/reviewer.agent.md
 src/engaku/templates/agents/scanner.agent.md
@@ -26,8 +28,12 @@ src/engaku/templates/ai/engaku.json
 src/engaku/templates/ai/overview.md
 src/engaku/templates/instructions/lessons.instructions.md
 src/engaku/templates/skills/brainstorming/SKILL.md
+src/engaku/templates/skills/chrome-devtools/SKILL.md
+src/engaku/templates/skills/context7/SKILL.md
+src/engaku/templates/skills/database/SKILL.md
 src/engaku/templates/skills/doc-coauthoring/SKILL.md
 src/engaku/templates/skills/frontend-design/SKILL.md
+src/engaku/templates/skills/karpathy-guidelines/SKILL.md
 src/engaku/templates/skills/mcp-builder/SKILL.md
 src/engaku/templates/skills/proactive-initiative/SKILL.md
 src/engaku/templates/skills/systematic-debugging/SKILL.md
