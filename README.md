@@ -131,3 +131,15 @@ After `engaku init`, four Agent Hooks fire automatically:
 | SQLite | `sqlite:///absolute/path/to/file.db` |
 
 For passwords with special characters (`:`, `@`, `#`), use environment variables (`DB_TYPE`, `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME`) in the server's `env` block instead of encoding them in the DSN.
+
+## Credits
+
+### karpathy-guidelines skill
+
+Adapted from [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) (MIT, Copyright © Forrest Chang), itself derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876).
+
+### MCP Servers
+
+- [chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp) — browser automation and DevTools (Chrome DevTools team)
+- [context7](https://github.com/upstash/context7) — live library documentation (Upstash)
+- [dbhub](https://github.com/bytebase/dbhub) — multi-database access (Bytebase)

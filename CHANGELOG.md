@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.2] — 2026-04-21
+
+### Added
+- `karpathy-guidelines` bundled skill (Simplicity First, Surgical Changes, Think Before Coding, Goal-Driven Execution; MIT-attributed)
+- `## Code Discipline` section (Simplicity First + Surgical Changes) in template `copilot-instructions.md`
+- `LICENSE` file (MIT, Jordan Liu)
+- `## Credits` section to `README.md`
+
+### Changed
+- Reviewer verification format now prefixes each task block with `Task {N}: {task title}`
+
 ## [1.1.1] — 2026-04-20
 
 ### Fixed

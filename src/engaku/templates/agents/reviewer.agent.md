@@ -52,8 +52,10 @@ For each task marked `[x]`, in order:
 5. Verdict: **PASS** (evidence matches expectation) or **FAIL** (evidence
    contradicts or is absent).
 
-Report format per task:
+Report format per task (extract task number and title from the task document's
+`## Tasks` numbered list, e.g. `1. **Author skill template**` → `Task 1: Author skill template`):
 
+> Task {N}: {task title}
 > Verified with: `{exact command}`
 > Result: {observed output summary, exit code}
 > Verdict: PASS | FAIL

@@ -1,6 +1,6 @@
 ---
 name: scanner
-model: ['Claude Opus 4.6 (copilot)']
+model: ['Claude Sonnet 4.6 (copilot)']
 description: Repository conventions scanner. Analyses the codebase, proposes .instructions.md groupings, and writes .github/instructions/ files after user approval.
 user-invocable: true
 tools: ['read', 'search', 'edit']

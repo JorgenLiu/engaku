@@ -23,6 +23,7 @@ Files created (never overwritten if they already exist):
       mcp-builder/SKILL.md
       doc-coauthoring/SKILL.md
       brainstorming/SKILL.md
+      karpathy-guidelines/SKILL.md
       chrome-devtools/SKILL.md  (--no-mcp skips)
       context7/SKILL.md         (--no-mcp skips)
       database/SKILL.md         (--no-mcp skips)
@@ -174,7 +175,7 @@ def run(cwd=None, no_mcp=False):
 
     # ── .github/skills/ ──────────────────────────────────────────────────────
     skills_dir = os.path.join(cwd, ".github", "skills")
-    for skill in ("systematic-debugging", "verification-before-completion", "frontend-design", "proactive-initiative", "mcp-builder", "doc-coauthoring", "brainstorming"):
+    for skill in ("systematic-debugging", "verification-before-completion", "frontend-design", "proactive-initiative", "mcp-builder", "doc-coauthoring", "brainstorming", "karpathy-guidelines"):
         _copy_template(
             os.path.join(tpl, "skills", skill, "SKILL.md"),
             os.path.join(skills_dir, skill, "SKILL.md"),

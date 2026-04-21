@@ -1,6 +1,6 @@
 ---
 name: planner
-model: ['Claude Opus 4.6 (copilot)']
+model: ['Claude Sonnet 4.6 (copilot)']
 description: >-
   Analysis, planning, and task management agent. Explores codebase,
   produces implementation plans, manages task lifecycle, and records

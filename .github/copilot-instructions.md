@@ -28,3 +28,19 @@ When you encounter an environment error, command failure, or repeated mistake, a
 - Do not use Python 3.9+ syntax.
 - Do not overwrite existing `.ai/` or `.github/` files during `engaku init`.
 - Do not run `twine upload` or push build artefacts to PyPI manually. PyPI publishing is handled automatically by GitHub Actions on `v*.*.*` tag push.
+
+## Code Discipline
+
+### Simplicity First
+- Prefer fewer lines over more lines; choose the simplest thing that works.
+- Prefer standard library over a new dependency.
+- Prefer readable names over clever abstractions.
+- Remove code when a feature can be dropped without loss.
+- Ask "what is the minimal change that satisfies this requirement?" before typing.
+
+### Surgical Changes
+- Touch only what the current task requires; leave all other code alone.
+- Match the style and idioms of surrounding code exactly — no drive-by reformats.
+- Do not add features, error handling, or tests that were not explicitly requested.
+- If you spot an out-of-scope improvement, file a note or task instead of fixing it now.
+- Before saving, diff your changes and question every line not directly required.

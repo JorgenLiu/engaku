@@ -29,6 +29,7 @@ EXPECTED_FILES = [
     os.path.join(".github", "skills", "chrome-devtools", "SKILL.md"),
     os.path.join(".github", "skills", "context7", "SKILL.md"),
     os.path.join(".github", "skills", "database", "SKILL.md"),
+    os.path.join(".github", "skills", "karpathy-guidelines", "SKILL.md"),
     os.path.join(".github", "copilot-instructions.md"),
     os.path.join(".github", "instructions", "lessons.instructions.md"),
     os.path.join(".vscode", "mcp.json"),
@@ -143,6 +144,8 @@ class TestInit(unittest.TestCase):
         # Non-MCP skills should still exist
         sd_path = os.path.join(self.tmpdir, ".github", "skills", "systematic-debugging", "SKILL.md")
         self.assertTrue(os.path.exists(sd_path), "systematic-debugging should exist with --no-mcp")
+        kg_path = os.path.join(self.tmpdir, ".github", "skills", "karpathy-guidelines", "SKILL.md")
+        self.assertTrue(os.path.exists(kg_path), "karpathy-guidelines should exist with --no-mcp")
 
     def test_mcp_json_is_valid(self):
         """engaku init creates a valid mcp.json with all three servers."""
