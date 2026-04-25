@@ -12,10 +12,54 @@ Usage:
 import json
 import os
 import re
+import shlex
 import sys
 
 from engaku.constants import CONFIG_FILE
 from engaku.utils import load_config
+
+
+# Engaku subcommands that appear in agent hook commands.
+_HOOK_SUBCOMMANDS = ("inject", "prompt-check", "task-review")
+
+
+def _render_hook_cmd(subcommand, python):
+    """Return the hook command string for a given subcommand.
+
+    Returns 'engaku <subcommand>' when python is None/empty, or
+    '<quoted-python> -m engaku <subcommand>' when python is set.
+    """
+    if python:
+        return "{} -m engaku {}".format(shlex.quote(python), subcommand)
+    return "engaku {}".format(subcommand)
+
+
+def _update_agent_hooks(agent_path, python):
+    """Rewrite Engaku-managed hook commands in an agent file.
+
+    Matches 'command: engaku <subcommand>' or
+    'command: <anything> -m engaku <subcommand>' for inject, prompt-check,
+    and task-review. Custom non-Engaku commands are left unchanged.
+    Returns (changed, reason).
+    """
+    with open(agent_path, "r", encoding="utf-8") as f:
+        content = f.read()
+
+    new_content = content
+    for subcommand in _HOOK_SUBCOMMANDS:
+        pattern = re.compile(
+            r"([ \t]*command:[ \t]+)(?:.*-m\s+)?engaku\s+" + re.escape(subcommand) + r"\s*$",
+            re.MULTILINE,
+        )
+        replacement = r"\g<1>" + _render_hook_cmd(subcommand, python)
+        new_content = pattern.sub(replacement, new_content)
+
+    if new_content == content:
+        return False, "no change"
+
+    with open(agent_path, "w", encoding="utf-8") as f:
+        f.write(new_content)
+    return True, "ok"
 
 
 def _update_agent_model(agent_path, model):
@@ -187,6 +231,21 @@ def run(cwd=None):
 
     total_changed = changed
     total_skipped = skipped
+
+    # ── python interpreter → hook commands ───────────────────────────────────
+    python = config.get("python")
+    if os.path.isdir(agents_dir):
+        for fname in sorted(os.listdir(agents_dir)):
+            if not fname.endswith(".agent.md"):
+                continue
+            agent_path = os.path.join(agents_dir, fname)
+            updated, reason = _update_agent_hooks(agent_path, python)
+            if updated:
+                sys.stdout.write(
+                    "[updated] {} hooks -> {}\n".format(fname, _render_hook_cmd("inject", python))
+                )
+                total_changed += 1
+
     sys.stdout.write(
         "\napply complete: {} updated, {} skipped.\n".format(total_changed, total_skipped)
     )

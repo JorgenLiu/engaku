@@ -2,8 +2,9 @@
   "inputs": [
     {
       "type": "promptString",
-      "id": "dbDsn",
-      "description": "Database connection string for dbhub (e.g. postgresql://user:pass@host:5432/db). Leave empty to skip."
+      "id": "db-dsn",
+      "description": "Database connection string for dbhub (e.g. postgresql://user:pass@host:5432/db).",
+      "password": true
     }
   ],
   "servers": {
@@ -16,8 +17,12 @@
       "url": "https://mcp.context7.com/mcp"
     },
     "dbhub": {
+      "type": "stdio",
       "command": "npx",
-      "args": ["@bytebase/dbhub@latest", "--dsn", "${input:dbDsn}"]
+      "args": ["-y", "@bytebase/dbhub@latest", "--transport", "stdio", "--config", "${workspaceFolder}/.vscode/dbhub.toml"],
+      "env": {
+        "DBHUB_DSN": "${input:db-dsn}"
+      }
     }
   }
 }

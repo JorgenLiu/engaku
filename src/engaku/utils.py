@@ -107,6 +107,7 @@ def load_config(cwd):
             pass
     result = {
         "agents": raw.get("agents", {}),
+        "python": raw.get("python") or None,
     }
     if "mcp_tools" in raw:
         result["mcp_tools"] = raw["mcp_tools"]

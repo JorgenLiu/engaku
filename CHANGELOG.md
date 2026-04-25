@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.4] — 2026-04-25
+
+### Added
+- Configurable hook Python interpreter via `python` key in `.ai/engaku.json`; `engaku apply` rewrites Engaku-managed hook commands to `<python> -m engaku <subcommand>`
+- Generated `.vscode/dbhub.toml` template with `readonly = true` and `max_rows = 1000` guardrails
+
+### Changed
+- DBHub MCP default now uses `--config ${workspaceFolder}/.vscode/dbhub.toml` with `env.DBHUB_DSN` instead of inline `--dsn`; database skill and README updated accordingly
+
 ## [1.1.3] — 2026-04-21
 
 ### Changed

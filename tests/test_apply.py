@@ -6,7 +6,7 @@ import unittest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
 
-from engaku.cmd_apply import run, _update_agent_model, _update_agent_tools
+from engaku.cmd_apply import run, _update_agent_model, _update_agent_tools, _render_hook_cmd, _update_agent_hooks
 
 
 class TestApply(unittest.TestCase):
@@ -185,3 +185,83 @@ class TestApply(unittest.TestCase):
         content = self._read_agent("coder")
         # tools field must be untouched — old-mcp/* should still be present
         self.assertIn("old-mcp/*", content)
+
+    # ── hook command rendering ────────────────────────────────────────────────
+
+    def test_render_hook_cmd_no_python(self):
+        """python=None keeps the plain 'engaku <subcommand>' form."""
+        self.assertEqual(_render_hook_cmd("inject", None), "engaku inject")
+        self.assertEqual(_render_hook_cmd("prompt-check", None), "engaku prompt-check")
+        self.assertEqual(_render_hook_cmd("task-review", None), "engaku task-review")
+
+    def test_render_hook_cmd_with_python(self):
+        """python set produces '<python> -m engaku <subcommand>'."""
+        self.assertEqual(_render_hook_cmd("inject", ".venv/bin/python"), ".venv/bin/python -m engaku inject")
+
+    def test_render_hook_cmd_spaces_quoted(self):
+        """Interpreter paths with spaces are shell-quoted."""
+        cmd = _render_hook_cmd("inject", "/path with spaces/python")
+        self.assertIn("-m engaku inject", cmd)
+        self.assertIn("'", cmd)  # shlex.quote wraps in single quotes
+
+    def test_null_python_keeps_hook_commands_unchanged(self):
+        """python=null in config does not modify existing 'engaku inject' commands."""
+        with open(self.config_path, "w", encoding="utf-8") as f:
+            json.dump({"agents": {"coder": "model"}, "python": None}, f)
+        agent_body = (
+            "---\nname: coder\ntools: ['edit']\nhooks:\n"
+            "  SessionStart:\n    - type: command\n      command: engaku inject\n"
+            "---\n\nBody.\n"
+        )
+        self._write_agent("coder", agent_body)
+        self._capture_run()
+        self.assertIn("command: engaku inject", self._read_agent("coder"))
+
+    def test_venv_python_rewrites_hook_commands(self):
+        """python: .venv/bin/python rewrites Engaku hook commands."""
+        with open(self.config_path, "w", encoding="utf-8") as f:
+            json.dump({"agents": {"coder": "model"}, "python": ".venv/bin/python"}, f)
+        agent_body = (
+            "---\nname: coder\ntools: ['edit']\nhooks:\n"
+            "  SessionStart:\n    - type: command\n      command: engaku inject\n"
+            "  UserPromptSubmit:\n    - type: command\n      command: engaku prompt-check\n"
+            "  Stop:\n    - type: command\n      command: engaku task-review\n"
+            "---\n\nBody.\n"
+        )
+        self._write_agent("coder", agent_body)
+        self._capture_run()
+        content = self._read_agent("coder")
+        self.assertIn("command: .venv/bin/python -m engaku inject", content)
+        self.assertIn("command: .venv/bin/python -m engaku prompt-check", content)
+        self.assertIn("command: .venv/bin/python -m engaku task-review", content)
+
+    def test_absolute_path_with_spaces_is_quoted(self):
+        """Absolute interpreter paths with spaces are quoted correctly."""
+        with open(self.config_path, "w", encoding="utf-8") as f:
+            json.dump({"agents": {"coder": "model"}, "python": "/my venv/bin/python"}, f)
+        agent_body = (
+            "---\nname: coder\ntools: ['edit']\nhooks:\n"
+            "  SessionStart:\n    - type: command\n      command: engaku inject\n"
+            "---\n\nBody.\n"
+        )
+        self._write_agent("coder", agent_body)
+        self._capture_run()
+        content = self._read_agent("coder")
+        self.assertIn("-m engaku inject", content)
+        self.assertNotIn("command: engaku inject", content)
+
+    def test_custom_hook_command_preserved(self):
+        """Non-Engaku hook commands are not rewritten."""
+        with open(self.config_path, "w", encoding="utf-8") as f:
+            json.dump({"agents": {"coder": "model"}, "python": ".venv/bin/python"}, f)
+        agent_body = (
+            "---\nname: coder\ntools: ['edit']\nhooks:\n"
+            "  SessionStart:\n    - type: command\n      command: npm run custom-hook\n"
+            "  Stop:\n    - type: command\n      command: engaku task-review\n"
+            "---\n\nBody.\n"
+        )
+        self._write_agent("coder", agent_body)
+        self._capture_run()
+        content = self._read_agent("coder")
+        self.assertIn("command: npm run custom-hook", content)
+        self.assertIn("command: .venv/bin/python -m engaku task-review", content)

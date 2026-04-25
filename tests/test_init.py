@@ -33,6 +33,7 @@ EXPECTED_FILES = [
     os.path.join(".github", "copilot-instructions.md"),
     os.path.join(".github", "instructions", "lessons.instructions.md"),
     os.path.join(".vscode", "mcp.json"),
+    os.path.join(".vscode", "dbhub.toml"),
 ]
 
 
@@ -129,14 +130,41 @@ class TestInit(unittest.TestCase):
             content = f.read()
         self.assertIn("applyTo", content)
 
+    def test_dbhub_toml_created_by_default_init(self):
+        """engaku init creates .vscode/dbhub.toml with DBHUB_DSN and guardrails."""
+        _git_init(self.tmpdir)
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        toml_path = os.path.join(self.tmpdir, ".vscode", "dbhub.toml")
+        self.assertTrue(os.path.exists(toml_path), "dbhub.toml should be created")
+        with open(toml_path) as f:
+            content = f.read()
+        self.assertIn("DBHUB_DSN", content)
+        self.assertIn("readonly = true", content)
+        self.assertIn("max_rows = 1000", content)
+
+    def test_dbhub_toml_preserved_on_second_init(self):
+        """engaku init preserves existing .vscode/dbhub.toml."""
+        _git_init(self.tmpdir)
+        toml_path = os.path.join(self.tmpdir, ".vscode", "dbhub.toml")
+        os.makedirs(os.path.dirname(toml_path), exist_ok=True)
+        with open(toml_path, "w") as f:
+            f.write("# custom config")
+        self._capture_run()
+        with open(toml_path) as f:
+            self.assertEqual(f.read(), "# custom config", "dbhub.toml should not be overwritten")
+
     def test_no_mcp_flag_skips_mcp_files(self):
-        """engaku init --no-mcp skips mcp.json and MCP-related skills."""
+        """engaku init --no-mcp skips mcp.json, dbhub.toml and MCP-related skills."""
         _git_init(self.tmpdir)
         code, out, _ = self._capture_run(no_mcp=True)
         self.assertEqual(code, 0)
         # mcp.json should NOT exist
         mcp_path = os.path.join(self.tmpdir, ".vscode", "mcp.json")
         self.assertFalse(os.path.exists(mcp_path), "mcp.json should not exist with --no-mcp")
+        # dbhub.toml should NOT exist
+        toml_path = os.path.join(self.tmpdir, ".vscode", "dbhub.toml")
+        self.assertFalse(os.path.exists(toml_path), "dbhub.toml should not exist with --no-mcp")
         # MCP-related skills should NOT exist
         for skill in ("chrome-devtools", "context7", "database"):
             skill_path = os.path.join(self.tmpdir, ".github", "skills", skill, "SKILL.md")
@@ -160,6 +188,22 @@ class TestInit(unittest.TestCase):
         self.assertIn("servers", data)
         for server in ("chrome-devtools", "context7", "dbhub"):
             self.assertIn(server, data["servers"], "Missing server: {}".format(server))
+        # DBHub shape assertions (TOML-backed)
+        db = data["servers"]["dbhub"]
+        self.assertEqual(db.get("type"), "stdio", "dbhub must have type=stdio")
+        args = db.get("args", [])
+        self.assertIn("-y", args)
+        self.assertIn("--transport", args)
+        self.assertIn("stdio", args)
+        self.assertIn("--config", args)
+        self.assertIn("${workspaceFolder}/.vscode/dbhub.toml", args)
+        self.assertNotIn("--dsn", args, "dbhub must use TOML config, not --dsn")
+        self.assertEqual(db.get("env", {}).get("DBHUB_DSN"), "${input:db-dsn}")
+        # DBHub input assertions
+        inputs = data.get("inputs", [])
+        db_input = next((i for i in inputs if isinstance(i, dict) and i.get("id") == "db-dsn"), None)
+        self.assertIsNotNone(db_input, "inputs must contain an entry with id=db-dsn")
+        self.assertTrue(db_input.get("password"), "db-dsn input must have password=true")
 
     def test_default_init_injects_mcp_tools_into_agents(self):
         """Default init writes MCP tools into agent frontmatter via apply."""
@@ -197,6 +241,20 @@ class TestInit(unittest.TestCase):
         self.assertIn("agents", data)
         self.assertIn("mcp_tools", data)
         self.assertEqual(len(data["mcp_tools"]["coder"]), 3)
+        self.assertIn("python", data)
+        self.assertIsNone(data["python"])
+
+    def test_engaku_json_has_python_key_no_mcp(self):
+        """--no-mcp init generates engaku.json with python: null."""
+        import json
+        _git_init(self.tmpdir)
+        code, _, _ = self._capture_run(no_mcp=True)
+        self.assertEqual(code, 0)
+        config_path = os.path.join(self.tmpdir, ".ai", "engaku.json")
+        with open(config_path) as f:
+            data = json.load(f)
+        self.assertIn("python", data)
+        self.assertIsNone(data["python"])
 
     def test_engaku_json_shape_no_mcp(self):
         """--no-mcp init generates engaku.json without mcp_tools."""

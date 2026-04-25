@@ -221,6 +221,16 @@ class TestUpdate(unittest.TestCase):
         self.assertIn("context7", result["servers"], "context7 should be merged back")
         # custom server should be preserved
         self.assertIn("my-custom", result["servers"], "custom server should be preserved")
+        # dbhub shape preserved (TOML-backed)
+        db = result["servers"].get("dbhub", {})
+        self.assertEqual(db.get("type"), "stdio", "dbhub must retain type=stdio after merge")
+        args = db.get("args", [])
+        self.assertIn("--config", args, "dbhub must use --config after merge")
+        self.assertNotIn("--dsn", args, "dbhub must not use --dsn after merge")
+        # inputs merged by id — db-dsn should be present
+        inputs = result.get("inputs", [])
+        ids = [i.get("id") for i in inputs if isinstance(i, dict)]
+        self.assertIn("db-dsn", ids, "db-dsn input must be present after merge")
         self.assertIn("[update]", out)
 
     def test_update_injects_mcp_tools_into_agents(self):
@@ -246,6 +256,81 @@ class TestUpdate(unittest.TestCase):
             content = f.read()
         self.assertIn("context7/*", content, "MCP tools should be injected after update")
         self.assertIn("dbhub/*", content)
+
+    def test_update_creates_dbhub_toml_if_missing(self):
+        """run init (no_mcp=False), delete dbhub.toml, run update, verify it's recreated."""
+        import io
+        _git_init(self.tmpdir)
+        from engaku.cmd_init import run as init_run
+        buf = io.StringIO()
+        orig = sys.stdout
+        sys.stdout = buf
+        try:
+            init_run(cwd=self.tmpdir)
+        finally:
+            sys.stdout = orig
+
+        toml_path = os.path.join(self.tmpdir, ".vscode", "dbhub.toml")
+        self.assertTrue(os.path.exists(toml_path), "dbhub.toml should be created by init")
+        os.remove(toml_path)
+
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        self.assertTrue(os.path.exists(toml_path), "dbhub.toml should be recreated by update")
+        self.assertIn("[create]", out)
+
+    def test_update_preserves_existing_dbhub_toml(self):
+        """run update when dbhub.toml already exists — must not overwrite it."""
+        import io
+        _git_init(self.tmpdir)
+        from engaku.cmd_init import run as init_run
+        buf = io.StringIO()
+        orig = sys.stdout
+        sys.stdout = buf
+        try:
+            init_run(cwd=self.tmpdir)
+        finally:
+            sys.stdout = orig
+
+        toml_path = os.path.join(self.tmpdir, ".vscode", "dbhub.toml")
+        with open(toml_path, "w") as f:
+            f.write("# custom toml")
+
+        self._capture_run()
+
+        with open(toml_path) as f:
+            self.assertEqual(f.read(), "# custom toml", "dbhub.toml must not be overwritten by update")
+
+    def test_update_reapplies_python_hook_interpreter(self):
+        """After update with python set in engaku.json, hook commands use that interpreter."""
+        import io
+        import json
+        _git_init(self.tmpdir)
+        from engaku.cmd_init import run as init_run
+        buf = io.StringIO()
+        orig = sys.stdout
+        sys.stdout = buf
+        try:
+            init_run(cwd=self.tmpdir)
+        finally:
+            sys.stdout = orig
+
+        # Write engaku.json with python configured
+        config_path = os.path.join(self.tmpdir, ".ai", "engaku.json")
+        with open(config_path, "w") as f:
+            json.dump({
+                "agents": {"coder": "test-model"},
+                "python": ".venv/bin/python",
+            }, f)
+
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+
+        coder_path = os.path.join(self.tmpdir, ".github", "agents", "coder.agent.md")
+        with open(coder_path) as f:
+            content = f.read()
+        self.assertIn(".venv/bin/python -m engaku inject", content)
+        self.assertIn(".venv/bin/python -m engaku prompt-check", content)
 
     def test_update_skips_mcp_when_no_mcp_json(self):
         """run init with no_mcp, run update, mcp.json should not be created."""

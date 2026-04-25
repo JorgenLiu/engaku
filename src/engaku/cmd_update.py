@@ -152,6 +152,16 @@ def run(cwd=None):
             else:
                 out.append("[skip]    {}".format(mcp_path))
 
+    # ── .vscode/dbhub.toml ── create if mcp.json present but dbhub.toml missing ─
+    dbhub_toml_path = os.path.join(cwd, ".vscode", "dbhub.toml")
+    if os.path.isfile(mcp_path) and not os.path.exists(dbhub_toml_path):
+        from engaku.cmd_init import _copy_template
+        _copy_template(
+            os.path.join(tpl, "dbhub.toml"),
+            dbhub_toml_path,
+            out,
+        )
+
     for line in out:
         sys.stdout.write(line + "\n")
 

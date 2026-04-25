@@ -9,5 +9,6 @@
     "coder": ["chrome-devtools/*", "context7/*", "dbhub/*"],
     "planner": ["context7/*", "dbhub/*"],
     "reviewer": ["chrome-devtools/*", "dbhub/*"]
-  }
+  },
+  "python": null
 }

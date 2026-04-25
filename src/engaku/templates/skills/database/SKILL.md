@@ -14,7 +14,7 @@ Use the dbhub MCP server for multi-database access. Supports PostgreSQL, MySQL, 
 1. **Always call `search_objects` first** to explore the schema before writing any SQL.
 2. **Understand table structure**: review column names, types, and relationships before querying.
 3. **Use `execute_sql`** only after understanding the table structure.
-4. **Prefer read-only exploration**: use SELECT queries and the `--readonly` flag for safe exploration.
+4. **Prefer read-only exploration**: use SELECT queries. For production databases, configure `readonly = true` in `dbhub.toml` (preferred) or pass `--readonly` at startup.
 
 ## Tools
 
@@ -25,7 +25,7 @@ Use the dbhub MCP server for multi-database access. Supports PostgreSQL, MySQL, 
 
 ## DSN Formats
 
-The `${input:dbDsn}` prompt in `.vscode/mcp.json` expects a connection string in one of these formats:
+The `${input:db-dsn}` prompt in `.vscode/mcp.json` expects a connection string in one of these formats:
 
 | Database | DSN Format |
 |----------|-----------|
@@ -44,7 +44,7 @@ Passwords with special characters (`:`, `@`, `#`) break URL encoding. Use enviro
   "servers": {
     "dbhub": {
       "command": "npx",
-      "args": ["@bytebase/dbhub@latest", "--dsn", "${input:dbDsn}"],
+      "args": ["-y", "@bytebase/dbhub@latest", "--transport", "stdio", "--dsn", "${input:db-dsn}"],
       "env": {
         "DB_TYPE": "postgres",
         "DB_HOST": "localhost",
@@ -103,8 +103,25 @@ This gives you `execute_sql_prod` vs `execute_sql_staging` tools.
 
 ## Guardrails
 
-- Use `--readonly` flag to prevent accidental writes during exploration.
-- Use `--row-limit` to cap result sizes (e.g. `--row-limit 100`).
+`engaku init` generates `.vscode/dbhub.toml` as the default DBHub configuration. The DSN is passed via the `DBHUB_DSN` environment variable set in `.vscode/mcp.json` — secrets never appear in the TOML file, which is safe to commit.
+
+```toml
+[[sources]]
+id   = "default"
+dsn  = "${DBHUB_DSN}"
+lazy = true
+
+[[tools]]
+name     = "execute_sql"
+source   = "default"
+readonly = true
+max_rows = 1000
+```
+
+- `readonly = true` prevents accidental writes.
+- `max_rows` caps result sizes.
+- Edit `.vscode/dbhub.toml` to add more sources, change guardrails, or enable writes.
+- For inline `--dsn` without a TOML file (manual override), use `--dsn "${input:db-dsn}"` directly in `.vscode/mcp.json` instead.
 - Always inspect schema with `search_objects` before running queries on unfamiliar databases.
 
 ## Tips

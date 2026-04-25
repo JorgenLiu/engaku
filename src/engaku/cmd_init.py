@@ -81,7 +81,8 @@ def _write_engaku_json(cwd, no_mcp, out):
             "planner": "Claude Opus 4.6 (copilot)",
             "reviewer": "Claude Sonnet 4.6 (copilot)",
             "scanner": "Claude Opus 4.6 (copilot)",
-        }
+        },
+        "python": None,
     }
     if not no_mcp:
         data["mcp_tools"] = {
@@ -213,6 +214,11 @@ def run(cwd=None, no_mcp=False):
         _copy_template(
             os.path.join(tpl, "mcp.json"),
             os.path.join(cwd, ".vscode", "mcp.json"),
+            out,
+        )
+        _copy_template(
+            os.path.join(tpl, "dbhub.toml"),
+            os.path.join(cwd, ".vscode", "dbhub.toml"),
             out,
         )
 
