@@ -140,8 +140,8 @@ def _update_agent_tools(agent_path, mcp_tools_list):
     tools_str = tools_match.group(1).strip()
     # Parse quoted entries from inline YAML list: ['a', 'b'] or ["a", "b"]
     current_tools = re.findall(r"['\"]([^'\"]+)['\"]", tools_str)
-    # Strip existing MCP wildcard entries (entries containing '/')
-    non_mcp = [t for t in current_tools if "/" not in t]
+    # Strip existing MCP wildcard entries (entries ending with '/*')
+    non_mcp = [t for t in current_tools if not t.endswith("/*")]
 
     new_tools = non_mcp + list(mcp_tools_list)
     new_tools_str = "tools: [{}]".format(", ".join("'{}'".format(t) for t in new_tools))

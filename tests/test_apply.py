@@ -265,3 +265,23 @@ class TestApply(unittest.TestCase):
         content = self._read_agent("coder")
         self.assertIn("command: npm run custom-hook", content)
         self.assertIn("command: .venv/bin/python -m engaku task-review", content)
+
+    def test_non_mcp_slash_tool_preserved_after_apply(self):
+        """vscode/askQuestions and similar slash tools survive MCP wildcard replacement."""
+        self._write_config_full(
+            {"coder": "claude-sonnet"},
+            mcp_tools={"coder": ["context7/*"]},
+        )
+        self._write_agent(
+            "coder",
+            "---\nname: coder\ntools: ['edit', 'vscode/askQuestions', 'old-server/*']\n---\n\nBody.\n",
+        )
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        content = self._read_agent("coder")
+        # Non-MCP slash tool must be preserved
+        self.assertIn("vscode/askQuestions", content)
+        # New MCP wildcard from config must be present
+        self.assertIn("context7/*", content)
+        # Stale MCP wildcard must be removed
+        self.assertNotIn("old-server/*", content)

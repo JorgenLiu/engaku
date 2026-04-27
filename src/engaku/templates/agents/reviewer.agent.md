@@ -63,7 +63,7 @@ Report format per task (extract task number and title from the task document's
 ## After verification
 
 - **All tasks PASS:** set `status: done` in the task document first, then
-  run `git add -A && git commit -m "{task title from frontmatter}"`
+  run `git add -A && git commit -m "{concise English commit message based on the task title}"`
   (so the committed snapshot already reflects the final done state).
 - **Any task FAIL** → reset that task's `[x]` to `[ ]`, add an inline HTML
   comment explaining the failure (e.g.
@@ -79,3 +79,6 @@ Report format per task (extract task number and title from the task document's
   never run commands that modify project state. After all tasks PASS, run
   the default commit command.
 - **Edit scope: `.ai/tasks/*.md` exclusively.** Do not edit any other files.
+- **English commit messages only.** Commit messages must be in English. If
+  the task title is not in English, translate or summarize it into a concise
+  English phrase before committing.

@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.1.7] - 2026-04-27
+
+### Added
+- `vscode/askQuestions` tool added to planner agent so planner can use VS Code's
+  interactive clarification UI (fixed options + free-form input) when narrowing
+  scope or resolving ambiguity; falls back to plain chat questions when unavailable
+- Reviewer rule: English commit messages required; if task title is not in
+  English, reviewer must translate or summarize before committing
+
+### Fixed
+- `engaku apply` now only strips and replaces MCP wildcard tools ending with `/*`
+  (e.g. `context7/*`) instead of any tool containing `/`; non-MCP slash tools
+  such as `vscode/askQuestions` are preserved across apply runs
+
 ## [1.1.6] - 2026-04-27
 
 ### Added
