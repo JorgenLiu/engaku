@@ -46,18 +46,19 @@ def _is_rule_prompt(prompt):
     return any(p.search(prompt) for p in _PHRASE_PATTERNS)
 
 
-def _find_active_task(cwd):
-    """Scan .ai/tasks/*.md for first file with status: in-progress.
+def _find_active_tasks(cwd):
+    """Scan .ai/tasks/*.md for all files with status: in-progress.
 
-    Returns (title, unchecked_lines) tuple or None.
+    Returns list of (title, unchecked_lines) tuples in filename order.
     """
     tasks_dir = os.path.join(cwd, ".ai", "tasks")
     if not os.path.isdir(tasks_dir):
-        return None
+        return []
     try:
         entries = sorted(os.listdir(tasks_dir))
     except OSError:
-        return None
+        return []
+    results = []
     for filename in entries:
         if not filename.endswith(".md"):
             continue
@@ -82,8 +83,8 @@ def _find_active_task(cwd):
         if title is None:
             title = filename[:-3]
         unchecked = [l for l in body.splitlines() if l.strip().startswith("- [ ]")]
-        return (title, unchecked)
-    return None
+        results.append((title, unchecked))
+    return results
 
 
 def run(cwd=None):
@@ -103,12 +104,14 @@ def run(cwd=None):
             "If confirmed, update .github/copilot-instructions.md after completing the task."
         )
 
-    active_task = _find_active_task(cwd)
-    if active_task:
-        title, unchecked = active_task
-        task_lines = ["Active task: {}".format(title)]
-        task_lines.extend(unchecked)
-        parts.append("\n".join(task_lines))
+    active_tasks = _find_active_tasks(cwd)
+    if active_tasks:
+        blocks = []
+        for title, unchecked in active_tasks:
+            task_lines = ["Active task: {}".format(title)]
+            task_lines.extend(unchecked)
+            blocks.append("\n".join(task_lines))
+        parts.append("\n\n".join(blocks))
 
     if parts:
         output = {"systemMessage": "\n\n".join(parts)}

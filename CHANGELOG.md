@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.1.6] - 2026-04-27
+
+### Added
+- `Engaku-Managed Files` and `Verification Commands` sections in the generated `overview.md` template so every initialized project gets a high-signal project memory outline instead of a placeholder stub
+- One cross-agent global rule in `copilot-instructions.md` template: verify external tool/library/VS Code behaviour with documentation or source code before asserting
+
+### Changed
+- `engaku prompt-check` now scans all `status: in-progress` task files (matching `engaku inject`) and emits unchecked steps for every active task, not just the first one
+- Planner agent templates clarified: `.ai/overview.md` is planner-owned; when completed work will materially change project purpose, architecture, directory structure, major commands, or hard constraints, planner must include a concrete overview update task with the exact new text rather than editing directly
+
 ## [1.1.5] - 2026-04-27
 
 ### Added

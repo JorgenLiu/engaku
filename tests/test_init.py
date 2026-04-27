@@ -115,9 +115,13 @@ class TestInit(unittest.TestCase):
     def test_template_files_have_expected_content(self):
         _git_init(self.tmpdir)
         self._capture_run()
-        # overview.md should exist
+        # overview.md should exist and contain Engaku-aware sections
         overview = os.path.join(self.tmpdir, ".ai", "overview.md")
         self.assertTrue(os.path.exists(overview))
+        with open(overview) as f:
+            content = f.read()
+        self.assertIn("Engaku-Managed Files", content)
+        self.assertIn("Verification Commands", content)
 
     def test_creates_lessons_instructions(self):
         """engaku init creates lessons.instructions.md with applyTo frontmatter."""

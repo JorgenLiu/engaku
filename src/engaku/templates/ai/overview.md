@@ -7,7 +7,16 @@ Example: "Acme API is a Python/FastAPI service that powers the Acme mobile app. 
 ## Directory Structure
 List key directories and their roles (one line each).
 
-<!-- List key directories and their roles (one line each). -->
+## Engaku-Managed Files
+These paths are managed by Engaku and should not be deleted:
+
+- `.ai/tasks/` — task plans (owned by @planner)
+- `.ai/decisions/` — architecture decision records (owned by @planner)
+- `.ai/docs/` — design documents (owned by @planner)
+- `.ai/overview.md` — this file; update when project purpose, architecture, or constraints change
+- `.github/agents/` — agent definitions (coder, planner, reviewer, scanner)
+- `.github/instructions/` — path-scoped and always-on instructions
+- `.github/skills/` — bundled workflow skills
 
 ## Constraints
 List hard technical constraints the AI must always respect.
@@ -23,3 +32,11 @@ List the primary technologies used in this project.
 - Framework:
 - Database:
 - Infrastructure:
+
+## Verification Commands
+List the commands used to test, build, lint, and release this project.
+
+- Test:
+- Build:
+- Lint:
+- Release:

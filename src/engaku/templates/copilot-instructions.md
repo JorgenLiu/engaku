@@ -5,6 +5,7 @@
 - If the user expressed a new constraint or preference, update this file.
 - If a significant architecture decision was made, record it in `.ai/decisions/`.
 - Do not add agent-specific rules here — this file is global and applies to all agents. Agent-specific behaviour belongs in the agent's own `.agent.md` file.
+- When a design decision depends on external tool, platform, library, GitHub, or VS Code behaviour, verify with documentation or source code before asserting.
 
 ## Code Discipline
 

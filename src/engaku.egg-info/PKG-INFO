@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: engaku
-Version: 1.1.4
+Version: 1.1.5
 Summary: AI persistent memory layer for VS Code Copilot
 License: MIT
 Project-URL: Homepage, https://github.com/JorgenLiu/engaku
@@ -45,23 +45,28 @@ pip install git+https://github.com/JorgenLiu/engaku.git
 engaku init
 ```
 
-After running `init`, VS Code Agent Hooks are active. The `@coder`, `@planner`, `@reviewer`, and `@scanner` agents are available via `.github/agents/`. No further manual steps are needed — hooks fire automatically on SessionStart, UserPromptSubmit, Stop, and PreCompact.
+After running `init`, VS Code Agent Hooks are active. The `@coder`, `@planner`, `@reviewer`, and `@scanner` agents are available via `.github/agents/`. No further manual steps are needed — hooks fire automatically on SessionStart, SubagentStart, UserPromptSubmit, Stop, and PreCompact.
 
 ## What `engaku init` creates
 
 ```
 .ai/
   overview.md       — project description, constraints, tech stack
+  engaku.json       — model, MCP tool, and hook Python runtime config
   tasks/            — planner-managed task plans
   decisions/        — architecture decision records
 .github/
   copilot-instructions.md   — global agent rules
   agents/           — coder, planner, reviewer, scanner agent definitions
-  instructions/     — .instructions.md stubs for hooks, templates, tests
+  instructions/     — lessons and agent-boundaries.instructions.md stubs
   skills/           — bundled skills (systematic-debugging, verification-before-completion, etc.)
 .vscode/
+  settings.json     — enables VS Code custom agent hooks
   mcp.json          — MCP server configuration (chrome-devtools, context7, dbhub)
+  dbhub.toml        — DBHub MCP guardrail/template config
 ```
+
+`engaku init --no-mcp` skips both `.vscode/mcp.json` and `.vscode/dbhub.toml`, along with the MCP-related skills.
 
 ## Subcommands
 
@@ -71,23 +76,24 @@ After running `init`, VS Code Agent Hooks are active. The `@coder`, `@planner`, 
 | `inject` | Inject `.ai/overview.md` + active-task context (SessionStart / PreCompact hook) |
 | `prompt-check` | Detect rule/constraint in user prompt and inject active-task steps (UserPromptSubmit hook) |
 | `task-review` | Detect completed task plans and emit handoff reminder (Stop hook) |
-| `apply` | Apply `.ai/engaku.json` model config to `.github/agents/` frontmatter |
+| `apply` | Apply `.ai/engaku.json` model, MCP tool, and hook Python runtime config to `.github/agents/` frontmatter |
 
 ## How it works
 
-After `engaku init`, four Agent Hooks fire automatically:
+After `engaku init`, five Agent Hooks fire automatically:
 
 - **`SessionStart`** → `engaku inject`: injects `overview.md` and the active-task's remaining unchecked steps at the start of every session.
 - **`PreCompact`** → `engaku inject`: injects the full task body (Background, Design, File Map, and all checkbox lines) before conversation compaction so the compact model retains full task context.
+- **`SubagentStart`** → `engaku inject`: gives reviewer subagent sessions the same project and active-task context before verification begins.
 - **`UserPromptSubmit`** → `engaku prompt-check`: scans each user prompt for new rules or constraints and injects all remaining unchecked task steps as a system message so the agent always knows what to do next.
 - **`Stop`** → `engaku task-review`: after each agent turn, checks whether all steps in an in-progress task plan are ticked and emits a handoff reminder if so.
 
 ## Requirements
 
-- Python ≥ 3.8 (stdlib only, no third-party dependencies)
+- Python 3.8 or newer (stdlib only, no third-party dependencies)
 - VS Code with GitHub Copilot
 
-> **Python 3.8 baseline:** v1.0.x is the final release supporting Python 3.8. Users on constrained environments can pin with `pip install "engaku<1.1"`. Later releases require Python 3.11+.
+> **Python 3.8 baseline:** v1.1.x continues to support Python 3.8. The future Python 3.11 migration remains deferred.
 
 ## Configuration
 

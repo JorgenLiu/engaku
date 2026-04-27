@@ -204,6 +204,17 @@ class TestPromptCheckActiveTask(unittest.TestCase):
         self.assertIn("copilot-instructions.md", msg)
         self.assertIn("My task", msg)
 
+    def test_multiple_active_tasks_all_shown(self):
+        """Both in-progress task titles and unchecked steps appear in systemMessage."""
+        self._write_task("a_task1.md", "in-progress", "First task", "- [ ] Step A\n")
+        self._write_task("b_task2.md", "in-progress", "Second task", "- [ ] Step B\n")
+        _, out = _run_with_prompt("help", cwd=self.tmpdir)
+        msg = json.loads(out)["systemMessage"]
+        self.assertIn("First task", msg)
+        self.assertIn("Step A", msg)
+        self.assertIn("Second task", msg)
+        self.assertIn("Step B", msg)
+
 
 if __name__ == "__main__":
     unittest.main()
