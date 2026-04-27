@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.5] - 2026-04-27
+
+### Added
+- Generated `agent-boundaries.instructions.md` instruction stub to reinforce coder/planner/reviewer/scanner ownership boundaries during normal conversations
+- `templates/*.toml` package-data entry so the generated DBHub TOML template is included in built distributions
+
+### Changed
+- README generated-file and behavior documentation now matches the v1.1.x runtime, including `.ai/engaku.json`, `.vscode/settings.json`, `.vscode/dbhub.toml`, `SubagentStart`, and hook Python config
+
 ## [1.1.4] — 2026-04-25
 
 ### Added
@@ -57,7 +66,7 @@
 - Scanner grouping heuristic is now scale-aware: hard "3–6 groups" cap replaced with a responsibility-boundary-driven heuristic (2–4 groups typical for small repos; no cap for larger repos)
 
 ### Note
-- Final release with `requires-python = ">=3.8"`; Python 3.11 migration deferred; v1.1.x continues on Python 3.8
+- Python 3.11 migration deferred; v1.1.x continues on Python 3.8
 
 ## [0.8.0] — 2026-04-18
 

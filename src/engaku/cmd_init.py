@@ -3,35 +3,38 @@ Initialize .ai/ knowledge structure and .github/ hooks + agents in the current
 git repository.
 
 Files created (never overwritten if they already exist):
-  .ai/
-    overview.md
-    engaku.json
-    decisions/.gitkeep
-    tasks/.gitkeep
-    docs/.gitkeep
-  .github/
-    agents/
-      coder.agent.md
-      planner.agent.md
-      reviewer.agent.md
-      scanner.agent.md
-    skills/
-      systematic-debugging/SKILL.md
-      verification-before-completion/SKILL.md
-      frontend-design/SKILL.md
-      proactive-initiative/SKILL.md
-      mcp-builder/SKILL.md
-      doc-coauthoring/SKILL.md
-      brainstorming/SKILL.md
-      karpathy-guidelines/SKILL.md
-      chrome-devtools/SKILL.md  (--no-mcp skips)
-      context7/SKILL.md         (--no-mcp skips)
-      database/SKILL.md         (--no-mcp skips)
-    instructions/
-      lessons.instructions.md
-    copilot-instructions.md
-  .vscode/
-    mcp.json                   (--no-mcp skips)
+    .ai/
+        overview.md
+        engaku.json
+        decisions/.gitkeep
+        tasks/.gitkeep
+        docs/.gitkeep
+    .github/
+        agents/
+            coder.agent.md
+            planner.agent.md
+            reviewer.agent.md
+            scanner.agent.md
+        skills/
+            systematic-debugging/SKILL.md
+            verification-before-completion/SKILL.md
+            frontend-design/SKILL.md
+            proactive-initiative/SKILL.md
+            mcp-builder/SKILL.md
+            doc-coauthoring/SKILL.md
+            brainstorming/SKILL.md
+            karpathy-guidelines/SKILL.md
+            chrome-devtools/SKILL.md  (--no-mcp skips)
+            context7/SKILL.md         (--no-mcp skips)
+            database/SKILL.md         (--no-mcp skips)
+        instructions/
+            lessons.instructions.md
+            agent-boundaries.instructions.md
+        copilot-instructions.md
+    .vscode/
+        settings.json
+        mcp.json                   (--no-mcp skips)
+        dbhub.toml                 (--no-mcp skips)
 """
 import os
 import shutil
@@ -185,11 +188,12 @@ def run(cwd=None, no_mcp=False):
 
     # ── .github/instructions/ ─────────────────────────────────────────────────
     instructions_dir = os.path.join(cwd, ".github", "instructions")
-    _copy_template(
-        os.path.join(tpl, "instructions", "lessons.instructions.md"),
-        os.path.join(instructions_dir, "lessons.instructions.md"),
-        out,
-    )
+    for name in ("lessons.instructions.md", "agent-boundaries.instructions.md"):
+        _copy_template(
+            os.path.join(tpl, "instructions", name),
+            os.path.join(instructions_dir, name),
+            out,
+        )
 
     # ── .github/copilot-instructions.md ──────────────────────────────────────
     _copy_template(

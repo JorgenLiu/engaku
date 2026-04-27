@@ -9,3 +9,4 @@ mistake, append a one-line entry under `## Lessons` in
 Do not duplicate existing entries.
 
 ## Lessons
+- If `python -m unittest` exits 130 with no output, rerun from the explicit repo cwd before diagnosing code.

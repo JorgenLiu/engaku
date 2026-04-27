@@ -137,6 +137,34 @@ class TestUpdate(unittest.TestCase):
             content = f.read()
         self.assertIn("applyTo", content)
 
+    def test_creates_agent_boundaries_instructions(self):
+        """engaku update creates agent-boundaries.instructions.md if missing."""
+        _git_init(self.tmpdir)
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        path = os.path.join(
+            self.tmpdir, ".github", "instructions", "agent-boundaries.instructions.md"
+        )
+        self.assertTrue(os.path.exists(path), "agent-boundaries.instructions.md not created")
+        with open(path) as f:
+            content = f.read()
+        self.assertIn('applyTo: "**"', content)
+        self.assertIn("[create]", out)
+
+    def test_preserves_agent_boundaries_instructions(self):
+        """engaku update preserves existing agent-boundaries.instructions.md."""
+        _git_init(self.tmpdir)
+        path = os.path.join(
+            self.tmpdir, ".github", "instructions", "agent-boundaries.instructions.md"
+        )
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write("custom boundaries")
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        with open(path) as f:
+            self.assertEqual(f.read(), "custom boundaries")
+
     def test_non_git_repo_returns_error(self):
         # tmpdir has no .git → should fail
         code, _, err = self._capture_run()
@@ -184,9 +212,9 @@ class TestUpdate(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertIn("Done.", out)
         # All files are new → no [update] lines for agent/skill files
-        # (+1 for .vscode/settings.json, +1 for lessons.instructions.md)
+        # (+1 for .vscode/settings.json, +2 for generated instruction stubs)
         created = out.count("[create]")
-        self.assertEqual(created, len(_AGENTS) + len(_SKILLS) + 2)
+        self.assertEqual(created, len(_AGENTS) + len(_SKILLS) + 3)
 
     def test_update_merges_mcp_servers(self):
         """run init, remove one server from mcp.json, run update, verify restored."""

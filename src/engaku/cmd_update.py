@@ -4,8 +4,8 @@ Sync .github/agents/ and .github/skills/ from the latest bundled templates,
 then auto-apply engaku.json model config.
 
 Overwrites all agent and skill files managed by engaku with their latest
-bundled versions. Never touches .ai/ files, .github/copilot-instructions.md,
-or .github/instructions/ (those are user-owned).
+bundled versions. Never touches .ai/ files or .github/copilot-instructions.md.
+Creates missing generated .github/instructions/ stubs, preserving existing files.
 
 Usage:
   engaku update
@@ -100,13 +100,14 @@ def run(cwd=None):
             out,
         )
 
-    # ── .github/instructions/ ── create lessons stub if missing ──────────────
+    # ── .github/instructions/ ── create generated stubs if missing ──────────
     from engaku.cmd_init import _copy_template
-    _copy_template(
-        os.path.join(tpl, "instructions", "lessons.instructions.md"),
-        os.path.join(cwd, ".github", "instructions", "lessons.instructions.md"),
-        out,
-    )
+    for name in ("lessons.instructions.md", "agent-boundaries.instructions.md"):
+        _copy_template(
+            os.path.join(tpl, "instructions", name),
+            os.path.join(cwd, ".github", "instructions", name),
+            out,
+        )
 
     # ── .vscode/settings.json ── ensure hook setting is present ─────────────
     from engaku.cmd_init import _ensure_vscode_setting

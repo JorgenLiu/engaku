@@ -32,6 +32,7 @@ EXPECTED_FILES = [
     os.path.join(".github", "skills", "karpathy-guidelines", "SKILL.md"),
     os.path.join(".github", "copilot-instructions.md"),
     os.path.join(".github", "instructions", "lessons.instructions.md"),
+    os.path.join(".github", "instructions", "agent-boundaries.instructions.md"),
     os.path.join(".vscode", "mcp.json"),
     os.path.join(".vscode", "dbhub.toml"),
 ]
@@ -129,6 +130,42 @@ class TestInit(unittest.TestCase):
         with open(lessons_path) as f:
             content = f.read()
         self.assertIn("applyTo", content)
+
+    def test_creates_agent_boundaries_instructions(self):
+        """engaku init creates agent-boundaries.instructions.md."""
+        _git_init(self.tmpdir)
+        self._capture_run()
+        path = os.path.join(
+            self.tmpdir, ".github", "instructions", "agent-boundaries.instructions.md"
+        )
+        self.assertTrue(os.path.exists(path), "agent-boundaries.instructions.md not created")
+        with open(path) as f:
+            content = f.read()
+        self.assertIn('applyTo: "**"', content)
+        self.assertIn("coder", content)
+        self.assertIn("planner", content)
+        self.assertIn("reviewer", content)
+        self.assertIn("scanner", content)
+
+    def test_agent_boundaries_instructions_preserved(self):
+        """engaku init preserves existing agent-boundaries.instructions.md."""
+        _git_init(self.tmpdir)
+        path = os.path.join(
+            self.tmpdir, ".github", "instructions", "agent-boundaries.instructions.md"
+        )
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write("custom boundaries")
+        self._capture_run()
+        with open(path) as f:
+            self.assertEqual(f.read(), "custom boundaries")
+
+    def test_package_data_includes_toml_templates(self):
+        """DBHub TOML template is included in package-data inputs."""
+        root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        with open(os.path.join(root, "pyproject.toml")) as f:
+            content = f.read()
+        self.assertIn('"templates/*.toml"', content)
 
     def test_dbhub_toml_created_by_default_init(self):
         """engaku init creates .vscode/dbhub.toml with DBHUB_DSN and guardrails."""
