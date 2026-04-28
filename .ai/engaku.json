@@ -1,9 +1,9 @@
 {
   "agents": {
     "coder": "Claude Sonnet 4.6 (copilot)",
-    "planner": "Claude Sonnet 4.6 (copilot)",
+    "planner": "GPT-5.5 (copilot)",
     "reviewer": "Claude Sonnet 4.6 (copilot)",
-    "scanner": "Claude Sonnet 4.6 (copilot)"
+    "scanner": "GPT-5.5 (copilot)"
   },
   "mcp_tools": {
     "coder": ["chrome-devtools/*", "context7/*", "dbhub/*"],

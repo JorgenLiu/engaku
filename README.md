@@ -57,6 +57,7 @@ After running `init`, VS Code Agent Hooks are active. The `@coder`, `@planner`, 
 | `prompt-check` | Detect rule/constraint in user prompt and inject active-task steps (UserPromptSubmit hook) |
 | `task-review` | Detect completed task plans and emit handoff reminder (Stop hook) |
 | `apply` | Apply `.ai/engaku.json` model, MCP tool, and hook Python runtime config to `.github/agents/` frontmatter |
+| `update` | Sync generated agents and skills from bundled templates, merge MCP server additions, and apply `.ai/engaku.json` config |
 
 ## How it works
 

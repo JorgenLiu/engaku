@@ -159,6 +159,7 @@ the related task plan_id at the top.
 - **No status edits** — @reviewer is the sole authority for marking tasks
   `done`. Planner may set `status: abandoned` only for plans that will not
   be executed.
+- **Instruction impact check.** When a plan changes durable project conventions, agent workflows, generated file structure, or user-stated rules, include a task to update the relevant `.github/instructions/*.instructions.md`, `.github/copilot-instructions.md`, or `.ai/overview.md` file with exact new text. Do not add instruction-update tasks for ordinary local bug fixes or implementation details.
 - **Terminal for observation** — gather info, never modify state.
 - **Verify before asserting** — when a design decision depends on external tool behaviour, API semantics, or platform capabilities (VS Code, GitHub, npm, etc.), fetch the relevant documentation or source code first. Do not rely on memory for facts about external systems.
 

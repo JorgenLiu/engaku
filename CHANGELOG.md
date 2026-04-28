@@ -1,5 +1,13 @@
 # Changelog
 
+## [Unreleased]
+
+### Fixed
+- stale project instruction cleanup: `hooks.instructions.md` now correctly distinguishes hook-backed commands from ordinary CLI commands; `tests.instructions.md` reflects actual test naming conventions and removes the stale prohibition on module-level imports.
+
+### Changed
+- Planner agent now includes an Instruction impact check rule: plans that change durable conventions, agent workflows, generated file structure, or user-stated rules must include a task to update the relevant instruction or overview file with exact new text.
+
 ## [1.1.7] - 2026-04-27
 
 ### Added
