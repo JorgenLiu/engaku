@@ -30,6 +30,7 @@ EXPECTED_FILES = [
     os.path.join(".github", "skills", "context7", "SKILL.md"),
     os.path.join(".github", "skills", "database", "SKILL.md"),
     os.path.join(".github", "skills", "karpathy-guidelines", "SKILL.md"),
+    os.path.join(".github", "skills", "skill-authoring", "SKILL.md"),
     os.path.join(".github", "copilot-instructions.md"),
     os.path.join(".github", "instructions", "lessons.instructions.md"),
     os.path.join(".github", "instructions", "agent-boundaries.instructions.md"),
@@ -215,6 +216,8 @@ class TestInit(unittest.TestCase):
         self.assertTrue(os.path.exists(sd_path), "systematic-debugging should exist with --no-mcp")
         kg_path = os.path.join(self.tmpdir, ".github", "skills", "karpathy-guidelines", "SKILL.md")
         self.assertTrue(os.path.exists(kg_path), "karpathy-guidelines should exist with --no-mcp")
+        sa_path = os.path.join(self.tmpdir, ".github", "skills", "skill-authoring", "SKILL.md")
+        self.assertTrue(os.path.exists(sa_path), "skill-authoring should exist with --no-mcp")
 
     def test_mcp_json_is_valid(self):
         """engaku init creates a valid mcp.json with all three servers."""
@@ -284,6 +287,20 @@ class TestInit(unittest.TestCase):
         self.assertEqual(len(data["mcp_tools"]["coder"]), 3)
         self.assertIn("python", data)
         self.assertIsNone(data["python"])
+
+    def test_default_init_planner_has_chrome_devtools(self):
+        """Default init grants planner chrome-devtools/*, context7/*, dbhub/*."""
+        import json
+        _git_init(self.tmpdir)
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        config_path = os.path.join(self.tmpdir, ".ai", "engaku.json")
+        with open(config_path) as f:
+            data = json.load(f)
+        planner_tools = data["mcp_tools"]["planner"]
+        self.assertIn("chrome-devtools/*", planner_tools)
+        self.assertIn("context7/*", planner_tools)
+        self.assertIn("dbhub/*", planner_tools)
 
     def test_engaku_json_has_python_key_no_mcp(self):
         """--no-mcp init generates engaku.json with python: null."""

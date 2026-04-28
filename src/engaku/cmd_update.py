@@ -27,6 +27,7 @@ _SKILLS = (
     "context7",
     "database",
     "karpathy-guidelines",
+    "skill-authoring",
 )
 
 _AGENTS = (

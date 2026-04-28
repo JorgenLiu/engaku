@@ -38,6 +38,7 @@ src/engaku/templates/skills/frontend-design/SKILL.md
 src/engaku/templates/skills/karpathy-guidelines/SKILL.md
 src/engaku/templates/skills/mcp-builder/SKILL.md
 src/engaku/templates/skills/proactive-initiative/SKILL.md
+src/engaku/templates/skills/skill-authoring/SKILL.md
 src/engaku/templates/skills/systematic-debugging/SKILL.md
 src/engaku/templates/skills/verification-before-completion/SKILL.md
 tests/test_apply.py

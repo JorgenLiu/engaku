@@ -48,6 +48,8 @@ After running `init`, VS Code Agent Hooks are active. The `@coder`, `@planner`, 
 
 `engaku init --no-mcp` skips both `.vscode/mcp.json` and `.vscode/dbhub.toml`, along with the MCP-related skills.
 
+When MCP support is enabled, `engaku init` grants `chrome-devtools/*` to the planner agent by default (alongside `context7/*` and `dbhub/*`), so planner can run browser-backed research and verification before producing plans. `engaku update` does not modify an existing `.ai/engaku.json` — once written, your MCP tool allocations stay user-owned.
+
 ## Subcommands
 
 | Command | Purpose |
@@ -216,6 +218,14 @@ Structured web scraping and search via [Firecrawl](https://firecrawl.dev). Usefu
 ```
 
 Requires a Firecrawl API key. Not a default dependency — add only when structured web research is needed.
+
+## Bundled Skills
+
+### skill-authoring
+
+Helper workflow for turning a repeated multi-step method into a reusable Copilot skill. Different from VS Code's `/create-skill` command: this skill enforces an explicit primitive-selection gate (instruction file vs prompt file vs skill vs custom agent), draws a hard prompt-file-vs-skill boundary, and locks in an ownership rule — skills authored with this workflow stay user-owned and are not registered in Engaku's bundled template inventory unless an Engaku task explicitly ships them.
+
+Use it when you notice the same phases, safeguards, and output format being re-explained across sessions and a one-shot prompt would not capture the adaptive logic between phases.
 
 ## Credits
 

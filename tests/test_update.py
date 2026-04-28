@@ -177,6 +177,20 @@ class TestUpdate(unittest.TestCase):
     def test_karpathy_skill_included(self):
         self.assertIn("karpathy-guidelines", _SKILLS)
 
+    def test_skill_authoring_included(self):
+        self.assertIn("skill-authoring", _SKILLS)
+
+    def test_creates_skill_authoring_in_fresh_repo(self):
+        """run update on a repo without skill-authoring, verify skill is created."""
+        _git_init(self.tmpdir)
+        skill_path = os.path.join(
+            self.tmpdir, ".github", "skills", "skill-authoring", "SKILL.md"
+        )
+        self.assertFalse(os.path.exists(skill_path))
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        self.assertTrue(os.path.exists(skill_path), "skill-authoring/SKILL.md should be created")
+
     def test_creates_karpathy_skill_in_fresh_repo(self):
         """run update on a repo without karpathy-guidelines, verify skill is created."""
         _git_init(self.tmpdir)

@@ -8,6 +8,19 @@
 ### Changed
 - Planner agent now includes an Instruction impact check rule: plans that change durable conventions, agent workflows, generated file structure, or user-stated rules must include a task to update the relevant instruction or overview file with exact new text.
 
+## [1.1.8] - 2026-04-28
+
+### Added
+- New bundled skill `skill-authoring`: helps turn repeated multi-step
+  workflows into reusable Copilot skills, with explicit gates for choosing
+  between instructions, prompt files, skills, and custom agents. Skills
+  authored with this workflow are user-owned and not registered in Engaku's
+  bundled template inventory.
+- `engaku init` now grants planner `chrome-devtools/*` MCP access by default
+  (alongside `context7/*` and `dbhub/*`) in newly generated `.ai/engaku.json`,
+  so planner can run browser-backed research and verification before writing
+  plans. Existing `.ai/engaku.json` files are not modified by `engaku update`.
+
 ## [1.1.7] - 2026-04-27
 
 ### Added
