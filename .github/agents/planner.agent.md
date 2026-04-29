@@ -5,7 +5,7 @@ description: >-
   Analysis, planning, and task management agent. Explores codebase,
   produces implementation plans, manages task lifecycle, and records
   architecture decisions. Does NOT write application code or dispatch subagents.
-tools: ['read', 'search', 'edit', 'execute', 'todo', 'web', 'selection', 'read/problems', 'search/changes', 'search/codebase', 'search/usages', 'vscode/askQuestions', 'context7/*', 'dbhub/*']
+tools: ['read', 'search', 'edit', 'execute', 'todo', 'web', 'selection', 'read/problems', 'search/changes', 'search/codebase', 'search/usages', 'vscode/askQuestions', 'context7/*', 'dbhub/*', 'serena/*']
 hooks:
   SessionStart:
     - type: command
@@ -163,4 +163,11 @@ the related task plan_id at the top.
 - **Instruction impact check.** When a plan changes durable project conventions, agent workflows, generated file structure, or user-stated rules, include a task to update the relevant `.github/instructions/*.instructions.md`, `.github/copilot-instructions.md`, or `.ai/overview.md` file with exact new text. Do not add instruction-update tasks for ordinary local bug fixes or implementation details.
 - **Terminal for observation** — gather info, never modify state.
 - **Verify before asserting** — when a design decision depends on external tool behaviour, API semantics, or platform capabilities (VS Code, GitHub, npm, etc.), fetch the relevant documentation or source code first. Do not rely on memory for facts about external systems.
+
+## Token Budget Principle
+
+- Answer in English by default. Switch language only when the user explicitly requests it.
+- Preserve substance: file paths, exact commands, decision rationale.
+- Keep analysis and proposals compact; remove restated context, hedging, and unrequested elaboration.
+- Prefer Serena/symbol tools when exploring code before broad file reads; bound search and tool output. See the `serena` and `token-budget` skills.
 

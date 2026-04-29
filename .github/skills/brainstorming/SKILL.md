@@ -55,3 +55,9 @@ Before coding, you must understand:
 The output of brainstorming is a design, not implementation.
 
 When useful, write the approved design to a markdown document in the working project.
+
+## Token Budget
+
+- Answer in English by default; switch language only when explicitly requested.
+- Keep design summaries compact: capture decisions, trade-offs, and rejected alternatives without restating the prompt.
+- Cut filler and repeated framing across revisions.

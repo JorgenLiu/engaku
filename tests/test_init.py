@@ -31,6 +31,8 @@ EXPECTED_FILES = [
     os.path.join(".github", "skills", "database", "SKILL.md"),
     os.path.join(".github", "skills", "karpathy-guidelines", "SKILL.md"),
     os.path.join(".github", "skills", "skill-authoring", "SKILL.md"),
+    os.path.join(".github", "skills", "token-budget", "SKILL.md"),
+    os.path.join(".github", "skills", "serena", "SKILL.md"),
     os.path.join(".github", "copilot-instructions.md"),
     os.path.join(".github", "instructions", "lessons.instructions.md"),
     os.path.join(".github", "instructions", "agent-boundaries.instructions.md"),
@@ -57,14 +59,14 @@ class TestInit(unittest.TestCase):
         import shutil
         shutil.rmtree(self.tmpdir)
 
-    def _capture_run(self, cwd=None, no_mcp=False):
+    def _capture_run(self, cwd=None, no_mcp=False, skip_serena_setup=True):
         import io
         buf_out = io.StringIO()
         buf_err = io.StringIO()
         orig_out, orig_err = sys.stdout, sys.stderr
         sys.stdout, sys.stderr = buf_out, buf_err
         try:
-            code = run(cwd=cwd or self.tmpdir, no_mcp=no_mcp)
+            code = run(cwd=cwd or self.tmpdir, no_mcp=no_mcp, skip_serena_setup=skip_serena_setup)
         finally:
             sys.stdout, sys.stderr = orig_out, orig_err
         return code, buf_out.getvalue(), buf_err.getvalue()
@@ -208,7 +210,7 @@ class TestInit(unittest.TestCase):
         toml_path = os.path.join(self.tmpdir, ".vscode", "dbhub.toml")
         self.assertFalse(os.path.exists(toml_path), "dbhub.toml should not exist with --no-mcp")
         # MCP-related skills should NOT exist
-        for skill in ("chrome-devtools", "context7", "database"):
+        for skill in ("chrome-devtools", "context7", "database", "serena"):
             skill_path = os.path.join(self.tmpdir, ".github", "skills", skill, "SKILL.md")
             self.assertFalse(os.path.exists(skill_path), "{} should not exist with --no-mcp".format(skill))
         # Non-MCP skills should still exist
@@ -218,9 +220,11 @@ class TestInit(unittest.TestCase):
         self.assertTrue(os.path.exists(kg_path), "karpathy-guidelines should exist with --no-mcp")
         sa_path = os.path.join(self.tmpdir, ".github", "skills", "skill-authoring", "SKILL.md")
         self.assertTrue(os.path.exists(sa_path), "skill-authoring should exist with --no-mcp")
+        tb_path = os.path.join(self.tmpdir, ".github", "skills", "token-budget", "SKILL.md")
+        self.assertTrue(os.path.exists(tb_path), "token-budget should exist with --no-mcp")
 
     def test_mcp_json_is_valid(self):
-        """engaku init creates a valid mcp.json with all three servers."""
+        """engaku init creates a valid mcp.json with all expected servers."""
         import json
         _git_init(self.tmpdir)
         code, _, _ = self._capture_run()
@@ -230,7 +234,7 @@ class TestInit(unittest.TestCase):
         with open(mcp_path) as f:
             data = json.load(f)
         self.assertIn("servers", data)
-        for server in ("chrome-devtools", "context7", "dbhub"):
+        for server in ("chrome-devtools", "context7", "dbhub", "serena"):
             self.assertIn(server, data["servers"], "Missing server: {}".format(server))
         # DBHub shape assertions (TOML-backed)
         db = data["servers"]["dbhub"]
@@ -248,6 +252,13 @@ class TestInit(unittest.TestCase):
         db_input = next((i for i in inputs if isinstance(i, dict) and i.get("id") == "db-dsn"), None)
         self.assertIsNotNone(db_input, "inputs must contain an entry with id=db-dsn")
         self.assertTrue(db_input.get("password"), "db-dsn input must have password=true")
+        # Serena shape assertions
+        serena = data["servers"]["serena"]
+        self.assertEqual(serena.get("type"), "stdio")
+        self.assertEqual(serena.get("command"), "serena")
+        self.assertIn("start-mcp-server", serena.get("args", []))
+        self.assertIn("--context=vscode", serena.get("args", []))
+        self.assertIn("${workspaceFolder}", serena.get("args", []))
 
     def test_default_init_injects_mcp_tools_into_agents(self):
         """Default init writes MCP tools into agent frontmatter via apply."""
@@ -260,6 +271,7 @@ class TestInit(unittest.TestCase):
         self.assertIn("chrome-devtools/*", content)
         self.assertIn("context7/*", content)
         self.assertIn("dbhub/*", content)
+        self.assertIn("serena/*", content)
 
     def test_no_mcp_init_has_no_mcp_tools_in_agents(self):
         """--no-mcp init does not inject MCP tools into agent frontmatter."""
@@ -284,12 +296,13 @@ class TestInit(unittest.TestCase):
             data = json.load(f)
         self.assertIn("agents", data)
         self.assertIn("mcp_tools", data)
-        self.assertEqual(len(data["mcp_tools"]["coder"]), 3)
+        self.assertEqual(len(data["mcp_tools"]["coder"]), 4)
+        self.assertIn("serena/*", data["mcp_tools"]["coder"])
         self.assertIn("python", data)
         self.assertIsNone(data["python"])
 
     def test_default_init_planner_has_chrome_devtools(self):
-        """Default init grants planner chrome-devtools/*, context7/*, dbhub/*."""
+        """Default init grants planner chrome-devtools/*, context7/*, dbhub/*, serena/*."""
         import json
         _git_init(self.tmpdir)
         code, _, _ = self._capture_run()
@@ -301,6 +314,7 @@ class TestInit(unittest.TestCase):
         self.assertIn("chrome-devtools/*", planner_tools)
         self.assertIn("context7/*", planner_tools)
         self.assertIn("dbhub/*", planner_tools)
+        self.assertIn("serena/*", planner_tools)
 
     def test_engaku_json_has_python_key_no_mcp(self):
         """--no-mcp init generates engaku.json with python: null."""
@@ -325,6 +339,52 @@ class TestInit(unittest.TestCase):
             data = json.load(f)
         self.assertIn("agents", data)
         self.assertNotIn("mcp_tools", data)
+
+    def test_scanner_gets_serena_tools(self):
+        """Default init grants scanner serena/* via mcp_tools."""
+        import json
+        _git_init(self.tmpdir)
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        config_path = os.path.join(self.tmpdir, ".ai", "engaku.json")
+        with open(config_path) as f:
+            data = json.load(f)
+        scanner_tools = data["mcp_tools"].get("scanner", [])
+        self.assertIn("serena/*", scanner_tools)
+
+    def test_skip_serena_setup_flag_is_accepted(self):
+        """--skip-serena-setup flag is accepted and init still succeeds."""
+        _git_init(self.tmpdir)
+        code, out, err = self._capture_run(skip_serena_setup=True)
+        self.assertEqual(code, 0)
+
+    def test_serena_setup_called_when_mcp_enabled(self):
+        """setup_serena.run is invoked during default init (MCP enabled, no skip)."""
+        from unittest import mock
+        _git_init(self.tmpdir)
+        with mock.patch("engaku.cmd_setup_serena.run", return_value=0) as mock_setup:
+            code, _, _ = self._capture_run(skip_serena_setup=False)
+        self.assertEqual(code, 0)
+        mock_setup.assert_called_once()
+        _, kwargs = mock_setup.call_args
+        self.assertTrue(kwargs.get("called_from_init"))
+
+    def test_no_mcp_skips_serena_setup(self):
+        """--no-mcp init does not invoke serena setup."""
+        from unittest import mock
+        _git_init(self.tmpdir)
+        with mock.patch("engaku.cmd_setup_serena.run") as mock_setup:
+            code, _, _ = self._capture_run(no_mcp=True, skip_serena_setup=False)
+        self.assertEqual(code, 0)
+        mock_setup.assert_not_called()
+
+    def test_serena_setup_failure_does_not_block_init(self):
+        """setup_serena.run returning 1 does not affect init return code."""
+        from unittest import mock
+        _git_init(self.tmpdir)
+        with mock.patch("engaku.cmd_setup_serena.run", return_value=1):
+            code, _, _ = self._capture_run(skip_serena_setup=False)
+        self.assertEqual(code, 0)
 
 
 if __name__ == "__main__":

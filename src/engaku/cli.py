@@ -24,6 +24,10 @@ def main():
         "--no-mcp", action="store_true",
         help="Skip .vscode/mcp.json and MCP-related skills",
     )
+    init_parser.add_argument(
+        "--skip-serena-setup", action="store_true",
+        help="Skip automatic Serena MCP server installation (offline/no-network environments)",
+    )
 
     # engaku inject
     subparsers.add_parser(
@@ -55,11 +59,17 @@ def main():
         help="Update .github/skills/ from bundled templates (overwrites existing)",
     )
 
+    # engaku setup-serena
+    subparsers.add_parser(
+        "setup-serena",
+        help="Install Serena MCP server and run serena init in the current project",
+    )
+
     args = parser.parse_args()
 
     if args.command == "init":
         from engaku.cmd_init import run
-        sys.exit(run(no_mcp=args.no_mcp))
+        sys.exit(run(no_mcp=args.no_mcp, skip_serena_setup=args.skip_serena_setup))
     elif args.command == "inject":
         from engaku.cmd_inject import run
         sys.exit(run())
@@ -74,4 +84,7 @@ def main():
         sys.exit(run())
     elif args.command == "update":
         from engaku.cmd_update import run
+        sys.exit(run())
+    elif args.command == "setup-serena":
+        from engaku.cmd_setup_serena import run
         sys.exit(run())

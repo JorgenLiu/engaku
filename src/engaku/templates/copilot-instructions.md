@@ -7,6 +7,13 @@
 - Do not add agent-specific rules here — this file is global and applies to all agents. Agent-specific behaviour belongs in the agent's own `.agent.md` file.
 - When a design decision depends on external tool, platform, library, GitHub, or VS Code behaviour, verify with documentation or source code before asserting.
 
+## Token Budget Principle
+- Answer in English by default. Use another language only when the user explicitly requests it.
+- Preserve technical substance — code, paths, commands, exact error text, decisions.
+- Remove filler: restated tasks, repeated summaries, hedging, mood-setting, long unrequested explanations.
+- Default to concise progress updates and concise final answers; expand only when asked or when risk demands it.
+- Prefer Serena/symbol tools over broad file reads when available; bound search and tool output. See the `token-budget` and `serena` skills.
+
 ## Code Discipline
 
 ### Simplicity First

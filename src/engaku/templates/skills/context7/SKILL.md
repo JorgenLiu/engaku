@@ -48,3 +48,9 @@ query-docs("/facebook/react", "useOptimistic hook API")
 - Context7 uses HTTP remote mode — no local process needed, but requires network access.
 - For higher rate limits, users can set `CONTEXT7_API_KEY` in their environment.
 - Prefer context7 over training data whenever a library has had recent major releases.
+
+## Token Budget
+
+- Answer in English by default; switch language only when explicitly requested.
+- Resolve the exact library and version first, then query one specific topic.
+- Do not pull general overviews when a specific API question is the goal; bound queries to the symbol or feature in scope.

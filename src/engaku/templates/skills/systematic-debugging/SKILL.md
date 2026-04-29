@@ -94,3 +94,9 @@ If you catch yourself thinking any of these, stop and return to Phase 1:
 - Evidence that supports it.
 - Minimal change set.
 - Verification that the fix actually worked.
+
+## Token Budget
+
+- Answer in English by default; switch language only when explicitly requested.
+- Bound searches around the failing symbol or error string; do not pre-load whole modules.
+- Capture only the evidence that supports the diagnosis; skip narration of dead-end paths unless the user asks.

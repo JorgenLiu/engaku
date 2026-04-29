@@ -132,3 +132,9 @@ Before declaring the server complete, verify:
 | Define prompt | `@mcp.prompt()` | `server.prompt(name, args, handler)` |
 | Start server | `mcp.run()` | `server.connect(transport)` |
 | Error type | `McpError` | throw in handler |
+
+## Token Budget
+
+- Answer in English by default; switch language only when explicitly requested.
+- Read only the SDK pieces needed for the capability in scope.
+- Do not summarize the entire MCP spec when one tool, prompt, or transport is the actual subject.

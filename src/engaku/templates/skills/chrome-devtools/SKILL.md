@@ -45,3 +45,9 @@ Use the chrome-devtools-mcp server for browser automation, visual verification, 
 - Take screenshots before and after changes for visual diff comparison.
 - Use `evaluate_script` to extract structured data from the page rather than parsing screenshot images.
 - Lighthouse audits can be slow (~10-30s); run them only when performance analysis is specifically needed.
+
+## Token Budget
+
+- Answer in English by default; switch language only when explicitly requested.
+- Take targeted snapshots, evaluate narrow scripts, and request only the network/console slices needed for the task.
+- Do not dump full DOM trees or full Lighthouse reports when a single metric or selector answers the question.

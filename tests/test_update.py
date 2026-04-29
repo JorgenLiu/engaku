@@ -49,7 +49,7 @@ class TestUpdate(unittest.TestCase):
         orig = sys.stdout
         sys.stdout = buf
         try:
-            init_run(cwd=self.tmpdir)
+            init_run(cwd=self.tmpdir, skip_serena_setup=True)
         finally:
             sys.stdout = orig
 
@@ -180,6 +180,34 @@ class TestUpdate(unittest.TestCase):
     def test_skill_authoring_included(self):
         self.assertIn("skill-authoring", _SKILLS)
 
+    def test_token_budget_included(self):
+        self.assertIn("token-budget", _SKILLS)
+
+    def test_serena_included(self):
+        self.assertIn("serena", _SKILLS)
+
+    def test_creates_token_budget_in_fresh_repo(self):
+        """run update on a repo without token-budget, verify skill is created."""
+        _git_init(self.tmpdir)
+        skill_path = os.path.join(
+            self.tmpdir, ".github", "skills", "token-budget", "SKILL.md"
+        )
+        self.assertFalse(os.path.exists(skill_path))
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        self.assertTrue(os.path.exists(skill_path), "token-budget/SKILL.md should be created")
+
+    def test_creates_serena_in_fresh_repo(self):
+        """run update on a repo without serena, verify skill is created."""
+        _git_init(self.tmpdir)
+        skill_path = os.path.join(
+            self.tmpdir, ".github", "skills", "serena", "SKILL.md"
+        )
+        self.assertFalse(os.path.exists(skill_path))
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        self.assertTrue(os.path.exists(skill_path), "serena/SKILL.md should be created")
+
     def test_creates_skill_authoring_in_fresh_repo(self):
         """run update on a repo without skill-authoring, verify skill is created."""
         _git_init(self.tmpdir)
@@ -240,7 +268,7 @@ class TestUpdate(unittest.TestCase):
         orig = sys.stdout
         sys.stdout = buf
         try:
-            init_run(cwd=self.tmpdir)
+            init_run(cwd=self.tmpdir, skip_serena_setup=True)
         finally:
             sys.stdout = orig
 
@@ -308,7 +336,7 @@ class TestUpdate(unittest.TestCase):
         orig = sys.stdout
         sys.stdout = buf
         try:
-            init_run(cwd=self.tmpdir)
+            init_run(cwd=self.tmpdir, skip_serena_setup=True)
         finally:
             sys.stdout = orig
 
@@ -330,7 +358,7 @@ class TestUpdate(unittest.TestCase):
         orig = sys.stdout
         sys.stdout = buf
         try:
-            init_run(cwd=self.tmpdir)
+            init_run(cwd=self.tmpdir, skip_serena_setup=True)
         finally:
             sys.stdout = orig
 
@@ -353,7 +381,7 @@ class TestUpdate(unittest.TestCase):
         orig = sys.stdout
         sys.stdout = buf
         try:
-            init_run(cwd=self.tmpdir)
+            init_run(cwd=self.tmpdir, skip_serena_setup=True)
         finally:
             sys.stdout = orig
 
@@ -383,7 +411,7 @@ class TestUpdate(unittest.TestCase):
         orig = sys.stdout
         sys.stdout = buf
         try:
-            init_run(cwd=self.tmpdir, no_mcp=True)
+            init_run(cwd=self.tmpdir, no_mcp=True, skip_serena_setup=True)
         finally:
             sys.stdout = orig
 
@@ -393,6 +421,61 @@ class TestUpdate(unittest.TestCase):
         code, out, _ = self._capture_run()
         self.assertEqual(code, 0)
         self.assertFalse(os.path.exists(mcp_path), "mcp.json should not be created by update")
+
+    def test_update_merges_serena_server(self):
+        """After init, remove serena from mcp.json, run update, verify it's merged back."""
+        import json
+        _git_init(self.tmpdir)
+        from engaku.cmd_init import run as init_run
+        import io
+        buf = io.StringIO()
+        orig = sys.stdout
+        sys.stdout = buf
+        try:
+            init_run(cwd=self.tmpdir, skip_serena_setup=True)
+        finally:
+            sys.stdout = orig
+
+        mcp_path = os.path.join(self.tmpdir, ".vscode", "mcp.json")
+        with open(mcp_path) as f:
+            data = json.load(f)
+        del data["servers"]["serena"]
+        with open(mcp_path, "w") as f:
+            json.dump(data, f, indent=2)
+
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        with open(mcp_path) as f:
+            result = json.load(f)
+        self.assertIn("serena", result["servers"], "serena should be merged back")
+        serena = result["servers"]["serena"]
+        self.assertEqual(serena.get("type"), "stdio")
+        self.assertEqual(serena.get("command"), "serena")
+        self.assertIn("--context=vscode", serena.get("args", []))
+        self.assertIn("[update]", out)
+
+    def test_update_restores_serena_tool_assignment(self):
+        """After update+apply with serena/* in mcp_tools, agent has serena/* tools."""
+        import json
+        _git_init(self.tmpdir)
+
+        ai_dir = os.path.join(self.tmpdir, ".ai")
+        os.makedirs(ai_dir, exist_ok=True)
+        config_path = os.path.join(ai_dir, "engaku.json")
+        with open(config_path, "w") as f:
+            json.dump({
+                "agents": {"coder": "test-model"},
+                "mcp_tools": {"coder": ["context7/*", "serena/*"]},
+            }, f)
+
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+
+        coder_path = os.path.join(self.tmpdir, ".github", "agents", "coder.agent.md")
+        with open(coder_path) as f:
+            content = f.read()
+        self.assertIn("serena/*", content)
+        self.assertIn("context7/*", content)
 
 
 if __name__ == "__main__":

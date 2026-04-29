@@ -28,6 +28,8 @@ _SKILLS = (
     "database",
     "karpathy-guidelines",
     "skill-authoring",
+    "token-budget",
+    "serena",
 )
 
 _AGENTS = (

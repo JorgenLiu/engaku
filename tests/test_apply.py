@@ -285,3 +285,41 @@ class TestApply(unittest.TestCase):
         self.assertIn("context7/*", content)
         # Stale MCP wildcard must be removed
         self.assertNotIn("old-server/*", content)
+
+    def test_serena_wildcard_appended_to_mcp_tools(self):
+        """serena/* from mcp_tools is appended alongside other MCP tools."""
+        self._write_config_full(
+            {"coder": "claude-sonnet"},
+            mcp_tools={"coder": ["context7/*", "dbhub/*", "serena/*"]},
+        )
+        self._write_agent(
+            "coder",
+            "---\nname: coder\ntools: ['edit', 'read']\n---\n\nBody.\n",
+        )
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        content = self._read_agent("coder")
+        self.assertIn("serena/*", content)
+        self.assertIn("context7/*", content)
+        self.assertIn("dbhub/*", content)
+        # Non-MCP tools must also survive
+        self.assertIn("edit", content)
+        self.assertIn("read", content)
+
+    def test_serena_wildcard_replaces_stale_mcp_preserves_non_mcp(self):
+        """serena/* replaces stale MCP entries but preserves non-MCP tools."""
+        self._write_config_full(
+            {"coder": "claude-sonnet"},
+            mcp_tools={"coder": ["serena/*"]},
+        )
+        self._write_agent(
+            "coder",
+            "---\nname: coder\ntools: ['edit', 'old-server/*', 'vscode/askQuestions']\n---\n\nBody.\n",
+        )
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        content = self._read_agent("coder")
+        self.assertIn("serena/*", content)
+        self.assertNotIn("old-server/*", content)
+        self.assertIn("edit", content)
+        self.assertIn("vscode/askQuestions", content)

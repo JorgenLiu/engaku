@@ -23,6 +23,11 @@
       "env": {
         "DBHUB_DSN": "${input:db-dsn}"
       }
+    },
+    "serena": {
+      "type": "stdio",
+      "command": "serena",
+      "args": ["start-mcp-server", "--context=vscode", "--project", "${workspaceFolder}"]
     }
   }
 }

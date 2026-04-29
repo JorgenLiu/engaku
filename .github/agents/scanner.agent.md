@@ -3,7 +3,7 @@ name: scanner
 model: ['GPT-5.5 (copilot)']
 description: Repository conventions scanner. Analyses the codebase, proposes .instructions.md groupings, and writes .github/instructions/ files after user approval.
 user-invocable: true
-tools: ['read', 'search', 'edit', 'selection', 'read/problems', 'search/changes', 'search/codebase', 'search/usages', 'vscode/askQuestions']
+tools: ['read', 'search', 'edit', 'selection', 'read/problems', 'search/changes', 'search/codebase', 'search/usages', 'vscode/askQuestions', 'serena/*']
 hooks:
   SessionStart:
     - type: command
@@ -28,3 +28,10 @@ Scan this repository and create `.github/instructions/*.instructions.md` files t
 - Do NOT write `.instructions.md` files before the user approves groupings.
 - Each file must have valid YAML frontmatter with an `applyTo:` key.
 - Use concrete, specific language describing actual project conventions.
+
+## Token Budget Principle
+
+- Answer in English by default. Switch language only when the user explicitly requests it.
+- Preserve substance: file paths, glob patterns, exact convention text.
+- Drop filler and repeated summaries; keep grouping proposals compact.
+- Prefer Serena/symbol tools over broad file reads when surveying source; bound search output. See the `serena` and `token-budget` skills.

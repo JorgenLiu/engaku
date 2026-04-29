@@ -73,3 +73,9 @@ Every change must be verifiable against its stated goal.
 *Adapted from [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)
 (MIT, Copyright © Forrest Chang), itself derived from
 [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876).*
+
+## Token Budget
+
+- Answer in English by default; switch language only when explicitly requested.
+- Surgical principle applies to writing as well: minimal change, minimal explanation.
+- Cut hedging and restated requirements; let the diff speak.

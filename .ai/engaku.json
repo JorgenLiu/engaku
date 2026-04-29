@@ -6,9 +6,10 @@
     "scanner": "GPT-5.5 (copilot)"
   },
   "mcp_tools": {
-    "coder": ["chrome-devtools/*", "context7/*", "dbhub/*"],
-    "planner": ["context7/*", "dbhub/*"],
-    "reviewer": ["chrome-devtools/*", "dbhub/*"]
+    "coder": ["chrome-devtools/*", "context7/*", "dbhub/*", "serena/*"],
+    "planner": ["context7/*", "dbhub/*", "serena/*"],
+    "reviewer": ["chrome-devtools/*", "dbhub/*", "serena/*"],
+    "scanner": ["serena/*"]
   },
   "python": null
 }

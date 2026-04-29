@@ -18,6 +18,11 @@
     "dbhub": {
       "command": "npx",
       "args": ["@bytebase/dbhub@latest", "--dsn", "${input:dbDsn}"]
+    },
+    "serena": {
+      "type": "stdio",
+      "command": "serena",
+      "args": ["start-mcp-server", "--context=vscode", "--project", "${workspaceFolder}"]
     }
   }
 }

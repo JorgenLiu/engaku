@@ -129,3 +129,9 @@ max_rows = 1000
 - Start every database interaction with `search_objects` to understand what tables and columns exist.
 - Use `LIMIT` clauses in SELECT queries to avoid returning excessive data.
 - For production databases, always use `--readonly` mode unless writes are explicitly needed.
+
+## Token Budget
+
+- Answer in English by default; switch language only when explicitly requested.
+- Probe schema with `search_objects` before issuing SELECTs; cap rows with `LIMIT`.
+- Do not dump full tables or wide projections when a narrow column slice answers the question.
