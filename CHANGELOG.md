@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## [1.1.10] - 2026-04-29
+
+### Changed
+- Removed default Serena MCP integration: `engaku init` no longer configures `serena` in `.vscode/mcp.json`, `.ai/engaku.json`, or agent tool lists. Serena requires Python 3.11+ and a separate `uv`-managed runtime which is incompatible with Engaku's Python >=3.8 promise and causes MCP spawn failures.
+- Removed `setup-serena` subcommand and `--skip-serena-setup` flag from `engaku init`.
+- Custom agent `model:` frontmatter is now rendered as a YAML string (e.g. `model: "Claude Sonnet 4.6 (copilot)"`) instead of an array, for compatibility with the stricter GitHub Copilot CLI validator.
+- Removed `selection` from generated and live agent tool lists: `selection` is not a recognized VS Code/Copilot tool and was causing schema validation warnings.
+- Coder agent description updated to `executes implementation tasks and updates task checkboxes` to reflect actual ownership boundaries.
+
 ## [1.1.9] - 2026-04-29
 
 ### Added

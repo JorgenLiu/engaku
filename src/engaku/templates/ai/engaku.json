@@ -6,10 +6,10 @@
     "scanner": "Claude Opus 4.6 (copilot)"
   },
   "mcp_tools": {
-    "coder": ["chrome-devtools/*", "context7/*", "dbhub/*", "serena/*"],
-    "planner": ["context7/*", "dbhub/*", "serena/*"],
-    "reviewer": ["chrome-devtools/*", "dbhub/*", "serena/*"],
-    "scanner": ["serena/*"]
+    "coder": ["chrome-devtools/*", "context7/*", "dbhub/*"],
+    "planner": ["context7/*", "dbhub/*"],
+    "reviewer": ["chrome-devtools/*", "dbhub/*"],
+    "scanner": []
   },
   "python": null
 }

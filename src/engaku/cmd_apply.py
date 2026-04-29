@@ -85,7 +85,7 @@ def _update_agent_model(agent_path, model):
     fm = content[4:close]       # YAML body — no trailing newline
     rest = content[close:]      # starts with \n---
 
-    model_line = "model: ['{}']".format(model)
+    model_line = 'model: "{}"'.format(model)
 
     if re.search(r"^model:", fm, re.MULTILINE):
         new_fm = re.sub(r"^model:.*$", model_line, fm, flags=re.MULTILINE)

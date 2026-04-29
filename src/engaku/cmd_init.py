@@ -28,7 +28,6 @@ Files created (never overwritten if they already exist):
             chrome-devtools/SKILL.md  (--no-mcp skips)
             context7/SKILL.md         (--no-mcp skips)
             database/SKILL.md         (--no-mcp skips)
-            serena/SKILL.md           (--no-mcp skips)
         instructions/
             lessons.instructions.md
             agent-boundaries.instructions.md
@@ -92,10 +91,10 @@ def _write_engaku_json(cwd, no_mcp, out):
     }
     if not no_mcp:
         data["mcp_tools"] = {
-            "coder": ["chrome-devtools/*", "context7/*", "dbhub/*", "serena/*"],
-            "planner": ["chrome-devtools/*", "context7/*", "dbhub/*", "serena/*"],
-            "reviewer": ["chrome-devtools/*", "dbhub/*", "serena/*"],
-            "scanner": ["serena/*"],
+            "coder": ["chrome-devtools/*", "context7/*", "dbhub/*"],
+            "planner": ["chrome-devtools/*", "context7/*", "dbhub/*"],
+            "reviewer": ["chrome-devtools/*", "dbhub/*"],
+            "scanner": [],
         }
     dst_dir = os.path.dirname(dst)
     if dst_dir and not os.path.isdir(dst_dir):
@@ -150,7 +149,7 @@ def _ensure_vscode_setting(cwd, key, value, out):
     out.append("[create]  {} ({} = {})".format(settings_path, key, json.dumps(value)))
 
 
-def run(cwd=None, no_mcp=False, skip_serena_setup=False):
+def run(cwd=None, no_mcp=False):
     if cwd is None:
         cwd = os.getcwd()
 
@@ -207,7 +206,7 @@ def run(cwd=None, no_mcp=False, skip_serena_setup=False):
     )
     # ── .github/skills/ (MCP-related, conditional) ────────────────────────────
     if not no_mcp:
-        for skill in ("chrome-devtools", "context7", "database", "serena"):
+        for skill in ("chrome-devtools", "context7", "database"):
             _copy_template(
                 os.path.join(tpl, "skills", skill, "SKILL.md"),
                 os.path.join(skills_dir, skill, "SKILL.md"),
@@ -250,11 +249,6 @@ def run(cwd=None, no_mcp=False, skip_serena_setup=False):
         cmd_apply.run(cwd)
     finally:
         sys.stdout = _orig_stdout
-
-    # ── Serena setup (MCP-only, non-blocking) ────────────────────────────────
-    if not no_mcp and not skip_serena_setup:
-        from engaku import cmd_setup_serena
-        cmd_setup_serena.run(cwd=cwd, called_from_init=True)
 
     return 0
 

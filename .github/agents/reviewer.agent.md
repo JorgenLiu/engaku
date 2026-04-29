@@ -1,8 +1,8 @@
 ---
 name: reviewer
-model: ['Claude Sonnet 4.6 (copilot)']
+model: "Claude Sonnet 4.6 (copilot)"
 user-invocable: true
-tools: ['read', 'search', 'execute', 'edit', 'chrome-devtools/*', 'dbhub/*', 'serena/*']
+tools: ['read', 'search', 'execute', 'edit', 'chrome-devtools/*', 'dbhub/*']
 description: >-
   Task verification agent. Verifies completed tasks against their
   acceptance criteria, updates task document status.

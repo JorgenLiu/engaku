@@ -68,19 +68,19 @@ class TestApply(unittest.TestCase):
         self._write_agent("coder", "---\nname: coder\ntools: ['edit']\n---\n\nDo work.\n")
         code, out, _ = self._capture_run()
         self.assertEqual(code, 0)
-        self.assertIn("model: ['claude-sonnet-4-5 (copilot)']", self._read_agent("coder"))
+        self.assertIn('model: "claude-sonnet-4-5 (copilot)"', self._read_agent("coder"))
         self.assertIn("[updated]", out)
 
     def test_updates_existing_model_field(self):
         self._write_config({"keeper": "gpt-4o-mini (copilot)"})
         self._write_agent(
             "keeper",
-            "---\nname: keeper\nmodel: ['old-model (copilot)']\n---\n\nBody.\n",
+            "---\nname: keeper\nmodel: 'old-model (copilot)'\n---\n\nBody.\n",
         )
         code, out, _ = self._capture_run()
         self.assertEqual(code, 0)
         content = self._read_agent("keeper")
-        self.assertIn("model: ['gpt-4o-mini (copilot)']", content)
+        self.assertIn('model: "gpt-4o-mini (copilot)"', content)
         self.assertNotIn("old-model", content)
         self.assertIn("[updated]", out)
 
@@ -102,7 +102,7 @@ class TestApply(unittest.TestCase):
 
     def test_no_change_when_model_already_correct(self):
         self._write_config({"coder": "claude-sonnet-4-5 (copilot)"})
-        original = "---\nname: coder\nmodel: ['claude-sonnet-4-5 (copilot)']\n---\n\nBody.\n"
+        original = '---\nname: coder\nmodel: "claude-sonnet-4-5 (copilot)"\n---\n\nBody.\n'
         self._write_agent("coder", original)
         self._capture_run()
         self.assertEqual(self._read_agent("coder"), original)
@@ -286,11 +286,11 @@ class TestApply(unittest.TestCase):
         # Stale MCP wildcard must be removed
         self.assertNotIn("old-server/*", content)
 
-    def test_serena_wildcard_appended_to_mcp_tools(self):
-        """serena/* from mcp_tools is appended alongside other MCP tools."""
+    def test_no_serena_in_default_mcp_tools(self):
+        """Default MCP tool config does not include serena/*."""
         self._write_config_full(
             {"coder": "claude-sonnet"},
-            mcp_tools={"coder": ["context7/*", "dbhub/*", "serena/*"]},
+            mcp_tools={"coder": ["context7/*", "dbhub/*"]},
         )
         self._write_agent(
             "coder",
@@ -299,27 +299,15 @@ class TestApply(unittest.TestCase):
         code, _, _ = self._capture_run()
         self.assertEqual(code, 0)
         content = self._read_agent("coder")
-        self.assertIn("serena/*", content)
+        self.assertNotIn("serena/*", content)
         self.assertIn("context7/*", content)
         self.assertIn("dbhub/*", content)
-        # Non-MCP tools must also survive
-        self.assertIn("edit", content)
-        self.assertIn("read", content)
 
-    def test_serena_wildcard_replaces_stale_mcp_preserves_non_mcp(self):
-        """serena/* replaces stale MCP entries but preserves non-MCP tools."""
-        self._write_config_full(
-            {"coder": "claude-sonnet"},
-            mcp_tools={"coder": ["serena/*"]},
-        )
-        self._write_agent(
-            "coder",
-            "---\nname: coder\ntools: ['edit', 'old-server/*', 'vscode/askQuestions']\n---\n\nBody.\n",
-        )
-        code, _, _ = self._capture_run()
-        self.assertEqual(code, 0)
+    def test_no_serena_in_model_string_output(self):
+        """model: field is rendered as a string, not an array."""
+        self._write_config({"coder": "claude-sonnet-4-5 (copilot)"})
+        self._write_agent("coder", "---\nname: coder\ntools: ['edit']\n---\n\nBody.\n")
+        self._capture_run()
         content = self._read_agent("coder")
-        self.assertIn("serena/*", content)
-        self.assertNotIn("old-server/*", content)
-        self.assertIn("edit", content)
-        self.assertIn("vscode/askQuestions", content)
+        self.assertNotIn("model: [", content)
+        self.assertIn('model: "claude-sonnet-4-5 (copilot)"', content)

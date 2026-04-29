@@ -42,13 +42,13 @@ After running `init`, VS Code Agent Hooks are active. The `@coder`, `@planner`, 
   skills/           — bundled skills (systematic-debugging, verification-before-completion, etc.)
 .vscode/
   settings.json     — enables VS Code custom agent hooks
-  mcp.json          — MCP server configuration (chrome-devtools, context7, dbhub, serena)
+  mcp.json          — MCP server configuration (chrome-devtools, context7, dbhub)
   dbhub.toml        — DBHub MCP guardrail/template config
 ```
 
 `engaku init --no-mcp` skips both `.vscode/mcp.json` and `.vscode/dbhub.toml`, along with the MCP-related skills.
 
-When MCP support is enabled, `engaku init` grants `chrome-devtools/*` to the planner agent by default (alongside `context7/*`, `dbhub/*`, and `serena/*`), so planner can run browser-backed research and verification before producing plans. `engaku update` does not modify an existing `.ai/engaku.json` — once written, your MCP tool allocations stay user-owned.
+When MCP support is enabled, `engaku init` grants `chrome-devtools/*` to the planner agent by default (alongside `context7/*` and `dbhub/*`), so planner can run browser-backed research and verification before producing plans. `engaku update` does not modify an existing `.ai/engaku.json` — once written, your MCP tool allocations stay user-owned.
 
 ## Subcommands
 
@@ -60,7 +60,6 @@ When MCP support is enabled, `engaku init` grants `chrome-devtools/*` to the pla
 | `task-review` | Detect completed task plans and emit handoff reminder (Stop hook) |
 | `apply` | Apply `.ai/engaku.json` model, MCP tool, and hook Python runtime config to `.github/agents/` frontmatter |
 | `update` | Sync generated agents and skills from bundled templates, merge MCP server additions, and apply `.ai/engaku.json` config |
-| `setup-serena` | Install Serena MCP server and run `serena init` in the current project |
 
 ## How it works
 
@@ -109,37 +108,9 @@ The instruction also defines per-request compactness controls (`[normal]`, `[lit
 
 Teams that want Caveman's exact compression modes can install it separately: `npx skills add JuliusBrussee/caveman -a github-copilot`. Engaku uses its own compact mode inspired by Caveman mechanics and does not copy upstream skill text. Use `caveman-compress` only for manually reviewed natural-language memory files — never on generated Engaku templates.
 
-## Serena MCP server
-
-`engaku init` configures [Serena](https://github.com/oraios/serena) as a default MCP server for symbol-level code navigation. Serena uses a language-server backend to provide semantic code search, symbol lookup, and reference finding — reducing broad file reads and saving input tokens.
-
-During `engaku init`, Serena setup runs automatically. To rerun it manually:
-
-```bash
-engaku setup-serena
-```
-
-For offline or no-network environments:
-
-```bash
-engaku init --skip-serena-setup
-```
-
-The setup installs Serena via `uv` using these steps:
-
-```bash
-python -m pip install uv
-uv tool install -p 3.13 serena-agent@latest --prerelease=allow
-serena init
-```
-
-Engaku may install `uv` and Serena as user-level tools. It does not install language-specific dependencies or user-level Serena hooks. Serena setup failure is a warning — it never blocks `engaku init`.
-
-Use `engaku init --no-mcp` to skip Serena setup, the Serena MCP server entry, and all other MCP configuration.
-
 ## MCP Servers
 
-`engaku init` creates `.vscode/mcp.json` with four preconfigured MCP servers that give VS Code Copilot structured tool access to browser automation, live library documentation, databases, and symbol-level code navigation. Use `engaku init --no-mcp` to skip this entirely.
+`engaku init` creates `.vscode/mcp.json` with three preconfigured MCP servers that give VS Code Copilot structured tool access to browser automation, live library documentation, and databases. Use `engaku init --no-mcp` to skip this entirely.
 
 `engaku update` adds any missing server entries to an existing `.vscode/mcp.json` without overwriting your customizations.
 
@@ -208,24 +179,6 @@ max_rows = 1000
 ```
 
 Edit `.vscode/dbhub.toml` to add more sources, enable writes, or change row limits. For inline `--dsn` without a TOML file (manual override), replace `--config …` and the `env` block with `"--dsn", "${input:db-dsn}"` directly in `.vscode/mcp.json`.
-
-### serena
-
-[github.com/oraios/serena](https://github.com/oraios/serena) — Symbol-level code navigation via a language-server backend. Provides semantic search, symbol lookup, reference finding, and definition inspection without reading whole files. Configured by `engaku setup-serena` (run automatically during `engaku init`).
-
-**Prerequisites:** `uv` and Python 3.13 (installed by `engaku setup-serena`). Run `engaku setup-serena` to install.
-
-```json
-{
-  "serena": {
-    "type": "stdio",
-    "command": "serena",
-    "args": ["start-mcp-server", "--context=vscode", "--project", "${workspaceFolder}"]
-  }
-}
-```
-
-`engaku setup-serena` updates `command` to the absolute executable path when discovered, to avoid PATH inheritance issues in VS Code.
 
 ## Optional MCP Servers
 

@@ -1,7 +1,7 @@
 ---
 name: coder
-description: Standard development task executor. Follows project rules and maintains knowledge after each task.
-tools: ['agent', 'edit', 'read', 'search', 'execute', 'selection', 'read/problems', 'search/changes', 'search/codebase', 'search/usages', 'vscode/askQuestions']
+description: Standard development task executor. Executes implementation tasks and updates task checkboxes.
+tools: ['agent', 'edit', 'read', 'search', 'execute', 'read/problems', 'search/changes', 'search/codebase', 'search/usages', 'vscode/askQuestions']
 hooks:
   Stop:
     - type: command
