@@ -19,13 +19,6 @@ When you encounter an environment error, command failure, or repeated mistake, a
 - Zero third-party dependencies. stdlib only.
 - All user-facing strings in English.
 
-## Token Budget Principle
-- Answer in English by default. Use another language only when the user explicitly requests it.
-- Preserve technical substance — code, paths, commands, exact error text, decisions.
-- Remove filler: restated tasks, repeated summaries, hedging, mood-setting, long unrequested explanations.
-- Default to concise progress updates and concise final answers; expand only when asked or when risk demands it.
-- Prefer Serena/symbol tools over broad file reads when available; bound search and tool output. See the `token-budget` and `serena` skills.
-
 ## Project Constraints
 - Distribution: `pip install engaku` (PyPI) or `pip install git+https://github.com/JorgenLiu/engaku.git` (from source).
 - `cmd_*.py` modules each have a `run()` + `main()` entry point; `cli.py` routes subcommands via lazy import.

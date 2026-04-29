@@ -108,9 +108,3 @@ Conclusion: the targeted tests pass.
 ## Bottom Line
 
 Run the command. Read the output. Then make the claim.
-
-## Token Budget
-
-- Answer in English by default; switch language only when explicitly requested.
-- Report the exact command, exit code, and observed output; do not paraphrase verification evidence.
-- Skip narration beyond the verdict; PASS/FAIL with evidence is the whole report.

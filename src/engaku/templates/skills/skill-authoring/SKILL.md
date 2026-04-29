@@ -116,11 +116,6 @@ Body structure suggestion:
 4. Output format and location.
 5. Escalation note pointing to a larger primitive if the situation outgrows
    the skill.
-6. **Token Budget section** — every generated skill MUST include a compact
-   `## Token Budget` section requiring English-by-default professional brevity
-   and bounded-context guidance tailored to the skill's workflow (for example:
-   bounded queries for context-heavy skills; concise summaries for output-heavy
-   skills).
 
 ---
 
@@ -136,7 +131,6 @@ Before declaring the skill ready, confirm every item:
 - [ ] No instruction relies on memory from a previous run.
 - [ ] All referenced files use relative paths.
 - [ ] No third-party tools required unless explicitly listed.
-- [ ] Generated skill includes a `## Token Budget` section with English-by-default professional brevity and bounded-context guidance — missing this is a validation failure.
 
 ---
 
@@ -159,9 +153,3 @@ Convert the skill into a custom agent only when one of these is true:
 
 Otherwise keep it as a skill — skills are cheaper to maintain and easier to
 combine with other primitives.
-
-## Token Budget
-
-- Author skills in English by default; switch language only when explicitly requested.
-- Keep SKILL.md compact: phases and exit criteria, not narrative.
-- Every generated skill must include its own compact `## Token Budget` section with English-by-default professional brevity and bounded-context guidance.

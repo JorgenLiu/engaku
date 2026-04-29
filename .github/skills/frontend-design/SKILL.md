@@ -74,9 +74,3 @@ Use this skill to turn frontend requests into real, working UI with a deliberate
 - Keep implementation aligned with the project's framework and conventions.
 - If editing an existing UI, preserve its functional behavior unless the task requires behavioral changes.
 - Briefly state the chosen visual direction when it helps explain the implementation.
-
-## Token Budget
-
-- Answer in English by default; switch language only when explicitly requested.
-- State visual direction in one or two sentences; do not enumerate every option when a clear pick fits.
-- Cut filler before code; let the implementation carry the detail.

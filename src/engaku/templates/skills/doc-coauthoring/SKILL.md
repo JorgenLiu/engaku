@@ -112,9 +112,3 @@ Before declaring the document complete, test it from the reader's perspective.
 - **Over-polishing prose before structure is agreed.** Beautiful sentences in the wrong structure waste effort.
 - **Ignoring the audience.** A document for the team reads differently than one for leadership.
 - **Hiding uncertainty.** If something is unclear, say so. An honest "open question" is better than a confident wrong statement.
-
-## Token Budget
-
-- Draft documents in English by default; switch language only when explicitly requested.
-- Keep sections compact; remove repeated framing and restated context across revisions.
-- Preserve decisions, constraints, and open questions verbatim; cut hedging and mood-setting prose.

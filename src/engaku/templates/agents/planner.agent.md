@@ -163,10 +163,3 @@ the related task plan_id at the top.
 - **Terminal for observation** — gather info, never modify state.
 - **Verify before asserting** — when a design decision depends on external tool behaviour, API semantics, or platform capabilities (VS Code, GitHub, npm, etc.), fetch the relevant documentation or source code first. Do not rely on memory for facts about external systems.
 
-## Token Budget Principle
-
-- Answer in English by default. Switch language only when the user explicitly requests it.
-- Preserve substance: file paths, exact commands, decision rationale.
-- Keep analysis and proposals compact; remove restated context, hedging, and unrequested elaboration.
-- Prefer Serena/symbol tools when exploring code before broad file reads; bound search and tool output. See the `serena` and `token-budget` skills.
-

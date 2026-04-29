@@ -44,9 +44,3 @@ Proactive initiative does not mean refactoring everything you touch.
 - Confirmation that the primary fix is verified.
 - Brief report on sweep results: similar patterns found (and fixed) or none found.
 - List of any out-of-scope issues discovered, noted for follow-up.
-
-## Token Budget
-
-- Answer in English by default; switch language only when explicitly requested.
-- Sweep with bounded queries; do not re-read whole modules when a targeted grep answers the question.
-- Report only similar patterns and out-of-scope notes; skip the full investigation log.

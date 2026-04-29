@@ -83,10 +83,3 @@ Report format per task (extract task number and title from the task document's
 - **English commit messages only.** Commit messages must be in English. If
   the task title is not in English, translate or summarize it into a concise
   English phrase before committing.
-
-## Token Budget Principle
-
-- Answer in English by default. Switch language only when the user explicitly requests it.
-- Preserve verification evidence verbatim: command, full output, exit code.
-- Keep PASS/FAIL reports terse; do not narrate beyond what the verdict needs.
-- Prefer Serena/symbol tools when locating verification targets; bound search and tool output. See the `serena` and `token-budget` skills.

@@ -35,11 +35,3 @@ Execute the user's development task.
 **Before responding that work is done** (applies to every session where you edited source files):
 
 1. **Update project-level files** (`.ai/overview.md`) if the changes affect architecture or constraints. Do NOT modify `.ai/decisions/` or change the `status:` field or structure of `.ai/tasks/` files — `status:` is @reviewer's responsibility; task structure is @planner's responsibility. You MAY tick completed task checkboxes `[ ]` → `[x]` as you finish each step.
-
-## Token Budget Principle
-
-- Answer in English by default. Switch language only when the user explicitly requests it.
-- Preserve substance: code, paths, commands, exact error text, verification output.
-- Drop filler: restated tasks, repeated summaries, hedging, mood-setting, long unrequested explanations.
-- Default to concise progress updates and concise final responses; expand only on request or when risk demands it.
-- Prefer Serena/symbol tools over broad file reads when available; bound search and tool output. See the `serena` and `token-budget` skills.

@@ -31,11 +31,11 @@ EXPECTED_FILES = [
     os.path.join(".github", "skills", "database", "SKILL.md"),
     os.path.join(".github", "skills", "karpathy-guidelines", "SKILL.md"),
     os.path.join(".github", "skills", "skill-authoring", "SKILL.md"),
-    os.path.join(".github", "skills", "token-budget", "SKILL.md"),
     os.path.join(".github", "skills", "serena", "SKILL.md"),
     os.path.join(".github", "copilot-instructions.md"),
     os.path.join(".github", "instructions", "lessons.instructions.md"),
     os.path.join(".github", "instructions", "agent-boundaries.instructions.md"),
+    os.path.join(".github", "instructions", "token-budget.instructions.md"),
     os.path.join(".vscode", "mcp.json"),
     os.path.join(".vscode", "dbhub.toml"),
 ]
@@ -167,6 +167,32 @@ class TestInit(unittest.TestCase):
         with open(path) as f:
             self.assertEqual(f.read(), "custom boundaries")
 
+    def test_creates_token_budget_instructions(self):
+        """engaku init creates token-budget.instructions.md."""
+        _git_init(self.tmpdir)
+        self._capture_run()
+        path = os.path.join(
+            self.tmpdir, ".github", "instructions", "token-budget.instructions.md"
+        )
+        self.assertTrue(os.path.exists(path), "token-budget.instructions.md not created")
+        with open(path) as f:
+            content = f.read()
+        self.assertIn('applyTo: "**"', content)
+        self.assertIn("Compact mode", content)
+
+    def test_token_budget_instructions_preserved(self):
+        """engaku init preserves existing token-budget.instructions.md."""
+        _git_init(self.tmpdir)
+        path = os.path.join(
+            self.tmpdir, ".github", "instructions", "token-budget.instructions.md"
+        )
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w") as f:
+            f.write("custom token rules")
+        self._capture_run()
+        with open(path) as f:
+            self.assertEqual(f.read(), "custom token rules")
+
     def test_package_data_includes_toml_templates(self):
         """DBHub TOML template is included in package-data inputs."""
         root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -221,7 +247,9 @@ class TestInit(unittest.TestCase):
         sa_path = os.path.join(self.tmpdir, ".github", "skills", "skill-authoring", "SKILL.md")
         self.assertTrue(os.path.exists(sa_path), "skill-authoring should exist with --no-mcp")
         tb_path = os.path.join(self.tmpdir, ".github", "skills", "token-budget", "SKILL.md")
-        self.assertTrue(os.path.exists(tb_path), "token-budget should exist with --no-mcp")
+        self.assertFalse(os.path.exists(tb_path), "token-budget skill should not be generated")
+        tb_instruction_path = os.path.join(self.tmpdir, ".github", "instructions", "token-budget.instructions.md")
+        self.assertTrue(os.path.exists(tb_instruction_path), "token-budget instruction should exist with --no-mcp")
 
     def test_mcp_json_is_valid(self):
         """engaku init creates a valid mcp.json with all expected servers."""

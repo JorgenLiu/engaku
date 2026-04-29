@@ -25,7 +25,6 @@ Files created (never overwritten if they already exist):
             brainstorming/SKILL.md
             karpathy-guidelines/SKILL.md
             skill-authoring/SKILL.md
-            token-budget/SKILL.md
             chrome-devtools/SKILL.md  (--no-mcp skips)
             context7/SKILL.md         (--no-mcp skips)
             database/SKILL.md         (--no-mcp skips)
@@ -33,6 +32,7 @@ Files created (never overwritten if they already exist):
         instructions/
             lessons.instructions.md
             agent-boundaries.instructions.md
+            token-budget.instructions.md
         copilot-instructions.md
     .vscode/
         settings.json
@@ -183,7 +183,7 @@ def run(cwd=None, no_mcp=False, skip_serena_setup=False):
 
     # ── .github/skills/ ──────────────────────────────────────────────────────
     skills_dir = os.path.join(cwd, ".github", "skills")
-    for skill in ("systematic-debugging", "verification-before-completion", "frontend-design", "proactive-initiative", "mcp-builder", "doc-coauthoring", "brainstorming", "karpathy-guidelines", "skill-authoring", "token-budget"):
+    for skill in ("systematic-debugging", "verification-before-completion", "frontend-design", "proactive-initiative", "mcp-builder", "doc-coauthoring", "brainstorming", "karpathy-guidelines", "skill-authoring"):
         _copy_template(
             os.path.join(tpl, "skills", skill, "SKILL.md"),
             os.path.join(skills_dir, skill, "SKILL.md"),
@@ -192,7 +192,7 @@ def run(cwd=None, no_mcp=False, skip_serena_setup=False):
 
     # ── .github/instructions/ ─────────────────────────────────────────────────
     instructions_dir = os.path.join(cwd, ".github", "instructions")
-    for name in ("lessons.instructions.md", "agent-boundaries.instructions.md"):
+    for name in ("lessons.instructions.md", "agent-boundaries.instructions.md", "token-budget.instructions.md"):
         _copy_template(
             os.path.join(tpl, "instructions", name),
             os.path.join(instructions_dir, name),

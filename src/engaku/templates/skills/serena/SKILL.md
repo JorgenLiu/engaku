@@ -71,11 +71,3 @@ If Serena tools are unavailable in this session:
    - run `engaku setup-serena`, or
    - install manually per section 2 and restart VS Code.
 3. Do not block the task on Serena availability.
-
-## 5. Token-budget alignment
-
-Serena exists to support the rules in the `token-budget` skill:
-
-- context map first → use Serena to confirm the right symbol before reading
-- bounded reads → fetch the symbol, not the whole file
-- English-by-default professional brevity in any summary the agent emits

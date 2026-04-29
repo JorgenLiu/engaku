@@ -103,11 +103,11 @@ If the default `engaku` command is already broken, run the interpreter directly 
 
 ## Token budget
 
-Engaku-generated agents follow English-by-default professional brevity: preserve technical substance (code, paths, commands, exact error text, decisions, and verification results), but remove filler, repeated summaries, throat-clearing, avoidable hedging, and long explanations unless the user asks. Chinese or other languages are allowed only when explicitly requested.
+Engaku handles compact token budgeting through `.github/instructions/token-budget.instructions.md`, an always-on generated instruction. Compact mode is active by default: preserve technical substance (code, paths, commands, exact error text, decisions, and verification results), but remove filler, repeated summaries, throat-clearing, avoidable hedging, and long explanations unless the user asks. Chinese or other languages are allowed only when explicitly requested.
 
-The bundled `token-budget` skill documents the full workflow: build a context map first, prefer Serena/symbol tools before broad file reads, bound tool output, use narrow Context7 queries, and prefer concise progress updates.
+The instruction also defines per-request compactness controls (`[normal]`, `[lite]`, `[full]`) and keeps clarity exceptions for safety warnings, destructive-action confirmations, ordered instructions, and ambiguity-resolving clarifications.
 
-Teams that want Caveman's exact compression modes can install it separately: `npx skills add JuliusBrussee/caveman -a github-copilot`. Engaku does not copy Caveman's branded voice; it follows the same substance-preserving brevity principle. Use `caveman-compress` only for manually reviewed natural-language memory files — never on generated Engaku templates.
+Teams that want Caveman's exact compression modes can install it separately: `npx skills add JuliusBrussee/caveman -a github-copilot`. Engaku uses its own compact mode inspired by Caveman mechanics and does not copy upstream skill text. Use `caveman-compress` only for manually reviewed natural-language memory files — never on generated Engaku templates.
 
 ## Serena MCP server
 
