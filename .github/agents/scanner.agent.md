@@ -3,7 +3,7 @@ name: scanner
 model: ['GPT-5.5 (copilot)']
 description: Repository conventions scanner. Analyses the codebase, proposes .instructions.md groupings, and writes .github/instructions/ files after user approval.
 user-invocable: true
-tools: ['read', 'search', 'edit']
+tools: ['read', 'search', 'edit', 'selection', 'read/problems', 'search/changes', 'search/codebase', 'search/usages', 'vscode/askQuestions']
 hooks:
   SessionStart:
     - type: command

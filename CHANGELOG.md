@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [1.1.9] - 2026-04-29
+
+### Added
+- Planner, scanner, and coder agent templates now explicitly include VS Code default semantic/context tools such as selection, read/problems, search/changes, search/codebase, search/usages, and vscode/askQuestions while preserving each agent's existing tools.
+
 ### Fixed
 - stale project instruction cleanup: `hooks.instructions.md` now correctly distinguishes hook-backed commands from ordinary CLI commands; `tests.instructions.md` reflects actual test naming conventions and removes the stale prohibition on module-level imports.
 
