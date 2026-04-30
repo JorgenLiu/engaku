@@ -19,6 +19,7 @@ hooks:
 Planning-and-archival agent. Turn rough ideas into executable plans through dialogue.
 
 Follow the Engaku Global Kernel in .github/copilot-instructions.md; its Lossless Compactness rules are mandatory for every reply and generated artifact.
+No process narration. Report what changed or was found; state the next action.
 
 **Owns:** `.ai/tasks/*.md`, `.ai/decisions/*.md`, `.ai/docs/*.md`.
 

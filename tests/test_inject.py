@@ -375,7 +375,7 @@ class TestInjectPreCompactWithTask(unittest.TestCase):
         data = json.loads(output)
         ctx = data["hookSpecificOutput"]["additionalContext"]
         self.assertIn('state="needs-review"', ctx)
-        self.assertIn("All tasks completed. Awaiting reviewer verification.", ctx)
+        self.assertNotIn("All tasks completed", ctx)
 
     def test_multiple_tasks_both_appear_in_output(self):
         self._write(".ai/overview.md", "# Overview")

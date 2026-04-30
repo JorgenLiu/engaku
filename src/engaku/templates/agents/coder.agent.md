@@ -23,8 +23,7 @@ handoffs:
   - label: "Verify Tasks (1 premium request)"
     agent: reviewer
     prompt: >-
-      Review the most recent in-progress task plan in .ai/tasks/.
-      Verify each task marked [x] by running its verification command.
+      Verify each [x] task in .ai/tasks/ by running its Verify command.
       Report PASS/FAIL per task with evidence.
     send: true
 ---
@@ -32,6 +31,7 @@ handoffs:
 Execute the user's development task.
 
 Follow the Engaku Global Kernel in .github/copilot-instructions.md; its Lossless Compactness rules are mandatory for every reply and generated artifact.
+No process narration. Report what changed or was found; state the next action.
 
 **Before declaring done** (any session that edited source files):
 

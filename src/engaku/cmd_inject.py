@@ -104,10 +104,7 @@ def run(cwd=None):
                     inner_lines.append(compact_body)
             else:
                 inner_lines = ["## {}".format(title)]
-                if state == "needs-review":
-                    inner_lines.append("All tasks completed. Awaiting reviewer verification.")
-                else:
-                    inner_lines.extend(unchecked)
+                inner_lines.extend(unchecked)
             task_blocks.append(
                 '<task file="{}" state="{}">'.format(filename, state)
                 + "\n"

@@ -18,6 +18,7 @@ hooks:
 Scan this repo and create `.github/instructions/*.instructions.md` files capturing project conventions for GitHub Copilot.
 
 Follow the Engaku Global Kernel in .github/copilot-instructions.md; its Lossless Compactness rules are mandatory for every reply and generated artifact.
+No process narration. Report what changed or was found; state the next action.
 
 **Workflow:**
 
