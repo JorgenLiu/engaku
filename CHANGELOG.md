@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [1.1.12] - 2026-04-30
+
+### Changed
+- `SessionStart`, `PreCompact`, and `SubagentStart` inject hooks now emit a short compactness reminder even when no project overview or active task exists, anchoring resumed, compacted, and delegated contexts on latest-user-request priority, Lossless Compactness, exact evidence, and concise tool preambles. Existing output shape is preserved.
+
 ## [1.1.11] - 2026-04-30
 
 ### Changed
