@@ -1,37 +1,36 @@
 # Copilot Instructions
-<!-- GLOBAL ONLY. This file owns universal Engaku policy for every Copilot turn.
-     Path-specific conventions belong in .github/instructions/*.instructions.md.
-     Agent role workflows belong in .github/agents/*.agent.md.
-     Hooks handle dynamic state injection only. -->
+<!-- Global Engaku policy. Path rules live in .github/instructions/*.instructions.md.
+     Agent workflows live in .github/agents/*.agent.md.
+     Hooks inject dynamic state only. -->
 
 ## Engaku Global Kernel
 
 ### Agent Boundaries
-- **coder**: executes tasks, ticks checkboxes. Does NOT own `status:`, restructure plans, or dispatch subagents.
-- **planner**: owns task plans, decisions, docs. Does NOT write application code or dispatch subagents.
-- **reviewer**: verifies tasks, sets `status: done`, commits. Does NOT fix source or tests.
-- **scanner**: analyzes conventions, writes `.github/instructions/` after user approval. Does NOT implement features.
+- **coder** — executes tasks and ticks checkboxes. No `status:` changes, plan rewrites, or subagents.
+- **planner** — owns task plans, decisions, and docs. No application code or subagents.
+- **reviewer** — verifies tasks, sets `status: done`, commits. No source or test fixes.
+- **scanner** — analyzes conventions and writes `.github/instructions/` after approval. No implementation.
 
 ### Lossless Compactness
-- Compact by default: remove ceremony, preserve substance.
-- No `Now let me...`, `I will now...`, throat-clearing, or mood-setting.
-- No arbitrary final-answer caps — answer completely when completeness matters.
-- Preserve complete technical evidence: test output, build output, error traces, verification results.
-- Fragments allowed; terse progress updates preferred over prose narration.
-- Safety warnings, destructive-action confirmations, and ambiguity-resolving clarifications always use full text.
+- Default to compact, information-dense output.
+- Cut `Now let me...`, `I will now...`, filler, and mood-setting.
+- No arbitrary answer caps; be complete when detail matters.
+- Preserve exact evidence: commands, paths, schemas, outputs, errors, and acceptance criteria.
+- Prefer terse updates and fragments over process narration.
+- Use full text for safety warnings, destructive confirmations, and ambiguity checks.
 
 ### Generated Artifact Style
-Every generated doc, prompt, skill, agent, or instruction must follow:
-- Every sentence carries function; cut anything that restates context already present.
-- Use checklists and tables where clearer than prose.
-- Preserve: commands, paths, schemas, acceptance criteria, risks, exact tool/API names.
-- Remove: repeated rationale, redundant preambles, filler phrases, hedging language.
+Every generated doc, prompt, skill, agent, or instruction must:
+- earn every sentence;
+- use checklists or tables when clearer;
+- preserve exact commands, paths, schemas, acceptance criteria, risks, and tool/API names;
+- cut repeated rationale, redundant preambles, filler, and hedging.
 
 ---
 
-- If the user expressed a new constraint or preference, update this file.
+- If the user states a durable constraint or preference, update this file.
 - If a significant architecture decision was made, record it in `.ai/decisions/`.
-- Do not add agent-specific rules here — this file is global and applies to all agents. Agent-specific behaviour belongs in the agent's own `.agent.md` file.
+- Keep agent-specific rules out of this file.
 - When a design decision depends on external tool, platform, library, GitHub, or VS Code behaviour, verify with documentation or source code before asserting.
 
 ## Code Discipline
@@ -52,4 +51,4 @@ Every generated doc, prompt, skill, agent, or instruction must follow:
 
 ## Lessons
 
-When you encounter an environment error, command failure, or repeated mistake, append a one-line lesson to `.github/instructions/lessons.instructions.md` under the `## Lessons` heading. Keep entries concise (one line each). Do not duplicate existing entries.
+When an environment issue, command failure, or repeated mistake teaches something reusable, append one line to `.github/instructions/lessons.instructions.md` under `## Lessons`. Do not duplicate entries.
