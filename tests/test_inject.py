@@ -47,11 +47,16 @@ class TestInject(unittest.TestCase):
         self.assertIn("</project-context>", ctx)
         self.assertIn("This is a test project.", ctx)
 
-    def test_no_files_produces_empty_context(self):
+    def test_no_files_produces_compactness_reminder(self):
         code, output = self._capture_run()
         self.assertEqual(code, 0)
         data = json.loads(output)
-        self.assertEqual(data["hookSpecificOutput"]["additionalContext"], "")
+        ctx = data["hookSpecificOutput"]["additionalContext"]
+        self.assertNotEqual(ctx, "")
+        self.assertIn("latest request", ctx.lower())
+        self.assertIn("Lossless Compactness", ctx)
+        self.assertIn("exact evidence", ctx)
+        self.assertIn("concise tool preamble", ctx)
 
     def test_output_is_valid_json(self):
         self._write(".ai/overview.md", "# Overview")
@@ -86,11 +91,16 @@ class TestInject(unittest.TestCase):
         self.assertIn("This is a test project.", data["systemMessage"])
         self.assertIn("<project-context>", data["systemMessage"])
 
-    def test_precompact_empty_files_outputs_empty_system_message(self):
+    def test_precompact_empty_files_outputs_compactness_reminder(self):
         code, output = self._capture_run_with_stdin({"hookEventName": "PreCompact"})
         self.assertEqual(code, 0)
         data = json.loads(output)
-        self.assertEqual(data["systemMessage"], "")
+        msg = data["systemMessage"]
+        self.assertNotEqual(msg, "")
+        self.assertIn("latest request", msg.lower())
+        self.assertIn("Lossless Compactness", msg)
+        self.assertIn("exact evidence", msg)
+        self.assertIn("concise tool preamble", msg)
 
     def test_session_start_event_uses_hook_specific_output(self):
         self._write(".ai/overview.md", "# Overview")
@@ -114,6 +124,17 @@ class TestInject(unittest.TestCase):
             "Reviewer context test.",
             data["hookSpecificOutput"]["additionalContext"],
         )
+
+    def test_subagent_start_empty_files_has_compactness_reminder(self):
+        code, output = self._capture_run_with_stdin({"hookEventName": "SubagentStart"})
+        self.assertEqual(code, 0)
+        data = json.loads(output)
+        ctx = data["hookSpecificOutput"]["additionalContext"]
+        self.assertNotEqual(ctx, "")
+        self.assertIn("latest request", ctx.lower())
+        self.assertIn("Lossless Compactness", ctx)
+        self.assertIn("exact evidence", ctx)
+        self.assertIn("concise tool preamble", ctx)
 
     def test_unknown_event_defaults_to_session_start_format(self):
         self._write(".ai/overview.md", "# Overview")

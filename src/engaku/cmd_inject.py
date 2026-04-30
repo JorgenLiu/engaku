@@ -6,6 +6,15 @@ import sys
 from engaku.utils import parse_frontmatter, read_hook_input
 
 
+COMPACTNESS_REMINDER = (
+    "## Copilot Compactness Rules\n"
+    "- Latest request wins after interruption or resumption; discard stale intent.\n"
+    "- Apply Lossless Compactness: cut filler, mood-setting, and process narration.\n"
+    "- Preserve exact evidence: commands, paths, schemas, outputs, errors, and acceptance criteria.\n"
+    "- Send one concise tool preamble; report only delta and next action after read-only context batches."
+)
+
+
 def _find_active_tasks(cwd):
     """Scan .ai/tasks/*.md for all files with status: in-progress.
 
@@ -78,6 +87,7 @@ def run(cwd=None):
     hook_input = read_hook_input()
     event = hook_input.get("hookEventName", "SessionStart")
 
+    effective_events = ("SessionStart", "PreCompact", "SubagentStart")
     context_parts = []
 
     if os.path.isfile(overview_path):
@@ -90,6 +100,8 @@ def run(cwd=None):
     project_context = "<project-context>\n{}\n</project-context>".format(inner) if inner else ""
 
     parts = []
+    if event in effective_events:
+        parts.append(COMPACTNESS_REMINDER)
     if project_context:
         parts.append(project_context)
 
