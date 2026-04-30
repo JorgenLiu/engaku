@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.1.11] - 2026-04-30
+
+### Changed
+- Global Engaku policy (agent boundaries, lossless compactness, generated artifact style) moved from the generated token-budget instruction into `.github/copilot-instructions.md` as an always-on Engaku Global Kernel. Hooks inject dynamic state only; `.github/instructions/` remains path-specific.
+- Generated token-budget instruction retired; `engaku init` and `engaku update` no longer create it.
+- All bundled agent templates, instruction stubs, and skills rewritten with lossless compactness (shorter without losing commands, paths, verification rules, or safety gates).
+
 ## [1.1.10] - 2026-04-29
 
 ### Changed

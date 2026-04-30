@@ -1,6 +1,8 @@
 ---
 applyTo: "src/engaku/templates/**"
 ---
-Template file conventions for the engaku project.
+# Templates
 
-Files under `src/engaku/templates/` are copied verbatim to target repos by `engaku init`. When updating any template agent or hook file, always update BOTH the template version (`src/engaku/templates/`) AND the live version (`.github/`) in the same operation — never update one without the other. Template stubs should be generic enough to apply to any project; project-specific conventions belong in the actual `.github/instructions/` files inside each target repo after init.
+Files under `src/engaku/templates/` are copied verbatim by `engaku init`. When updating any template agent or hook file, update BOTH the template (`src/engaku/templates/`) AND the live version (`.github/`) in the same operation — never one without the other.
+
+Template stubs must be generic enough for any project. Project-specific conventions belong in each target repo's `.github/instructions/` after init.

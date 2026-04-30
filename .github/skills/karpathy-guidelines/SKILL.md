@@ -8,68 +8,61 @@ disable-model-invocation: false
 
 # Karpathy's Coding Principles
 
-Four principles distilled from Andrej Karpathy's observations on high-quality
-engineering. Apply them at the start of every non-trivial coding task.
+Four principles for high-quality engineering. Apply at the start of every non-trivial coding task.
 
 ---
 
 ## 1. Think Before Coding
 
-Plan before you write a single line. Understand the problem fully.
+Plan before typing. Understand the problem fully.
 
-- Re-read the spec, task, or error message carefully.
-- Clarify ambiguities before touching code, not after.
+- Re-read the spec/task/error message carefully.
+- Clarify ambiguities before touching code.
 - Identify the minimal change that satisfies the requirement.
-- Write pseudo-code or a brief plan when the logic is non-trivial.
-- **Do not type until you know what success looks like.**
+- Pseudo-code or brief plan for non-trivial logic.
+- **Don't type until you know what success looks like.**
 
-> For full design-before-build workflow, invoke the `brainstorming` skill.
+> Full design-before-build workflow → invoke `brainstorming` skill.
 
 ---
 
 ## 2. Simplicity First
 
-The best code is the code you did not write.
+The best code is the code you didn't write.
 
-- Prefer fewer lines over more lines.
-- Prefer standard library over new dependency.
-- Prefer readable names over clever tricks.
+- Fewer lines over more.
+- Standard library over a new dependency.
+- Readable names over clever tricks.
 - Remove code when the feature can be dropped without loss.
-- When two approaches work equally well, choose the one your team will understand
-  without a comment.
+- Equal options → choose what your team understands without a comment.
 - **Ask: "What is the simplest thing that could possibly work?"**
 
 ---
 
 ## 3. Surgical Changes
 
-Touch only what the task requires. Leave the rest alone.
+Touch only what the task requires.
 
-- Match the style and idioms of surrounding code exactly.
-- Do not refactor, rename, or reformat files outside the task scope.
-- Do not add features, tests, or error handling that were not asked for.
-- One logical change per commit. Do not bundle unrelated fixes.
-- If you notice something that should be improved but is out of scope, file a
-  note (comment, issue, or task) rather than fixing it now.
-- **Before saving: diff your changes and question every line that is not
-  directly required.**
+- Match the surrounding code's style and idioms exactly.
+- No refactor/rename/reformat outside scope.
+- No features/tests/error-handling that weren't asked for.
+- One logical change per commit; no bundled unrelated fixes.
+- Out-of-scope improvement → file a note (comment/issue/task), don't fix now.
+- **Before saving: diff your changes; question every line not directly required.**
 
 ---
 
 ## 4. Goal-Driven Execution
 
-Every change must be verifiable against its stated goal.
+Every change must be verifiable against its goal.
 
 - Identify the acceptance criterion before writing code.
-- Run the verification command from the task spec — do not assume it passes.
-- If no verification command exists, define one before you start.
-- Do not declare done until you have observed the expected output yourself.
+- Run the verification command from the task spec — don't assume it passes.
+- No verification command? Define one before starting.
+- Don't declare done until you've observed the expected output.
 
-> For the full verification-before-completion protocol, invoke the
-> `verification-before-completion` skill.
+> Full verification protocol → invoke `verification-before-completion` skill.
 
 ---
 
-*Adapted from [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills)
-(MIT, Copyright © Forrest Chang), itself derived from
-[Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876).*
+*Adapted from [forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills) (MIT, © Forrest Chang), derived from [Andrej Karpathy's observations](https://x.com/karpathy/status/2015883857489522876).*

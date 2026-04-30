@@ -16,31 +16,27 @@ Do not declare a task done without checking for related impacts.
 
 ## Post-Completion Checklist
 
-After completing any task, work through this list before claiming done:
-
-1. **Has the fix been verified with evidence?** Run the test or command. Do not rely on a prior run.
-2. **Are there similar issues in the same file or module?** Scan for the same pattern in the surrounding code.
-3. **Are upstream or downstream dependencies affected?** Check callers and callees of the changed code.
-4. **Are there uncovered edge cases?** Consider boundary values, empty inputs, error paths, and concurrent access.
-5. **Should any documentation or tests be updated?** If behavior changed, check whether existing tests or docs still accurately describe the system.
+1. **Fix verified with evidence?** Run the test/command. Don't trust prior runs.
+2. **Similar issues nearby?** Scan the same file/module for the pattern.
+3. **Upstream/downstream affected?** Check callers and callees.
+4. **Edge cases?** Boundary values, empty inputs, error paths, concurrency.
+5. **Docs/tests need updating?** Verify they still describe the system accurately.
 
 ## Scope Expansion Rule
 
-Fix one bug, check the category. If you find a pattern, address the pattern — not just the instance.
+Fix one bug, check the category. If you find a pattern, address the pattern.
 
-Example: if you fix a missing null check in one function, scan the same module for other call sites with the same risk. Fix those too if they are within scope.
+Example: missing null check fixed in one function → scan the module for other call sites with the same risk; fix those if in scope.
 
 ## When NOT to Expand
 
-Proactive initiative does not mean refactoring everything you touch.
+- No refactoring code unrelated to the task.
+- No new features while fixing bugs.
+- No architectural restructuring while addressing a single defect.
+- Stay within original scope. Out-of-scope findings → file a new task, don't silently expand.
 
-- Do not refactor code unrelated to the current task.
-- Do not add new features while fixing bugs.
-- Do not restructure architecture while addressing a single defect.
-- Stay within the original task scope. If sweep reveals issues outside scope, file a new task instead of silently expanding.
+## Output
 
-## Expected Output
-
-- Confirmation that the primary fix is verified.
-- Brief report on sweep results: similar patterns found (and fixed) or none found.
-- List of any out-of-scope issues discovered, noted for follow-up.
+- Confirmation primary fix is verified.
+- Brief sweep report: similar patterns found (and fixed) or none.
+- Out-of-scope findings noted for follow-up.

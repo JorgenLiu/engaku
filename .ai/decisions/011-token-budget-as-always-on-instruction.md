@@ -1,7 +1,7 @@
 ---
 id: 011
 title: Token budget as always-on instruction
-status: accepted
+status: superseded
 date: 2026-04-29
 related_task: 2026-04-29-token-budget-instruction-redesign
 ---

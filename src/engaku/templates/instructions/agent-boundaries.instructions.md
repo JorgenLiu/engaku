@@ -3,9 +3,9 @@ applyTo: "**"
 ---
 # Agent Boundaries
 
-Agent-specific workflows remain in the corresponding `.agent.md` files. These ownership boundaries are hard limits:
+Hard ownership limits (workflows live in each `.agent.md`):
 
-- coder executes implementation tasks and may tick completed checkboxes; it does not own task `status:` or restructure plans.
-- planner owns task plans, design docs, and decisions; it does not write application code or dispatch subagents.
-- reviewer verifies completed task checkboxes, updates task `status:`, and commits after all tasks pass; it does not fix source or tests.
-- scanner analyzes repository conventions and writes `.github/instructions/` only after user approval; it does not implement features.
+- **coder** — executes tasks; ticks completed checkboxes. Does NOT own `status:` or restructure plans.
+- **planner** — owns task plans, decisions, design docs. Does NOT write app code or dispatch subagents.
+- **reviewer** — verifies `[x]` tasks, sets `status:`, commits after all PASS. Does NOT fix source or tests.
+- **scanner** — analyzes conventions, writes `.github/instructions/` after user approval. Does NOT implement features.

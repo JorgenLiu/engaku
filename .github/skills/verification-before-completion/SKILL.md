@@ -8,94 +8,62 @@ disable-model-invocation: false
 
 # Verification Before Completion
 
-Use this skill whenever you are about to say that work is done, fixed, passing, or ready.
+Apply before saying work is done, fixed, passing, or ready.
 
 ## Iron Law
 
-Do not make completion or success claims without fresh verification evidence.
+No completion or success claims without fresh verification evidence.
 
 ## Gate Function
 
-Before making any success claim:
+Before any success claim:
 
-1. Identify the exact command, test, checklist, or inspection that proves the claim.
-2. Run it now, not based on memory or an earlier run.
-3. Read the full output and check the exit status.
-4. Confirm whether the output actually proves the claim.
-5. Only then state the result, with evidence.
+1. Identify the exact command/test/checklist/inspection that proves the claim.
+2. Run it now — not from memory, not from an earlier run.
+3. Read the full output and exit status.
+4. Confirm the output actually proves the claim.
+5. State the result with evidence.
 
-If any step is skipped, the claim is not verified.
+Any step skipped → claim not verified.
 
 ## When To Apply
 
-Apply this before:
-
-- Saying tests pass.
-- Saying a bug is fixed.
-- Saying a build succeeds.
-- Saying lint is clean.
-- Saying requirements are complete.
-- Committing or opening a PR.
-- Handing work off to another agent or human.
-- Moving to the next task.
+Before: tests pass, bug fixed, build succeeds, lint clean, requirements complete, committing/opening PR, handoff to another agent or human, moving to next task.
 
 ## Common Failure Modes
 
-### Tests
-
-- Good: run the exact test command and report the observed pass result.
-- Bad: "should pass now" or "looks correct".
-
-### Build
-
-- Good: run the build command and confirm exit code 0.
-- Bad: assume build passes because lint passes.
-
-### Bug Fixes
-
-- Good: rerun the original reproduction or regression test and confirm the symptom is gone.
-- Bad: assume the bug is fixed because code changed.
-
-### Requirements
-
-- Good: check the requirements or plan line by line.
-- Bad: assume passing tests means all requirements are satisfied.
+| Domain | Good | Bad |
+|---|---|---|
+| Tests | Run the exact command, report observed pass result. | "should pass now", "looks correct". |
+| Build | Run build command, confirm exit code 0. | Assume build passes because lint passes. |
+| Bug fixes | Rerun original repro/regression test, confirm symptom gone. | Assume fixed because code changed. |
+| Requirements | Check requirements/plan line by line. | Assume passing tests = all requirements met. |
 
 ## Red Flags
 
-If you catch yourself using wording like these before verifying, stop:
+If you catch yourself using these before verifying, stop:
 
-- "should"
-- "probably"
-- "seems fixed"
-- "done"
-- "great"
-- "perfect"
-- "ready"
+- "should", "probably", "seems fixed", "done", "great", "perfect", "ready".
 
 Confidence is not evidence.
 
 ## Anti-Rationalization
 
-Common evasion phrases that are not evidence. Stop when you hear yourself using them.
-
 | Phrase | Why it fails | What to do instead |
 |---|---|---|
-| "should pass now" | Prediction is not a test result. | Run the test. Report the actual output. |
+| "should pass now" | Prediction is not a result. | Run the test. Report the actual output. |
 | "looks correct" | Visual inspection is not execution. | Execute the code and observe the result. |
-| "it's probably an environment issue" | Blame-shifting without investigation. | Reproduce in a clean environment; confirm or rule out the environment. |
-| "I've tried everything" | Implies exhaustion, not evidence. | List what was actually tried. Each attempt should have a result. |
-| "it works on my machine" | Local success does not prove correctness everywhere. | Run in the target environment. Capture the output. |
-| "the change is trivial, no need to test" | Trivial changes cause real bugs. | Run the relevant test suite regardless of perceived risk. |
+| "it's probably an environment issue" | Blame-shifting. | Reproduce in clean env; confirm or rule out. |
+| "I've tried everything" | Exhaustion isn't evidence. | List what was tried. Each attempt has a result. |
+| "it works on my machine" | Local success doesn't prove correctness. | Run in target env. Capture the output. |
+| "the change is trivial, no need to test" | Trivial changes cause real bugs. | Run the relevant test suite anyway. |
 
-## Practical Pattern
-
-Use this shape when reporting status:
+## Reporting Pattern
 
 1. State what was verified.
-2. State the exact command or check used.
+2. State the exact command/check used.
 3. State the observed result.
-4. Then state the claim.
+4. State the claim.
 
 Example:
 

@@ -8,37 +8,30 @@ disable-model-invocation: false
 
 # MCP Server Builder
 
-Build Model Context Protocol (MCP) servers that expose tools, resources, and prompts to AI assistants.
+Build Model Context Protocol servers exposing tools, resources, and prompts to AI assistants.
 
 ## Workflow
 
-Follow these four phases in order. Do not skip phases.
+Three phases, in order. Don't skip.
 
 ---
 
 ### Phase 1 — Research
 
-Before writing any code, gather the information needed to build the server.
+Before writing code:
 
-1. **Understand the MCP specification.** Fetch the MCP docs sitemap for reference:
-   - URL: `https://modelcontextprotocol.io/sitemap.xml`
-   - Focus on: transport types, tool/resource/prompt schemas, error handling conventions.
+1. **MCP spec** — fetch sitemap `https://modelcontextprotocol.io/sitemap.xml`. Focus: transport types, tool/resource/prompt schemas, error conventions.
+2. **SDK README** for chosen language:
+   - TypeScript: `https://raw.githubusercontent.com/modelcontextprotocol/typescript-sdk/main/README.md`
+   - Python: `https://raw.githubusercontent.com/modelcontextprotocol/python-sdk/main/README.md`
+3. **Target API/service** — read its docs/SDK; identify operations, auth, rate limits, data shapes.
+4. **Design note** listing:
+   - Tools (name, description, input schema)
+   - Resources, if any
+   - Transport (stdio for CLI, SSE for networked)
+   - Auth strategy (env var, OAuth, API key)
 
-2. **Read the SDK README for the chosen language.**
-   - TypeScript SDK: fetch `https://raw.githubusercontent.com/modelcontextprotocol/typescript-sdk/main/README.md`
-   - Python SDK: fetch `https://raw.githubusercontent.com/modelcontextprotocol/python-sdk/main/README.md`
-
-3. **Study the target API or service.**
-   - Read the API documentation or SDK for the service the MCP server will wrap.
-   - Identify the key operations, authentication method, rate limits, and data shapes.
-
-4. **Produce a brief design note** listing:
-   - Tools to expose (name, description, input schema).
-   - Resources to expose, if any.
-   - Transport choice (stdio for CLI, SSE for networked).
-   - Auth strategy (env var, OAuth, API key).
-
-Do not proceed to Phase 2 until the design note is reviewed.
+Don't proceed until the design note is reviewed.
 
 ---
 
@@ -50,8 +43,6 @@ Do not proceed to Phase 2 until the design note is reviewed.
 pip install mcp         # installs FastMCP
 ```
 
-Skeleton:
-
 ```python
 from mcp.server.fastmcp import FastMCP
 
@@ -60,24 +51,20 @@ mcp = FastMCP("my-server")
 @mcp.tool()
 def my_tool(param: str) -> str:
     """One-line description shown to the model."""
-    # Implementation here
     return result
 ```
 
-Key conventions:
-- One `@mcp.tool()` per operation. Keep tools focused — prefer many small tools over few large ones.
-- Use Python type hints for parameters; FastMCP derives the JSON Schema automatically.
+- One `@mcp.tool()` per operation. Many small tools > few large ones.
+- Type hints → FastMCP derives JSON Schema.
 - Raise `McpError` for user-visible errors; let unexpected exceptions propagate.
-- Use `@mcp.resource("protocol://path")` for read-only data the model can pull.
-- Use `@mcp.prompt()` for reusable prompt templates.
+- `@mcp.resource("protocol://path")` for read-only data.
+- `@mcp.prompt()` for reusable templates.
 
 #### TypeScript (MCP SDK)
 
 ```
 npm install @modelcontextprotocol/sdk
 ```
-
-Skeleton:
 
 ```typescript
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
@@ -94,32 +81,30 @@ const transport = new StdioServerTransport();
 await server.connect(transport);
 ```
 
-Key conventions:
-- Use Zod schemas for input validation.
+- Zod schemas for input validation.
 - Return `content` arrays with typed blocks (`text`, `image`, `resource`).
-- Use `server.resource()` for read-only data.
-- Use `server.prompt()` for reusable templates.
+- `server.resource()` for read-only data; `server.prompt()` for templates.
 
-#### General Design Principles
+#### Design Principles
 
-- **Naming**: Use `snake_case` for tool names. Names should be verb-noun: `get_issue`, `create_branch`, `search_docs`.
-- **Descriptions**: Write descriptions as if explaining the tool to a colleague. The model reads them to decide when to call the tool.
-- **Idempotency**: Prefer idempotent operations. Document side effects clearly.
-- **Error handling**: Return structured error messages. Include enough context for the model to retry or ask the user for clarification.
-- **Authentication**: Read secrets from environment variables. Never hardcode credentials. Document required env vars in the README.
-- **Rate limiting**: Implement client-side rate limiting if the upstream API enforces limits.
+- **Naming**: `snake_case`, verb-noun (`get_issue`, `create_branch`, `search_docs`).
+- **Descriptions**: model uses them to choose tools — write as if explaining to a colleague.
+- **Idempotency**: prefer idempotent ops; document side effects clearly.
+- **Errors**: structured messages with context for retry/clarification.
+- **Auth**: secrets from env vars. Never hardcode. Document required vars in README.
+- **Rate limiting**: client-side limiting if upstream enforces.
 
 ---
 
 ### Phase 3 — Review
 
-Before declaring the server complete, verify:
+Before declaring complete:
 
-1. **Does each tool have a clear, accurate description?** The model relies on descriptions to select the right tool.
-2. **Are input schemas correct and complete?** Missing or wrong types cause silent failures.
-3. **Are errors handled gracefully?** Test with invalid inputs, missing auth, network failures.
-4. **Is the README complete?** It should include: install instructions, required env vars, example usage, and a list of exposed tools/resources.
-5. **Does the server start and respond?** Run it locally and test with the MCP Inspector or a simple client.
+1. Each tool has a clear, accurate description (model uses it for selection).
+2. Input schemas correct and complete.
+3. Errors handled gracefully (test invalid inputs, missing auth, network failures).
+4. README covers install, env vars, example usage, exposed tools/resources.
+5. Server starts and responds — test locally with MCP Inspector or a simple client.
 
 ---
 
@@ -127,8 +112,8 @@ Before declaring the server complete, verify:
 
 | Concept | Python (FastMCP) | TypeScript (SDK) |
 |---------|-------------------|-------------------|
-| Define tool | `@mcp.tool()` | `server.tool(name, schema, handler)` |
-| Define resource | `@mcp.resource(uri)` | `server.resource(name, template, handler)` |
-| Define prompt | `@mcp.prompt()` | `server.prompt(name, args, handler)` |
-| Start server | `mcp.run()` | `server.connect(transport)` |
-| Error type | `McpError` | throw in handler |
+| Tool | `@mcp.tool()` | `server.tool(name, schema, handler)` |
+| Resource | `@mcp.resource(uri)` | `server.resource(name, template, handler)` |
+| Prompt | `@mcp.prompt()` | `server.prompt(name, args, handler)` |
+| Start | `mcp.run()` | `server.connect(transport)` |
+| Error | `McpError` | throw in handler |

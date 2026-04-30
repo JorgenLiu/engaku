@@ -31,6 +31,8 @@ handoffs:
 
 Execute the user's development task.
 
-**Before responding that work is done** (applies to every session where you edited source files):
+**Before declaring done** (any session that edited source files):
 
-1. **Update project-level files** (`.ai/overview.md`) if the changes affect architecture or constraints. Do NOT modify `.ai/decisions/` or change the `status:` field or structure of `.ai/tasks/` files — `status:` is @reviewer's responsibility; task structure is @planner's responsibility. You MAY tick completed task checkboxes `[ ]` → `[x]` as you finish each step.
+1. Update `.ai/overview.md` if architecture or constraints changed.
+2. Tick completed task checkboxes `[ ]` → `[x]` as you finish each step.
+3. Do NOT modify `.ai/decisions/` or change `status:`/structure of `.ai/tasks/` files. `status:` is @reviewer's; task structure is @planner's.

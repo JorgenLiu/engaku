@@ -31,7 +31,6 @@ Files created (never overwritten if they already exist):
         instructions/
             lessons.instructions.md
             agent-boundaries.instructions.md
-            token-budget.instructions.md
         copilot-instructions.md
     .vscode/
         settings.json
@@ -191,7 +190,7 @@ def run(cwd=None, no_mcp=False):
 
     # ── .github/instructions/ ─────────────────────────────────────────────────
     instructions_dir = os.path.join(cwd, ".github", "instructions")
-    for name in ("lessons.instructions.md", "agent-boundaries.instructions.md", "token-budget.instructions.md"):
+    for name in ("lessons.instructions.md", "agent-boundaries.instructions.md"):
         _copy_template(
             os.path.join(tpl, "instructions", name),
             os.path.join(instructions_dir, name),

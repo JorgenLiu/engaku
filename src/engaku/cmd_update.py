@@ -103,7 +103,7 @@ def run(cwd=None):
 
     # ── .github/instructions/ ── create generated stubs if missing ──────────
     from engaku.cmd_init import _copy_template
-    for name in ("lessons.instructions.md", "agent-boundaries.instructions.md", "token-budget.instructions.md"):
+    for name in ("lessons.instructions.md", "agent-boundaries.instructions.md"):
         _copy_template(
             os.path.join(tpl, "instructions", name),
             os.path.join(cwd, ".github", "instructions", name),

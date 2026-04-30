@@ -8,33 +8,26 @@ disable-model-invocation: false
 
 # Document Co-authoring
 
-Write documents with the user, not for them. The goal is a document that reflects the user's thinking, structured and sharpened through dialogue.
+Write documents *with* the user, not for them. The result should reflect the user's thinking, sharpened through dialogue.
 
 ## Core Principle
 
-Never produce a full draft unprompted. Ask questions first. Structure second. Draft sections only after alignment on scope and audience.
+Never produce a full draft unprompted. Ask questions first. Structure second. Draft sections only after scope and audience are aligned.
 
 ---
 
 ## Stage 1 — Context Gathering
 
-Before writing anything, understand what the document needs to accomplish.
+Ask before writing:
 
-### Questions to ask the user
+1. **Type?** (ADR, RFC, design doc, task plan, runbook, post-mortem, README)
+2. **Audience?** (Team, leadership, external contributors, future self)
+3. **Decision or outcome to drive?**
+4. **Reader's existing context?** What can be assumed vs. must be explained?
+5. **Existing docs/code/conversations?** Read them now if they exist.
+6. **Desired length and detail?**
 
-1. **What type of document is this?** (ADR, RFC, design doc, task plan, runbook, post-mortem, README)
-2. **Who is the audience?** (Team, leadership, external contributors, future self)
-3. **What decision or outcome should this document drive?**
-4. **What context does the reader already have?** What can be assumed vs. what must be explained?
-5. **Are there existing documents, code, or conversations that provide background?**
-   - If yes, read those files now to absorb context before proceeding.
-6. **What is the desired length and level of detail?**
-
-### What to do with answers
-
-- Summarize the gathered context back to the user in 3-5 bullet points.
-- Confirm alignment before moving to Stage 2.
-- If the user's answers reveal ambiguity or conflicting goals, surface that explicitly.
+Summarize gathered context back in 3–5 bullets. Confirm alignment before Stage 2. Surface conflicting goals explicitly.
 
 ---
 
@@ -42,73 +35,42 @@ Before writing anything, understand what the document needs to accomplish.
 
 ### Propose an outline
 
-Based on Stage 1, propose a section outline. For common document types:
+**ADR** — Title/Status/Date · Context · Decision · Consequences · Alternatives.
+**Design Doc** — Problem · Goals/Non-goals · Overview · Detailed design · Trade-offs · Open questions.
+**Task Plan** — Background · Design (approach, file map) · Tasks (ordered, w/ acceptance) · Out of scope.
+**RFC** — Summary · Motivation · Detailed proposal · Drawbacks · Alternatives · Unresolved questions.
 
-**ADR (Architecture Decision Record)**:
-- Title, Status, Date
-- Context — what forces are at play
-- Decision — what was decided
-- Consequences — what follows from the decision
-- Alternatives considered
+### Iterate
 
-**Design Doc**:
-- Problem statement
-- Goals / Non-goals
-- Design overview
-- Detailed design (per component)
-- Trade-offs and alternatives
-- Open questions
-
-**Task Plan**:
-- Background
-- Design (approach, file map)
-- Tasks (ordered, with acceptance criteria)
-- Out of scope
-
-**RFC**:
-- Summary
-- Motivation
-- Detailed proposal
-- Drawbacks
-- Alternatives
-- Unresolved questions
-
-### Iterate on structure
-
-- Present the outline and ask: "Does this structure capture what you need? Should any sections be added, removed, or reordered?"
-- Revise until the user approves the outline.
+Ask: "Does this structure capture what you need? Add/remove/reorder?" Revise until approved.
 
 ### Draft section by section
 
-- Write one section at a time.
-- After each section, pause and ask for feedback: "Does this capture your intent? What should change?"
-- Do not write the next section until the current one is approved or marked "good enough for now."
+One section at a time. Pause after each: "Capture your intent? What should change?" Don't proceed until current is approved or marked "good enough for now."
 
 ---
 
 ## Stage 3 — Reader Testing
 
-Before declaring the document complete, test it from the reader's perspective.
+Before declaring complete:
 
-### Checklist
-
-1. **Can a reader who was not in the conversation understand the document?** Remove jargon or define it. Fill in assumed context.
-2. **Does every section earn its place?** Cut sections that repeat information or add no value.
-3. **Are decisions and trade-offs explicit?** A design doc that says "we chose X" without explaining why is incomplete.
-4. **Is the document the right length?** Too long and it won't be read. Too short and it won't be useful.
-5. **Are open questions clearly marked?** Use a dedicated section or inline markers so they are not lost.
+1. Could a reader who wasn't in the conversation understand it? Remove jargon or define it.
+2. Does every section earn its place? Cut repetition.
+3. Are decisions and trade-offs explicit? "We chose X" without why is incomplete.
+4. Right length? Too long → won't be read; too short → useless.
+5. Open questions clearly marked?
 
 ### Final pass
 
-- Read the full document aloud (or ask the user to). Flag anything that sounds awkward or unclear.
-- Check for consistency: terminology, formatting, tone.
-- Confirm with the user: "Is this ready, or are there sections you want to revisit?"
+- Read aloud (or have user do it). Flag anything awkward.
+- Check terminology, formatting, tone consistency.
+- Confirm: "Ready, or sections to revisit?"
 
 ---
 
 ## Anti-patterns
 
-- **Dumping a full draft without asking questions.** This produces documents that reflect the model's assumptions, not the user's needs.
-- **Over-polishing prose before structure is agreed.** Beautiful sentences in the wrong structure waste effort.
-- **Ignoring the audience.** A document for the team reads differently than one for leadership.
-- **Hiding uncertainty.** If something is unclear, say so. An honest "open question" is better than a confident wrong statement.
+- Dumping a full draft without asking → reflects model assumptions, not user needs.
+- Polishing prose before structure is agreed → wasted effort.
+- Ignoring audience.
+- Hiding uncertainty → an honest "open question" beats a confident wrong claim.

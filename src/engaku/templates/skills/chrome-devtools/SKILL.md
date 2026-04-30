@@ -7,41 +7,40 @@ disable-model-invocation: false
 
 # Chrome DevTools MCP
 
-Use the chrome-devtools-mcp server for browser automation, visual verification, and performance profiling. The server provides Puppeteer-backed browser control exposed as MCP tools.
+Puppeteer-backed browser control via MCP for automation, visual verification, and performance profiling.
 
 ## When to use
 
-- **Visual verification**: after making UI changes, take a screenshot to confirm the result matches expectations.
-- **UI automation**: navigate to a page, click elements, fill forms, and verify outcomes.
-- **Performance audits**: run Lighthouse to get Core Web Vitals, accessibility scores, and SEO checks.
-- **JavaScript evaluation**: run arbitrary JS in the page context to inspect DOM state, read console output, or trigger client-side logic.
-- **Network inspection**: list network requests to debug API calls, check for failed fetches, or verify caching headers.
+- **Visual verification** — screenshot after UI changes.
+- **UI automation** — navigate, click, fill, verify.
+- **Performance audits** — Lighthouse for Core Web Vitals, accessibility, SEO.
+- **JS evaluation** — inspect DOM, console output, client-side logic.
+- **Network inspection** — debug API calls, failed fetches, caching headers.
 
 ## Tools
 
 | Tool | Purpose |
 |------|---------|
-| `navigate_page` | Load a URL in the browser |
-| `take_screenshot` | Capture the current page as an image |
-| `click` | Click an element by CSS selector |
-| `fill` | Type text into an input field |
-| `evaluate_script` | Execute JavaScript in the page context |
-| `lighthouse_audit` | Run a Lighthouse audit and return the report |
-| `performance_start_trace` | Begin a Chrome performance trace |
-| `performance_stop_trace` | Stop the trace and return results |
-| `list_network_requests` | List captured network requests |
+| `navigate_page` | Load a URL |
+| `take_screenshot` | Capture page as image |
+| `click` | Click element by selector |
+| `fill` | Type into input |
+| `evaluate_script` | Run JS in page context |
+| `lighthouse_audit` | Lighthouse report |
+| `performance_start_trace` / `performance_stop_trace` | Chrome perf trace |
+| `list_network_requests` | Captured network requests |
 
 ## Workflow
 
-1. **Navigate** to the target URL with `navigate_page`.
-2. **Interact** with the page using `click` and `fill` as needed.
-3. **Verify visually** with `take_screenshot` — compare against expectations.
-4. **Audit performance** with `lighthouse_audit` when optimizing load times or accessibility.
-5. **Debug** with `evaluate_script` to inspect DOM state or `list_network_requests` to check API calls.
+1. `navigate_page` to target.
+2. Interact with `click` / `fill`.
+3. `take_screenshot` to verify.
+4. `lighthouse_audit` when optimizing load/accessibility.
+5. `evaluate_script` for DOM state; `list_network_requests` for API checks.
 
 ## Tips
 
-- Always use `--headless` mode (configured by default in mcp.json) for CI and non-interactive environments.
-- Take screenshots before and after changes for visual diff comparison.
-- Use `evaluate_script` to extract structured data from the page rather than parsing screenshot images.
-- Lighthouse audits can be slow (~10-30s); run them only when performance analysis is specifically needed.
+- Headless mode is default in `mcp.json` — keep it for CI / non-interactive use.
+- Screenshot before/after for visual diffs.
+- Prefer `evaluate_script` over parsing screenshots for structured data.
+- Lighthouse audits are slow (~10–30s); only when needed.

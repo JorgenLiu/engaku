@@ -8,50 +8,32 @@ disable-model-invocation: false
 
 # Brainstorming
 
-Use this skill to turn rough ideas into an explicit design before code is written.
+Turn rough ideas into an explicit design before code is written.
 
 ## Hard Gate
 
-Do not jump straight into implementation when the design is still ambiguous.
-
-Before coding, you must understand:
-
-- what is being built
-- why it matters
-- what constraints apply
-- what success looks like
+Do not jump to implementation while the design is ambiguous. Before coding you must understand: **what** is being built, **why** it matters, **what constraints** apply, **what success** looks like.
 
 ## When To Use
 
-- New features.
-- New components or pages.
-- Behavior changes.
-- Architecture decisions.
-- Any request where multiple approaches are plausible.
+New features, components/pages, behavior changes, architecture decisions, or any request where multiple approaches are plausible.
 
 ## Process
 
-1. Explore context first.
-   Inspect the relevant project files, docs, or existing patterns before asking detailed questions.
-2. Ask clarifying questions one at a time.
-   Focus on purpose, constraints, and success criteria.
-3. Propose 2-3 approaches.
-   Include trade-offs and recommend one.
-4. Present the design incrementally.
-   Cover architecture, data flow, UI behavior, failure handling, and testing as needed.
-5. Get approval before implementation.
-   If parts are unclear, revise the design instead of coding around ambiguity.
+1. **Explore context** — inspect relevant files, docs, existing patterns first.
+2. **Ask clarifying questions** one at a time. Focus on purpose, constraints, success criteria.
+3. **Propose 2–3 approaches** with trade-offs; recommend one.
+4. **Present design incrementally** — architecture, data flow, UI behavior, failure handling, testing as needed.
+5. **Get approval** before implementation. Revise the design when parts are unclear; don't code around ambiguity.
 
 ## Design Principles
 
-- Prefer clear boundaries and small, well-defined units.
-- Keep the design proportional to the task: simple tasks can have short designs, but still need one.
-- Use YAGNI aggressively.
-- Avoid unrelated refactoring proposals.
-- In existing codebases, follow established patterns unless there is a strong reason not to.
+- Clear boundaries; small, well-defined units.
+- Design proportional to task; simple tasks → short designs (still required).
+- YAGNI aggressively.
+- No unrelated refactoring proposals.
+- In existing codebases, follow established patterns unless there's a strong reason not to.
 
 ## Output
 
-The output of brainstorming is a design, not implementation.
-
-When useful, write the approved design to a markdown document in the working project.
+A design, not implementation. When useful, write the approved design to a markdown doc in the project.

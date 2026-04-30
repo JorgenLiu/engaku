@@ -100,13 +100,13 @@ If the default `engaku` command is already broken, run the interpreter directly 
 
 
 
-## Token budget
+## Global kernel and lossless compactness
 
-Engaku handles compact token budgeting through `.github/instructions/token-budget.instructions.md`, an always-on generated instruction. Compact mode is active by default: preserve technical substance (code, paths, commands, exact error text, decisions, and verification results), but remove filler, repeated summaries, throat-clearing, avoidable hedging, and long explanations unless the user asks. Chinese or other languages are allowed only when explicitly requested.
+Engaku policy lives in `.github/copilot-instructions.md` as an **Engaku Global Kernel**: agent ownership boundaries, Caveman-inspired lossless compactness rules, and generated artifact style in one unconditional file. `.github/instructions/` remains path-specific; hooks inject dynamic state only.
 
-The instruction also defines per-request compactness controls (`[normal]`, `[lite]`, `[full]`) and keeps clarity exceptions for safety warnings, destructive-action confirmations, ordered instructions, and ambiguity-resolving clarifications.
+Lossless compactness: preserve complete technical substance (code, paths, commands, exact error text, decisions, verification results) while removing ceremony — no `Now let me…` filler, no repeated summaries, no arbitrary answer caps.
 
-Teams that want Caveman's exact compression modes can install it separately: `npx skills add JuliusBrussee/caveman -a github-copilot`. Engaku uses its own compact mode inspired by Caveman mechanics and does not copy upstream skill text. Use `caveman-compress` only for manually reviewed natural-language memory files — never on generated Engaku templates.
+Teams that want Caveman's exact compression modes can install it separately: `npx skills add JuliusBrussee/caveman -a github-copilot`. Engaku uses its own Caveman-inspired rules and does not copy upstream skill text.
 
 ## MCP Servers
 

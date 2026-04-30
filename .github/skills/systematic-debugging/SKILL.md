@@ -16,54 +16,46 @@ Do not propose fixes before investigating the root cause.
 
 ## When To Use
 
-- Test failures.
-- Unexpected behavior.
-- Build or CI failures.
-- Integration bugs.
-- Performance problems.
-- Regressions.
-- Cases where previous fixes did not work.
+Test failures, unexpected behavior, build/CI failures, integration bugs, performance problems, regressions, cases where previous fixes did not work.
 
 ## The Five Phases
 
 ### Phase 0: Spin Detection
 
-Before doing anything else, if you have already attempted a fix:
+If you've already attempted a fix:
 
-1. List every approach tried so far.
-2. Identify the common pattern across those attempts — what assumption do they all share?
-3. Determine whether your changes have been superficial (adjusting values, reordering lines) or structural (changing the mechanism, addressing the root cause).
+1. List every approach tried.
+2. Identify the common assumption across them.
+3. Determine: superficial (values, ordering) or structural (mechanism, root cause)?
 
-If you are making superficial variations on the same approach, stop. You are spinning. Move to Phase 1 fresh.
+Superficial variations on the same approach → stop. You're spinning. Move to Phase 1 fresh.
 
 ### Phase 1: Root Cause Investigation
 
-Before attempting any fix:
-
-1. Read the full error output carefully.
-2. Reproduce the issue consistently.
+1. Read the full error output.
+2. Reproduce consistently.
 3. Check recent changes that could explain it.
 4. Gather evidence at the failing boundaries.
-5. Trace the bad state or value back to its source.
+5. Trace the bad state/value back to its source.
 
 ### Phase 2: Pattern Analysis
 
 1. Find similar working code or known-good examples.
-2. Compare the broken case against the working case.
+2. Compare broken vs. working.
 3. Identify all meaningful differences.
-4. Understand dependencies, assumptions, and configuration.
+4. Understand dependencies, assumptions, configuration.
 
 ### Phase 3: Hypothesis and Testing
 
 1. State one clear hypothesis.
 2. Make the smallest possible change to test it.
 3. Verify the result before doing anything else.
-4. If it fails, form a new hypothesis instead of stacking more changes.
-5. Invert your primary assumption — if you assumed the bug is in X, investigate as if X is correct and the problem is elsewhere.
+4. If it fails, form a new hypothesis — don't stack changes.
+5. Invert your primary assumption — if you assumed bug is in X, investigate as if X is correct and the problem is elsewhere.
 
 ### Phase 4: Implementation
 
-1. Create the simplest failing reproduction or test case you can.
+1. Create the simplest failing reproduction or test case.
 2. Implement one fix for the identified root cause.
 3. Verify the issue is resolved and nothing else regressed.
 4. If multiple fix attempts fail, stop and question the architecture or assumptions.
@@ -71,7 +63,7 @@ Before attempting any fix:
 
 ## Red Flags
 
-If you catch yourself thinking any of these, stop and return to Phase 1:
+Stop and return to Phase 1 if you catch yourself thinking:
 
 - "Let me just try a quick fix."
 - "I'll change several things at once."
@@ -85,12 +77,12 @@ If you catch yourself thinking any of these, stop and return to Phase 1:
 - One hypothesis at a time.
 - One meaningful change at a time.
 - Read stack traces fully.
-- Prefer evidence over intuition.
-- Fix at the source, not at the symptom.
+- Evidence over intuition.
+- Fix at the source, not the symptom.
 
-## Expected Output
+## Output
 
-- Clear statement of the suspected root cause.
-- Evidence that supports it.
+- Suspected root cause.
+- Evidence supporting it.
 - Minimal change set.
-- Verification that the fix actually worked.
+- Verification the fix worked.

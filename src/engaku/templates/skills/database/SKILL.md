@@ -7,28 +7,28 @@ disable-model-invocation: false
 
 # Database MCP (dbhub)
 
-Use the dbhub MCP server for multi-database access. Supports PostgreSQL, MySQL, MariaDB, SQL Server, and SQLite through a single interface.
+Multi-database access (PostgreSQL, MySQL, MariaDB, SQL Server, SQLite) through one MCP interface.
 
 ## Workflow
 
-1. **Always call `search_objects` first** to explore the schema before writing any SQL.
-2. **Understand table structure**: review column names, types, and relationships before querying.
-3. **Use `execute_sql`** only after understanding the table structure.
-4. **Prefer read-only exploration**: use SELECT queries. For production databases, configure `readonly = true` in `dbhub.toml` (preferred) or pass `--readonly` at startup.
+1. **Always `search_objects` first** — explore schema before writing SQL.
+2. Review columns, types, relationships before querying.
+3. Use `execute_sql` only after understanding structure.
+4. Prefer read-only exploration (SELECT). For prod, set `readonly = true` in `dbhub.toml` (preferred) or pass `--readonly` at startup.
 
 ## Tools
 
 | Tool | Purpose |
 |------|---------|
-| `search_objects` | Explore database schema — tables, columns, indexes, views |
-| `execute_sql` | Execute a SQL query and return results |
+| `search_objects` | Schema exploration — tables, columns, indexes, views |
+| `execute_sql` | Run SQL and return results |
 
 ## DSN Formats
 
-The `${input:db-dsn}` prompt in `.vscode/mcp.json` expects a connection string in one of these formats:
+The `${input:db-dsn}` prompt in `.vscode/mcp.json` expects:
 
-| Database | DSN Format |
-|----------|-----------|
+| Database | DSN |
+|----------|-----|
 | PostgreSQL | `postgres://user:pass@host:5432/db?sslmode=disable` |
 | MySQL | `mysql://user:pass@host:3306/db` |
 | MariaDB | `mariadb://user:pass@host:3306/db` |
@@ -37,7 +37,7 @@ The `${input:db-dsn}` prompt in `.vscode/mcp.json` expects a connection string i
 
 ## Environment Variable Alternative
 
-Passwords with special characters (`:`, `@`, `#`) break URL encoding. Use environment variables instead and leave the DSN empty:
+Passwords with `:` / `@` / `#` break URL encoding. Use env vars and leave the DSN empty:
 
 ```json
 {
@@ -60,12 +60,12 @@ Passwords with special characters (`:`, `@`, `#`) break URL encoding. Use enviro
 
 ## SSL/TLS
 
-- Use `sslmode=require` for remote servers.
-- Use `sslmode=verify-ca` or `sslmode=verify-full` with `sslrootcert=/path/to/ca.pem` for RDS/cloud databases.
+- `sslmode=require` for remote servers.
+- `sslmode=verify-ca` / `verify-full` with `sslrootcert=/path/to/ca.pem` for RDS / cloud databases.
 
 ## SSH Tunneling
 
-For databases behind a bastion host, add SSH arguments to the server config:
+For databases behind a bastion:
 
 ```json
 {
@@ -82,7 +82,7 @@ For databases behind a bastion host, add SSH arguments to the server config:
 
 ## Multi-Database Setup
 
-Create multiple server entries in `.vscode/mcp.json` with different `--id` values so tools are named distinctly:
+Use distinct `--id` values so tools are named per source:
 
 ```json
 {
@@ -99,11 +99,11 @@ Create multiple server entries in `.vscode/mcp.json` with different `--id` value
 }
 ```
 
-This gives you `execute_sql_prod` vs `execute_sql_staging` tools.
+Yields `execute_sql_prod` vs `execute_sql_staging`.
 
 ## Guardrails
 
-`engaku init` generates `.vscode/dbhub.toml` as the default DBHub configuration. The DSN is passed via the `DBHUB_DSN` environment variable set in `.vscode/mcp.json` — secrets never appear in the TOML file, which is safe to commit.
+`engaku init` generates `.vscode/dbhub.toml` as the default DBHub config. The DSN comes from `DBHUB_DSN` set in `.vscode/mcp.json` — secrets stay out of the TOML, which is safe to commit.
 
 ```toml
 [[sources]]
@@ -118,14 +118,14 @@ readonly = true
 max_rows = 1000
 ```
 
-- `readonly = true` prevents accidental writes.
+- `readonly = true` blocks accidental writes.
 - `max_rows` caps result sizes.
-- Edit `.vscode/dbhub.toml` to add more sources, change guardrails, or enable writes.
-- For inline `--dsn` without a TOML file (manual override), use `--dsn "${input:db-dsn}"` directly in `.vscode/mcp.json` instead.
-- Always inspect schema with `search_objects` before running queries on unfamiliar databases.
+- Edit `.vscode/dbhub.toml` to add sources, change guardrails, or enable writes.
+- For an inline override without TOML, use `--dsn "${input:db-dsn}"` directly in `.vscode/mcp.json`.
+- Always `search_objects` before querying unfamiliar databases.
 
 ## Tips
 
-- Start every database interaction with `search_objects` to understand what tables and columns exist.
-- Use `LIMIT` clauses in SELECT queries to avoid returning excessive data.
-- For production databases, always use `--readonly` mode unless writes are explicitly needed.
+- Start every interaction with `search_objects`.
+- `LIMIT` SELECTs to avoid huge result sets.
+- Production → `--readonly` unless writes are explicitly required.

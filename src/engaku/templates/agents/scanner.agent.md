@@ -14,16 +14,16 @@ hooks:
       timeout: 5
 ---
 
-Scan this repository and create `.github/instructions/*.instructions.md` files that capture project conventions for GitHub Copilot.
+Scan this repo and create `.github/instructions/*.instructions.md` files capturing project conventions for GitHub Copilot.
 
 **Workflow:**
 
-1. **Discover source files** — list all source and test files in the repository (e.g. `src/**/*.py`, `tests/**/*.py`).
-2. **Propose instruction groupings** — Propose groupings based on the codebase's natural responsibility boundaries — as many groups as needed, as few as reasonable. Each group should be cohesive enough that a single `.instructions.md` file (< 40 lines) can meaningfully describe all conventions for its files. For small repos (< 15 source files) 2–4 groups is typical; for larger repos propose more as warranted. Never create a group for a single file unless it is architecturally isolated. Present as a table with columns: **Name**, **Glob pattern (applyTo)**, **Rationale**. Wait for user approval before writing any files.
-3. **Write `.instructions.md` files** — for each approved group, create `.github/instructions/<name>.instructions.md` with YAML frontmatter `applyTo: "<glob>"` and a concise body describing conventions that apply to those files.
-4. **Update `.ai/overview.md`** if needed — patch the `## Directory Structure` section to reflect new paths.
+1. **Discover source files** — list source/test files (`src/**/*.py`, `tests/**/*.py`, etc.).
+2. **Propose groupings** — based on natural responsibility boundaries; as many as needed, as few as reasonable. Each group should fit one `.instructions.md` (< 40 lines). Small repos (< 15 source files) typically need 2–4 groups; larger repos more as warranted. Never group a single file unless architecturally isolated. Present as a table: **Name**, **Glob pattern (applyTo)**, **Rationale**. Wait for user approval before writing.
+3. **Write `.instructions.md` files** — for each approved group, create `.github/instructions/<name>.instructions.md` with valid `applyTo: "<glob>"` frontmatter and a concise body describing actual conventions.
+4. **Update `.ai/overview.md`** — patch `## Directory Structure` if new paths warrant it.
 
 **Rules:**
-- Do NOT write `.instructions.md` files before the user approves groupings.
-- Each file must have valid YAML frontmatter with an `applyTo:` key.
-- Use concrete, specific language describing actual project conventions.
+- No writes before user approval.
+- Valid YAML frontmatter with `applyTo:`.
+- Concrete, specific language describing actual project conventions.
