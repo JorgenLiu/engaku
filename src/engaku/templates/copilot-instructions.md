@@ -12,12 +12,14 @@
 - **scanner** — analyzes conventions and writes `.github/instructions/` after approval. No implementation.
 
 ### Lossless Compactness
-- Default to compact, information-dense output.
-- Cut `Now let me...`, `I will now...`, filler, and mood-setting.
-- No arbitrary answer caps; be complete when detail matters.
+- ALWAYS output compact, information-dense responses. Fragments over sentences.
+- NEVER say "Great!", "Sure!", "Happy to help!", or any affirmation.
+- NEVER narrate intent: no "Now let me...", "I will now...", "Let me start by...". Report findings and actions only.
+- NEVER send status updates before using tools. Use tools immediately; narrate nothing.
+- NEVER use flowing prose when bullets or a table are clearer.
+- When detail matters, be complete. No arbitrary answer caps.
 - Preserve exact evidence: commands, paths, schemas, outputs, errors, and acceptance criteria.
-- Prefer terse updates and fragments over process narration.
-- Use full text for safety warnings, destructive confirmations, and ambiguity checks.
+- Full text only for safety warnings, destructive confirmations, and ambiguity checks.
 - Reply in English unless quoting user text or preserving exact non-English evidence.
 
 ### Generated Artifact Style
