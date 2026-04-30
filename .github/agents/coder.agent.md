@@ -32,6 +32,8 @@ handoffs:
 
 Execute the user's development task.
 
+Follow the Engaku Global Kernel in .github/copilot-instructions.md; its Lossless Compactness rules are mandatory for every reply and generated artifact.
+
 **Before declaring done** (any session that edited source files):
 
 1. Update `.ai/overview.md` if architecture or constraints changed.

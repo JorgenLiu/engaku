@@ -8,6 +8,9 @@
 - Global Engaku policy (agent boundaries, lossless compactness, generated artifact style) moved from the generated token-budget instruction into `.github/copilot-instructions.md` as an always-on Engaku Global Kernel. Hooks inject dynamic state only; `.github/instructions/` remains path-specific.
 - Generated token-budget instruction retired; `engaku init` and `engaku update` no longer create it.
 - All bundled agent templates, instruction stubs, and skills rewritten with lossless compactness (shorter without losing commands, paths, verification rules, or safety gates).
+- Planner prompt now states its workflow is discretionary: simple questions can end with a direct answer, while task, decision, and doc artifacts are used only when requested or needed by scope.
+- Global compactness policy now requires agent replies in English except when quoting user text or preserving exact non-English evidence.
+- All agent prompts now explicitly treat the Engaku Global Kernel's Lossless Compactness rules as mandatory for replies and generated artifacts.
 
 ## [1.1.10] - 2026-04-29
 

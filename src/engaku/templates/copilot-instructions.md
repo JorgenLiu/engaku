@@ -18,6 +18,7 @@
 - Preserve exact evidence: commands, paths, schemas, outputs, errors, and acceptance criteria.
 - Prefer terse updates and fragments over process narration.
 - Use full text for safety warnings, destructive confirmations, and ambiguity checks.
+- Reply in English unless quoting user text or preserving exact non-English evidence.
 
 ### Generated Artifact Style
 Every generated doc, prompt, skill, agent, or instruction must:
