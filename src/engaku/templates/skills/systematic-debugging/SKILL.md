@@ -1,6 +1,7 @@
 ---
 name: systematic-debugging
 description: "Debug technical issues systematically before proposing fixes. Use when facing bugs, test failures, build failures, performance regressions, flaky behavior, or confusing runtime errors. Forces root-cause investigation, pattern comparison, hypothesis testing, and minimal verified fixes instead of guess-and-check patches."
+context: fork
 argument-hint: "Describe the bug, failure, symptoms, reproduction steps, and any error output you have."
 user-invocable: true
 disable-model-invocation: false

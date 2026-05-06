@@ -1,6 +1,7 @@
 ---
 name: proactive-initiative
 description: "Check for related impacts after completing a task. Use after fixing a bug, finishing a feature, or completing any task before declaring it done. Forces a sweep for similar issues, upstream/downstream effects, edge cases, and documentation gaps instead of stopping at the single instance."
+context: fork
 argument-hint: "Describe what you just completed and which file or module was affected."
 user-invocable: true
 disable-model-invocation: false

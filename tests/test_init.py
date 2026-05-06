@@ -354,6 +354,36 @@ class TestInit(unittest.TestCase):
         scanner_tools = data["mcp_tools"].get("scanner", [])
         self.assertNotIn("serena/*", scanner_tools)
 
+    def test_vscode_settings_generated(self):
+        """engaku init writes both required settings into .vscode/settings.json."""
+        import json
+        _git_init(self.tmpdir)
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        settings_path = os.path.join(self.tmpdir, ".vscode", "settings.json")
+        self.assertTrue(os.path.exists(settings_path), "settings.json should be created")
+        with open(settings_path) as f:
+            settings = json.load(f)
+        self.assertTrue(settings.get("chat.useCustomAgentHooks"), "chat.useCustomAgentHooks should be True")
+        self.assertTrue(settings.get("github.copilot.chat.skillTool.enabled"), "github.copilot.chat.skillTool.enabled should be True")
+
+    def test_vscode_settings_preserves_existing(self):
+        """engaku init merges new settings without overwriting pre-existing ones."""
+        import json
+        _git_init(self.tmpdir)
+        vscode_dir = os.path.join(self.tmpdir, ".vscode")
+        os.makedirs(vscode_dir, exist_ok=True)
+        settings_path = os.path.join(vscode_dir, "settings.json")
+        with open(settings_path, "w") as f:
+            json.dump({"editor.tabSize": 4, "unrelated.setting": "keep-me"}, f)
+        self._capture_run()
+        with open(settings_path) as f:
+            settings = json.load(f)
+        self.assertEqual(settings.get("editor.tabSize"), 4, "pre-existing editor.tabSize must be preserved")
+        self.assertEqual(settings.get("unrelated.setting"), "keep-me", "pre-existing unrelated.setting must be preserved")
+        self.assertTrue(settings.get("chat.useCustomAgentHooks"))
+        self.assertTrue(settings.get("github.copilot.chat.skillTool.enabled"))
+
 
 if __name__ == "__main__":
     unittest.main()

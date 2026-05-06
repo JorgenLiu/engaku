@@ -1,6 +1,7 @@
 ---
 name: verification-before-completion
 description: "Verify evidence before claiming work is complete, fixed, or passing. Use before saying tests pass, a bug is fixed, a build succeeds, requirements are met, or before committing, opening a PR, or moving on to the next task. Requires fresh verification output before any success claim."
+context: fork
 argument-hint: "Describe what claim you are about to make and what command or checklist should prove it."
 user-invocable: true
 disable-model-invocation: false

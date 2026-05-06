@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## [1.1.14] - 2026-05-06
+
+### Added
+- All bundled tool-heavy skills (`systematic-debugging`, `verification-before-completion`, `frontend-design`, `proactive-initiative`, `mcp-builder`, `doc-coauthoring`, `skill-authoring`, `chrome-devtools`, `context7`, `database`) now include `context: fork` in frontmatter (VS Code 1.118, `github.copilot.chat.skillTool.enabled` required). Skill execution runs in a dedicated subagent context to keep main chat context focused.
+- `engaku init` now sets `github.copilot.chat.skillTool.enabled: true` in `.vscode/settings.json` alongside `chat.useCustomAgentHooks`.
+- README: new `User-level compact instruction` chapter with exact Linux/macOS and Windows PowerShell commands to install the compact instruction globally.
+
 ## [1.1.12] - 2026-04-30
 
 ### Changed

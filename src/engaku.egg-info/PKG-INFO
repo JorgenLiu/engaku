@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: engaku
-Version: 1.1.8
+Version: 1.1.13
 Summary: AI persistent memory layer for VS Code Copilot
 License: MIT
 Project-URL: Homepage, https://github.com/JorgenLiu/engaku
@@ -119,6 +119,14 @@ If the default `engaku` command is already broken, run the interpreter directly 
 ```
 
 
+
+## Global kernel and lossless compactness
+
+Engaku policy lives in `.github/copilot-instructions.md` as an **Engaku Global Kernel**: agent ownership boundaries, Caveman-inspired lossless compactness rules, and generated artifact style in one unconditional file. `.github/instructions/` remains path-specific; hooks inject dynamic state only.
+
+Lossless compactness: preserve complete technical substance (code, paths, commands, exact error text, decisions, verification results) while removing ceremony — no `Now let me…` filler, no repeated summaries, no arbitrary answer caps.
+
+Teams that want Caveman's exact compression modes can install it separately: `npx skills add JuliusBrussee/caveman -a github-copilot`. Engaku uses its own Caveman-inspired rules and does not copy upstream skill text.
 
 ## MCP Servers
 

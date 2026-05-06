@@ -1,6 +1,7 @@
 ---
 name: skill-authoring
 description: "Turn a repeated multi-step workflow into a reusable Copilot skill. Use when the same method, with the same phases and safeguards, is being re-explained across sessions and the workflow is genuinely reusable rather than a one-off prompt."
+context: fork
 argument-hint: "Describe the workflow you keep repeating: trigger, inputs, steps, outputs, and stopping rules."
 user-invocable: true
 disable-model-invocation: false

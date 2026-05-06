@@ -1,6 +1,7 @@
 ---
 name: frontend-design
 description: "Design and build distinctive, production-grade frontend interfaces with a strong visual point of view. Use when the user asks for landing pages, dashboards, websites, app screens, React components, HTML/CSS layouts, UI polish, visual redesigns, styling refactors, or when a web interface feels generic and needs stronger art direction."
+context: fork
 argument-hint: "Describe the UI, audience, stack, constraints, and the aesthetic direction you want."
 user-invocable: true
 disable-model-invocation: true

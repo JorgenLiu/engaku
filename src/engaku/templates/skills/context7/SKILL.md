@@ -1,6 +1,7 @@
 ---
 name: context7
 description: Live, version-specific library documentation via context7 MCP. Invoke resolve-library-id + query-docs for accurate, up-to-date API references.
+context: fork
 user-invocable: true
 disable-model-invocation: false
 ---

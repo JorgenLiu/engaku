@@ -1,6 +1,7 @@
 ---
 name: doc-coauthoring
 description: "Co-author design docs, ADRs, RFCs, or task plans. Use when the user wants to write or refine a document collaboratively — not just request a one-shot draft."
+context: fork
 argument-hint: "Describe the document to co-author: type (ADR, RFC, design doc, task plan), topic, and audience."
 user-invocable: true
 disable-model-invocation: false

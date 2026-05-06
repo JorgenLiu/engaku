@@ -108,6 +108,49 @@ Lossless compactness: preserve complete technical substance (code, paths, comman
 
 Teams that want Caveman's exact compression modes can install it separately: `npx skills add JuliusBrussee/caveman -a github-copilot`. Engaku uses its own Caveman-inspired rules and does not copy upstream skill text.
 
+## User-level compact instruction
+
+A user-level `compact.instructions.md` suppresses affirmations, intent narration, and pre-tool status updates across all workspaces. Copilot reads it automatically from:
+
+| Platform | Path |
+|----------|------|
+| macOS / Linux | `~/.copilot/instructions/compact.instructions.md` |
+| Windows | `%USERPROFILE%\.copilot\instructions\compact.instructions.md` |
+
+**Linux / macOS:**
+
+```sh
+mkdir -p ~/.copilot/instructions
+cat > ~/.copilot/instructions/compact.instructions.md << 'EOF'
+---
+applyTo: "**"
+---
+NEVER output warmth, curiosity, playfulness, or personality. NEVER say "Great!", "Sure!", "Happy to help!", or any affirmation.
+NEVER narrate what you are about to do ("I will now...", "Let me...", "I'll start by..."). Report actions and findings only.
+NEVER send intermediary status updates before using tools. Use tools immediately; narrate nothing.
+ALWAYS respond in the most compact, information-dense form. Fragments are preferred over prose sentences.
+ALWAYS use bullets or tables when listing multiple items. NEVER default to flowing prose paragraphs.
+EOF
+```
+
+**Windows (PowerShell):**
+
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.copilot\instructions" | Out-Null
+@'
+---
+applyTo: "**"
+---
+NEVER output warmth, curiosity, playfulness, or personality. NEVER say "Great!", "Sure!", "Happy to help!", or any affirmation.
+NEVER narrate what you are about to do ("I will now...", "Let me...", "I'll start by..."). Report actions and findings only.
+NEVER send intermediary status updates before using tools. Use tools immediately; narrate nothing.
+ALWAYS respond in the most compact, information-dense form. Fragments are preferred over prose sentences.
+ALWAYS use bullets or tables when listing multiple items. NEVER default to flowing prose paragraphs.
+'@ | Set-Content "$env:USERPROFILE\.copilot\instructions\compact.instructions.md" -Encoding UTF8
+```
+
+The `applyTo: "**"` pattern makes this instruction active in every workspace without any per-project configuration.
+
 ## MCP Servers
 
 `engaku init` creates `.vscode/mcp.json` with three preconfigured MCP servers that give VS Code Copilot structured tool access to browser automation, live library documentation, and databases. Use `engaku init --no-mcp` to skip this entirely.

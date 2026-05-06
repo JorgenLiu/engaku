@@ -1,6 +1,7 @@
 ---
 name: mcp-builder
 description: "Guide building MCP servers in Python (FastMCP) or TypeScript. Use when the user asks to build an MCP server or integrate an external API/service via MCP."
+context: fork
 argument-hint: "Describe the MCP server to build: what API or service it wraps, which language (Python/TypeScript), and any constraints."
 user-invocable: true
 disable-model-invocation: false
