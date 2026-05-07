@@ -214,7 +214,6 @@ def run(cwd=None, no_mcp=False):
 
     # ── .vscode/settings.json ── VS Code settings for hooks and skill context ─
     _ensure_vscode_setting(cwd, "chat.useCustomAgentHooks", True, out)
-    _ensure_vscode_setting(cwd, "github.copilot.chat.skillTool.enabled", True, out)
 
     # ── .vscode/mcp.json ── MCP server configuration ────────────────────────
     if not no_mcp:

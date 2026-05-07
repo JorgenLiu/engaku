@@ -365,7 +365,7 @@ class TestInit(unittest.TestCase):
         with open(settings_path) as f:
             settings = json.load(f)
         self.assertTrue(settings.get("chat.useCustomAgentHooks"), "chat.useCustomAgentHooks should be True")
-        self.assertTrue(settings.get("github.copilot.chat.skillTool.enabled"), "github.copilot.chat.skillTool.enabled should be True")
+        self.assertNotIn("github.copilot.chat.skillTool.enabled", settings, "skillTool setting must not be generated")
 
     def test_vscode_settings_preserves_existing(self):
         """engaku init merges new settings without overwriting pre-existing ones."""
@@ -382,7 +382,7 @@ class TestInit(unittest.TestCase):
         self.assertEqual(settings.get("editor.tabSize"), 4, "pre-existing editor.tabSize must be preserved")
         self.assertEqual(settings.get("unrelated.setting"), "keep-me", "pre-existing unrelated.setting must be preserved")
         self.assertTrue(settings.get("chat.useCustomAgentHooks"))
-        self.assertTrue(settings.get("github.copilot.chat.skillTool.enabled"))
+        self.assertNotIn("github.copilot.chat.skillTool.enabled", settings)
 
 
 if __name__ == "__main__":

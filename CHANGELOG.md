@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+## [1.1.15] - 2026-05-07
+
+### Changed
+- Temporarily removed bundled skill `context: fork` frontmatter and stopped generating `github.copilot.chat.skillTool.enabled` because upstream skill-tool/fork behavior is still experimental and can cause confusing subagent/tool behavior (refs: microsoft/vscode#312445, microsoft/vscode#312904, kimseungbin/claude-skills#13).
+
 ## [1.1.14] - 2026-05-06
 
 ### Added

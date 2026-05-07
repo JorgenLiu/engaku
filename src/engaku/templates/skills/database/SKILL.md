@@ -1,7 +1,6 @@
 ---
 name: database
 description: Multi-database access via dbhub MCP. Explore schema with search_objects before writing SQL, format DSN strings, prefer read-only exploration.
-context: fork
 user-invocable: true
 disable-model-invocation: false
 ---

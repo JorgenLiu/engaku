@@ -1,7 +1,6 @@
 ---
 name: chrome-devtools
 description: Browser automation and DevTools via chrome-devtools-mcp. Screenshot for visual verification, Lighthouse for performance audits, navigate + snapshot for UI automation.
-context: fork
 user-invocable: true
 disable-model-invocation: false
 ---
