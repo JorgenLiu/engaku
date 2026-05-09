@@ -72,6 +72,19 @@ def _copy_template(src, dst, out):
     out.append("[create]  {}".format(dst))
 
 
+def _copy_skill_dir(tpl_skill_dir, dst_skill_dir, out):
+    """Copy all files in tpl_skill_dir to dst_skill_dir, skipping existing files."""
+    if not os.path.isdir(tpl_skill_dir):
+        return
+    for dirpath, dirnames, filenames in os.walk(tpl_skill_dir):
+        dirnames.sort()
+        for filename in sorted(filenames):
+            src = os.path.join(dirpath, filename)
+            rel = os.path.relpath(src, tpl_skill_dir)
+            dst = os.path.join(dst_skill_dir, rel)
+            _copy_template(src, dst, out)
+
+
 def _write_engaku_json(cwd, no_mcp, out):
     """Generate .ai/engaku.json, skipping if already exists."""
     import json
@@ -181,10 +194,15 @@ def run(cwd=None, no_mcp=False):
 
     # ── .github/skills/ ──────────────────────────────────────────────────────
     skills_dir = os.path.join(cwd, ".github", "skills")
-    for skill in ("systematic-debugging", "verification-before-completion", "frontend-design", "proactive-initiative", "mcp-builder", "doc-coauthoring", "brainstorming", "karpathy-guidelines", "skill-authoring"):
-        _copy_template(
-            os.path.join(tpl, "skills", skill, "SKILL.md"),
-            os.path.join(skills_dir, skill, "SKILL.md"),
+    for skill in (
+        "systematic-debugging", "verification-before-completion",
+        "frontend-design", "proactive-initiative", "mcp-builder",
+        "doc-coauthoring", "brainstorming", "karpathy-guidelines",
+        "skill-authoring", "xlsx-analyze", "docx-read",
+    ):
+        _copy_skill_dir(
+            os.path.join(tpl, "skills", skill),
+            os.path.join(skills_dir, skill),
             out,
         )
 
@@ -206,9 +224,9 @@ def run(cwd=None, no_mcp=False):
     # ── .github/skills/ (MCP-related, conditional) ────────────────────────────
     if not no_mcp:
         for skill in ("chrome-devtools", "context7", "database"):
-            _copy_template(
-                os.path.join(tpl, "skills", skill, "SKILL.md"),
-                os.path.join(skills_dir, skill, "SKILL.md"),
+            _copy_skill_dir(
+                os.path.join(tpl, "skills", skill),
+                os.path.join(skills_dir, skill),
                 out,
             )
 

@@ -31,6 +31,16 @@ EXPECTED_FILES = [
     os.path.join(".github", "skills", "database", "SKILL.md"),
     os.path.join(".github", "skills", "karpathy-guidelines", "SKILL.md"),
     os.path.join(".github", "skills", "skill-authoring", "SKILL.md"),
+    os.path.join(".github", "skills", "xlsx-analyze", "SKILL.md"),
+    os.path.join(".github", "skills", "xlsx-analyze", "requirements-py38.txt"),
+    os.path.join(".github", "skills", "xlsx-analyze", "scripts", "inspect_workbook.py"),
+    os.path.join(".github", "skills", "xlsx-analyze", "scripts", "profile_sheet.py"),
+    os.path.join(".github", "skills", "xlsx-analyze", "scripts", "formula_graph.py"),
+    os.path.join(".github", "skills", "docx-read", "SKILL.md"),
+    os.path.join(".github", "skills", "docx-read", "requirements-py38.txt"),
+    os.path.join(".github", "skills", "docx-read", "scripts", "inspect_docx.py"),
+    os.path.join(".github", "skills", "docx-read", "scripts", "extract_text.py"),
+    os.path.join(".github", "skills", "docx-read", "scripts", "docx_to_html.py"),
     os.path.join(".github", "copilot-instructions.md"),
     os.path.join(".github", "instructions", "lessons.instructions.md"),
     os.path.join(".github", "instructions", "agent-boundaries.instructions.md"),
@@ -183,6 +193,15 @@ class TestInit(unittest.TestCase):
             content = f.read()
         self.assertIn('"templates/*.toml"', content)
 
+    def test_package_data_includes_skill_scripts(self):
+        """pyproject.toml package-data includes requirements and script globs."""
+        root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        with open(os.path.join(root, "pyproject.toml")) as f:
+            content = f.read()
+        self.assertIn("templates/skills/*/requirements", content)
+        self.assertIn("templates/skills/*/scripts/*.py", content)
+        self.assertIn("dependencies = []", content)
+
     def test_dbhub_toml_created_by_default_init(self):
         """engaku init creates .vscode/dbhub.toml as comment-only guidance."""
         _git_init(self.tmpdir)
@@ -231,6 +250,16 @@ class TestInit(unittest.TestCase):
         self.assertTrue(os.path.exists(kg_path), "karpathy-guidelines should exist with --no-mcp")
         sa_path = os.path.join(self.tmpdir, ".github", "skills", "skill-authoring", "SKILL.md")
         self.assertTrue(os.path.exists(sa_path), "skill-authoring should exist with --no-mcp")
+        # xlsx-analyze should exist (non-MCP skill)
+        xlsx_path = os.path.join(self.tmpdir, ".github", "skills", "xlsx-analyze", "SKILL.md")
+        self.assertTrue(os.path.exists(xlsx_path), "xlsx-analyze should exist with --no-mcp")
+        xlsx_req = os.path.join(self.tmpdir, ".github", "skills", "xlsx-analyze", "requirements-py38.txt")
+        self.assertTrue(os.path.exists(xlsx_req), "xlsx-analyze requirements-py38.txt should exist with --no-mcp")
+        # docx-read should exist (non-MCP skill)
+        docx_path = os.path.join(self.tmpdir, ".github", "skills", "docx-read", "SKILL.md")
+        self.assertTrue(os.path.exists(docx_path), "docx-read should exist with --no-mcp")
+        docx_req = os.path.join(self.tmpdir, ".github", "skills", "docx-read", "requirements-py38.txt")
+        self.assertTrue(os.path.exists(docx_req), "docx-read requirements-py38.txt should exist with --no-mcp")
         tb_path = os.path.join(self.tmpdir, ".github", "skills", "token-budget", "SKILL.md")
         self.assertFalse(os.path.exists(tb_path), "token-budget skill should not be generated")
     def test_mcp_json_is_valid(self):

@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: engaku
-Version: 1.1.15
+Version: 1.1.16
 Summary: AI persistent memory layer for VS Code Copilot
 License: MIT
 Project-URL: Homepage, https://github.com/JorgenLiu/engaku
@@ -63,7 +63,7 @@ After running `init`, VS Code Agent Hooks are active. The `@coder`, `@planner`, 
 .vscode/
   settings.json     — enables VS Code custom agent hooks
   mcp.json          — MCP server configuration (chrome-devtools, context7, dbhub)
-  dbhub.toml        — DBHub MCP guardrail/template config
+  dbhub.toml        — DBHub MCP TOML config (fill in your database sources)
 ```
 
 `engaku init --no-mcp` skips both `.vscode/mcp.json` and `.vscode/dbhub.toml`, along with the MCP-related skills.
@@ -211,37 +211,33 @@ The `applyTo: "**"` pattern makes this instruction active in every workspace wit
 
 [github.com/bytebase/dbhub](https://github.com/bytebase/dbhub) — Multi-database access supporting PostgreSQL, MySQL, MariaDB, SQL Server, and SQLite. Two tools: `search_objects` (schema exploration) and `execute_sql` (query execution).
 
-**Prerequisites:** Node.js. Requires a DSN connection string (VS Code prompts on first use; the prompt is password-protected so the value is not stored in plain text). `engaku init` generates `.vscode/dbhub.toml` as an editable template with `readonly = true` and `max_rows = 1000` guardrails; secrets stay in the password-protected MCP input and never touch the TOML file.
+**Prerequisites:** Node.js. `engaku init` generates `.vscode/dbhub.toml` as a comment-only stub wired to `--config`. Fill it in with your own `[[sources]]` and optional `[[tools]]` entries; see [dbhub.ai/config/toml](https://dbhub.ai/config/toml) for the full schema.
 
 ```json
 {
   "dbhub": {
     "type": "stdio",
     "command": "npx",
-    "args": ["-y", "@bytebase/dbhub@latest", "--transport", "stdio", "--config", "${workspaceFolder}/.vscode/dbhub.toml"],
-    "env": {
-      "DBHUB_DSN": "${input:db-dsn}"
-    }
+    "args": ["-y", "@bytebase/dbhub@latest", "--transport", "stdio", "--config", "${workspaceFolder}/.vscode/dbhub.toml"]
   }
 }
 ```
 
-The generated `.vscode/dbhub.toml`:
+The generated `.vscode/dbhub.toml` is a comment-only template — fill in your databases:
 
 ```toml
-[[sources]]
-id   = "default"
-dsn  = "${DBHUB_DSN}"
-lazy = true
-
-[[tools]]
-name     = "execute_sql"
-source   = "default"
-readonly = true
-max_rows = 1000
+# See full config reference: https://dbhub.ai/config/toml
+#
+# [[sources]]
+# id   = "default"
+# dsn  = "postgres://user:pass@localhost:5432/mydb"
+# lazy = true
+#
+# [[tools]]
+# name     = "execute_sql"
+# source   = "default"
+# readonly = true
 ```
-
-Edit `.vscode/dbhub.toml` to add more sources, enable writes, or change row limits. For inline `--dsn` without a TOML file (manual override), replace `--config …` and the `env` block with `"--dsn", "${input:db-dsn}"` directly in `.vscode/mcp.json`.
 
 ## Optional MCP Servers
 

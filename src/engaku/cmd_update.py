@@ -28,6 +28,8 @@ _SKILLS = (
     "database",
     "karpathy-guidelines",
     "skill-authoring",
+    "xlsx-analyze",
+    "docx-read",
 )
 
 _AGENTS = (
@@ -69,6 +71,19 @@ def _force_copy(src, dst, out):
     out.append("{}  {}".format(action, dst))
 
 
+def _force_copy_skill_dir(tpl_skill_dir, dst_skill_dir, out):
+    """Copy all files in tpl_skill_dir to dst_skill_dir, always overwriting."""
+    if not os.path.isdir(tpl_skill_dir):
+        return
+    for dirpath, dirnames, filenames in os.walk(tpl_skill_dir):
+        dirnames.sort()
+        for filename in sorted(filenames):
+            src = os.path.join(dirpath, filename)
+            rel = os.path.relpath(src, tpl_skill_dir)
+            dst = os.path.join(dst_skill_dir, rel)
+            _force_copy(src, dst, out)
+
+
 def run(cwd=None):
     if cwd is None:
         cwd = os.getcwd()
@@ -95,9 +110,9 @@ def run(cwd=None):
     # ── .github/skills/ ──────────────────────────────────────────────────────
     skills_dir = os.path.join(cwd, ".github", "skills")
     for skill in _SKILLS:
-        _force_copy(
-            os.path.join(tpl, "skills", skill, "SKILL.md"),
-            os.path.join(skills_dir, skill, "SKILL.md"),
+        _force_copy_skill_dir(
+            os.path.join(tpl, "skills", skill),
+            os.path.join(skills_dir, skill),
             out,
         )
 

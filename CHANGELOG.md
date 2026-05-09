@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+## [1.1.17] - 2026-05-09
+
+### Added
+- Bundled `xlsx-analyze` skill with three helper scripts for Python 3.8.4: `inspect_workbook.py` (workbook structure, sheet dimensions, formula count), `profile_sheet.py` (column dtype/missing/unique/numeric stats using pandas), and `formula_graph.py` (formula dependency graph via `openpyxl.formula.Tokenizer`). Formulas are parsed but never evaluated.
+- Bundled `docx-read` skill with three helper scripts for Python 3.8.4: `inspect_docx.py` (paragraph/heading/table/image/section counts), `extract_text.py` (sequential paragraph, heading, and table content blocks), and `docx_to_html.py` (Mammoth-backed HTML/plain-text conversion).
+- Each Office skill includes a `requirements-py38.txt` with pinned dependencies (numpy, pandas, openpyxl for xlsx-analyze; python-docx, lxml, Mammoth for docx-read). Neither set is added to Engaku's main runtime dependencies.
+- `engaku init` and `engaku update` now copy entire skill directories (SKILL.md + requirements + scripts) instead of only SKILL.md, enabling bundled helper scripts for any skill.
+
+### Changed
+- `pyproject.toml` package-data now includes `templates/skills/*/requirements*.txt` and `templates/skills/*/scripts/*.py` globs so bundled helper scripts are distributed with the package.
+
 ## [1.1.16] - 2026-05-09
 
 ### Changed

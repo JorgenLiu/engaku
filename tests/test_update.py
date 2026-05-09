@@ -247,15 +247,65 @@ class TestUpdate(unittest.TestCase):
             path = os.path.join(self.tmpdir, ".github", "agents", name)
             self.assertTrue(os.path.exists(path), "Missing agent: {}".format(name))
 
+    def test_xlsx_analyze_skill_included(self):
+        self.assertIn("xlsx-analyze", _SKILLS)
+
+    def test_docx_read_skill_included(self):
+        self.assertIn("docx-read", _SKILLS)
+
+    def test_creates_docx_read_skill_files_in_fresh_repo(self):
+        """run update on a fresh repo, verify docx-read skill files are created."""
+        _git_init(self.tmpdir)
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        base = os.path.join(self.tmpdir, ".github", "skills", "docx-read")
+        for rel in (
+            "SKILL.md",
+            "requirements-py38.txt",
+            os.path.join("scripts", "inspect_docx.py"),
+            os.path.join("scripts", "extract_text.py"),
+            os.path.join("scripts", "docx_to_html.py"),
+        ):
+            self.assertTrue(
+                os.path.exists(os.path.join(base, rel)),
+                "Missing docx-read file: {}".format(rel),
+            )
+
+    def test_creates_xlsx_analyze_skill_files_in_fresh_repo(self):
+        """run update on a fresh repo, verify xlsx-analyze skill files are created."""
+        _git_init(self.tmpdir)
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        base = os.path.join(self.tmpdir, ".github", "skills", "xlsx-analyze")
+        for rel in (
+            "SKILL.md",
+            "requirements-py38.txt",
+            os.path.join("scripts", "inspect_workbook.py"),
+            os.path.join("scripts", "profile_sheet.py"),
+            os.path.join("scripts", "formula_graph.py"),
+        ):
+            self.assertTrue(
+                os.path.exists(os.path.join(base, rel)),
+                "Missing xlsx-analyze file: {}".format(rel),
+            )
+
     def test_summary_counts_correct_for_fresh_repo(self):
         _git_init(self.tmpdir)
         code, out, _ = self._capture_run()
         self.assertEqual(code, 0)
         self.assertIn("Done.", out)
-        # All files are new → no [update] lines for agent/skill files
-        # (+1 for .vscode/settings.json, +2 for generated instruction stubs)
+        # Count expected files by walking each skill's template directory
+        import engaku.cmd_update as _cu
+        tpl = os.path.join(os.path.dirname(_cu.__file__), "templates")
+        skill_file_count = 0
+        for skill in _SKILLS:
+            skill_dir = os.path.join(tpl, "skills", skill)
+            if os.path.isdir(skill_dir):
+                for _, _, files in os.walk(skill_dir):
+                    skill_file_count += len(files)
+        # +1 for .vscode/settings.json, +2 for generated instruction stubs
         created = out.count("[create]")
-        self.assertEqual(created, len(_AGENTS) + len(_SKILLS) + 3)
+        self.assertEqual(created, len(_AGENTS) + skill_file_count + 3)
 
     def test_update_merges_mcp_servers(self):
         """run init, remove one server from mcp.json, run update, verify restored."""

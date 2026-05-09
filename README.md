@@ -78,6 +78,41 @@ After `engaku init`, five Agent Hooks fire automatically:
 
 > **Python 3.8 baseline:** v1.1.x continues to support Python 3.8. The future Python 3.11 migration remains deferred.
 
+## Bundled Office skills
+
+`engaku init` and `engaku update` deploy two optional Office read/analysis skills into `.github/skills/`. Each ships a `requirements-py38.txt` with pinned Python 3.8.4-compatible dependencies and helper scripts. Engaku itself still has **no third-party runtime dependencies**.
+
+### xlsx-analyze
+
+Inspect Excel workbooks and delimited files, profile column data, and map formula relationships.
+
+```bash
+python -m pip install -r .github/skills/xlsx-analyze/requirements-py38.txt
+# inspect workbook structure
+python .github/skills/xlsx-analyze/scripts/inspect_workbook.py file.xlsx --format json
+# profile a sheet's columns
+python .github/skills/xlsx-analyze/scripts/profile_sheet.py file.xlsx --sheet Sheet1 --format json
+# build a formula dependency graph (no formula evaluation)
+python .github/skills/xlsx-analyze/scripts/formula_graph.py file.xlsx --sheet Sheet1 --format json
+```
+
+Supports `.xlsx`, `.xlsm`, `.csv`, and `.tsv`. Formula relationships are inferred via `openpyxl.formula.Tokenizer` without evaluating any formula.
+
+### docx-read
+
+Read and inspect DOCX files, extract paragraphs/headings/tables, and optionally convert to HTML or plain text.
+
+```bash
+python -m pip install -r .github/skills/docx-read/requirements-py38.txt
+# inspect document structure
+python .github/skills/docx-read/scripts/inspect_docx.py report.docx --format json
+# extract text content
+python .github/skills/docx-read/scripts/extract_text.py report.docx --include-tables --format markdown
+# convert to HTML (Mammoth; output is NOT sanitized — review before rendering)
+python .github/skills/docx-read/scripts/docx_to_html.py report.docx --output out.html
+```
+
+
 ## Configuration
 
 ### Hook Python interpreter
