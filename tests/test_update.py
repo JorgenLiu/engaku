@@ -296,10 +296,10 @@ class TestUpdate(unittest.TestCase):
         args = db.get("args", [])
         self.assertIn("--config", args, "dbhub must use --config after merge")
         self.assertNotIn("--dsn", args, "dbhub must not use --dsn after merge")
-        # inputs merged by id — db-dsn should be present
+        # No db-dsn input — credentials belong in dbhub.toml
         inputs = result.get("inputs", [])
         ids = [i.get("id") for i in inputs if isinstance(i, dict)]
-        self.assertIn("db-dsn", ids, "db-dsn input must be present after merge")
+        self.assertNotIn("db-dsn", ids, "db-dsn input must not be present in mcp.json after merge")
         self.assertIn("[update]", out)
 
     def test_update_injects_mcp_tools_into_agents(self):

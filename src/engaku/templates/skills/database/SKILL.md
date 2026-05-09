@@ -25,7 +25,7 @@ Multi-database access (PostgreSQL, MySQL, MariaDB, SQL Server, SQLite) through o
 
 ## DSN Formats
 
-The `${input:db-dsn}` prompt in `.vscode/mcp.json` expects:
+DSN format by database type (set in `.vscode/dbhub.toml`):
 
 | Database | DSN |
 |----------|-----|
@@ -35,27 +35,14 @@ The `${input:db-dsn}` prompt in `.vscode/mcp.json` expects:
 | SQL Server | `sqlserver://user:pass@host:1433/db` |
 | SQLite | `sqlite:///absolute/path/to/file.db` or `sqlite://relative/path.db` |
 
-## Environment Variable Alternative
+## Environment Variable Interpolation
 
-Passwords with `:` / `@` / `#` break URL encoding. Use env vars and leave the DSN empty:
+Use `${VAR_NAME}` in `dbhub.toml` to keep secrets out of the file:
 
-```json
-{
-  "servers": {
-    "dbhub": {
-      "command": "npx",
-      "args": ["-y", "@bytebase/dbhub@latest", "--transport", "stdio", "--dsn", "${input:db-dsn}"],
-      "env": {
-        "DB_TYPE": "postgres",
-        "DB_HOST": "localhost",
-        "DB_PORT": "5432",
-        "DB_USER": "myuser",
-        "DB_PASSWORD": "my@complex#pass",
-        "DB_NAME": "mydb"
-      }
-    }
-  }
-}
+```toml
+[[sources]]
+id  = "default"
+dsn = "${DATABASE_URL}"
 ```
 
 ## SSL/TLS
@@ -65,63 +52,52 @@ Passwords with `:` / `@` / `#` break URL encoding. Use env vars and leave the DS
 
 ## SSH Tunneling
 
-For databases behind a bastion:
+For databases behind a bastion, configure the tunnel in `dbhub.toml`:
 
-```json
-{
-  "command": "npx",
-  "args": [
-    "@bytebase/dbhub@latest",
-    "--dsn", "postgres://user:pass@localhost:5432/db",
-    "--ssh-host", "bastion.example.com",
-    "--ssh-user", "ubuntu",
-    "--ssh-key", "~/.ssh/id_rsa"
-  ]
-}
+```toml
+[[sources]]
+id       = "db-via-bastion"
+dsn      = "postgres://user:pass@10.0.1.100:5432/mydb"
+ssh_host = "bastion.example.com"
+ssh_user = "ubuntu"
+ssh_key  = "~/.ssh/id_rsa"
 ```
 
 ## Multi-Database Setup
 
-Use distinct `--id` values so tools are named per source:
-
-```json
-{
-  "servers": {
-    "dbhub-prod": {
-      "command": "npx",
-      "args": ["@bytebase/dbhub@latest", "--dsn", "${input:dbDsnProd}", "--id", "prod"]
-    },
-    "dbhub-staging": {
-      "command": "npx",
-      "args": ["@bytebase/dbhub@latest", "--dsn", "${input:dbDsnStaging}", "--id", "staging"]
-    }
-  }
-}
-```
-
-Yields `execute_sql_prod` vs `execute_sql_staging`.
-
-## Guardrails
-
-`engaku init` generates `.vscode/dbhub.toml` as the default DBHub config. The DSN comes from `DBHUB_DSN` set in `.vscode/mcp.json` — secrets stay out of the TOML, which is safe to commit.
+Use multiple `[[sources]]` blocks in `dbhub.toml` — each source ID is appended to tool names:
 
 ```toml
 [[sources]]
-id   = "default"
-dsn  = "${DBHUB_DSN}"
-lazy = true
+id  = "prod"
+dsn = "${DB_PROD_DSN}"
 
-[[tools]]
-name     = "execute_sql"
-source   = "default"
-readonly = true
-max_rows = 1000
+[[sources]]
+id  = "staging"
+dsn = "${DB_STAGING_DSN}"
 ```
 
-- `readonly = true` blocks accidental writes.
-- `max_rows` caps result sizes.
-- Edit `.vscode/dbhub.toml` to add sources, change guardrails, or enable writes.
-- For an inline override without TOML, use `--dsn "${input:db-dsn}"` directly in `.vscode/mcp.json`.
+Yields `execute_sql_prod` and `execute_sql_staging`.
+
+## Guardrails
+
+`engaku init` generates `.vscode/dbhub.toml` as a comment-only stub wired via `--config`. Fill in your own `[[sources]]` and `[[tools]]` entries; see [dbhub.ai/config/toml](https://dbhub.ai/config/toml) for the full schema.
+
+```toml
+# [[sources]]
+# id   = "default"
+# dsn  = "postgres://user:pass@localhost:5432/mydb"
+# lazy = true
+
+# [[tools]]
+# name     = "execute_sql"
+# source   = "default"
+# readonly = true      # optional: block writes
+```
+
+- Add `readonly = true` to block accidental writes.
+- Add `max_rows` to cap result sets.
+- Use `${ENV_VAR}` interpolation in the TOML for secrets; the file is safe to commit when env vars hold credentials.
 - Always `search_objects` before querying unfamiliar databases.
 
 ## Tips

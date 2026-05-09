@@ -1,12 +1,4 @@
 {
-  "inputs": [
-    {
-      "type": "promptString",
-      "id": "db-dsn",
-      "description": "Database connection string for dbhub (e.g. postgresql://user:pass@host:5432/db).",
-      "password": true
-    }
-  ],
   "servers": {
     "chrome-devtools": {
       "command": "npx",
@@ -19,10 +11,7 @@
     "dbhub": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@bytebase/dbhub@latest", "--transport", "stdio", "--config", "${workspaceFolder}/.vscode/dbhub.toml"],
-      "env": {
-        "DBHUB_DSN": "${input:db-dsn}"
-      }
+      "args": ["-y", "@bytebase/dbhub@latest", "--transport", "stdio", "--config", "${workspaceFolder}/.vscode/dbhub.toml"]
     }
   }
 }

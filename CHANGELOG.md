@@ -2,6 +2,14 @@
 
 ## [Unreleased]
 
+## [1.1.16] - 2026-05-09
+
+### Changed
+- Generated `.vscode/dbhub.toml` is now a comment-only guidance file linking to `https://dbhub.ai/config/toml`. Users fill in their own `[[sources]]` and `[[tools]]` entries; Engaku no longer owns opinionated defaults that drift against DBHub schema changes.
+- Generated `.vscode/mcp.json` no longer includes an `inputs` block or `env.DBHUB_DSN`. DBHub credentials belong in the TOML via `${ENV_VAR}` interpolation, not in the MCP server config.
+- Bundled `src/engaku/templates/ai/engaku.json` planner MCP allocation aligned with runtime behavior: planner now has `chrome-devtools/*`, `context7/*`, and `dbhub/*` consistently with `cmd_init._write_engaku_json`, README, and tests.
+- Updated database skill and README to reflect the comment-only TOML template and refer users to upstream DBHub docs for schema details.
+
 ## [1.1.15] - 2026-05-07
 
 ### Changed

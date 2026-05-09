@@ -184,7 +184,7 @@ class TestInit(unittest.TestCase):
         self.assertIn('"templates/*.toml"', content)
 
     def test_dbhub_toml_created_by_default_init(self):
-        """engaku init creates .vscode/dbhub.toml with DBHUB_DSN and guardrails."""
+        """engaku init creates .vscode/dbhub.toml as comment-only guidance."""
         _git_init(self.tmpdir)
         code, _, _ = self._capture_run()
         self.assertEqual(code, 0)
@@ -192,9 +192,11 @@ class TestInit(unittest.TestCase):
         self.assertTrue(os.path.exists(toml_path), "dbhub.toml should be created")
         with open(toml_path) as f:
             content = f.read()
-        self.assertIn("DBHUB_DSN", content)
-        self.assertIn("readonly = true", content)
-        self.assertIn("max_rows = 1000", content)
+        self.assertIn("https://dbhub.ai/config/toml", content)
+        self.assertNotIn("DBHUB_DSN", content)
+        # Ensure no active (uncommented) entries exist — only comment lines
+        self.assertNotIn("\nreadonly = true", content)
+        self.assertNotIn("\nmax_rows = 1000", content)
 
     def test_dbhub_toml_preserved_on_second_init(self):
         """engaku init preserves existing .vscode/dbhub.toml."""
@@ -255,12 +257,11 @@ class TestInit(unittest.TestCase):
         self.assertIn("--config", args)
         self.assertIn("${workspaceFolder}/.vscode/dbhub.toml", args)
         self.assertNotIn("--dsn", args, "dbhub must use TOML config, not --dsn")
-        self.assertEqual(db.get("env", {}).get("DBHUB_DSN"), "${input:db-dsn}")
-        # DBHub input assertions
+        self.assertNotIn("env", db, "dbhub must not have an env block (credentials belong in dbhub.toml)")
+        # No db-dsn input — credentials belong in dbhub.toml, not mcp.json
         inputs = data.get("inputs", [])
-        db_input = next((i for i in inputs if isinstance(i, dict) and i.get("id") == "db-dsn"), None)
-        self.assertIsNotNone(db_input, "inputs must contain an entry with id=db-dsn")
-        self.assertTrue(db_input.get("password"), "db-dsn input must have password=true")
+        ids = [i.get("id") for i in inputs if isinstance(i, dict)]
+        self.assertNotIn("db-dsn", ids, "db-dsn input must not be present in mcp.json")
 
     def test_default_init_injects_mcp_tools_into_agents(self):
         """Default init writes MCP tools into agent frontmatter via apply."""
