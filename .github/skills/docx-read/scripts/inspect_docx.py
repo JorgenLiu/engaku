@@ -84,6 +84,8 @@ def _inspect(path):
     except Exception:
         pass
 
+    extras = _count_extras(path)
+
     return {
         "file": os.path.basename(path),
         "paragraphs": paragraph_count,
@@ -94,8 +96,80 @@ def _inspect(path):
         "sections": section_count,
         "has_header": has_header,
         "has_footer": has_footer,
+        "comment_count": extras["comment_count"],
+        "tracked_insertion_count": extras["tracked_insertion_count"],
+        "tracked_deletion_count": extras["tracked_deletion_count"],
+        "hyperlink_count": extras["hyperlink_count"],
+        "footnote_count": extras["footnote_count"],
+        "endnote_count": extras["endnote_count"],
         "properties": props,
     }
+
+
+def _count_extras(path):
+    """Count comments, tracked changes, hyperlinks, footnotes, and endnotes.
+
+    Read-only ZIP/XML inspection. No writing or formula evaluation.
+    All counts default to 0 on any parsing error.
+    """
+    import zipfile
+    import xml.etree.ElementTree as ET
+
+    W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+    result = {
+        "comment_count": 0,
+        "tracked_insertion_count": 0,
+        "tracked_deletion_count": 0,
+        "hyperlink_count": 0,
+        "footnote_count": 0,
+        "endnote_count": 0,
+    }
+    try:
+        with zipfile.ZipFile(path, "r") as z:
+            names = set(z.namelist())
+
+            if "word/comments.xml" in names:
+                with z.open("word/comments.xml") as f:
+                    root = ET.parse(f).getroot()
+                result["comment_count"] = len(
+                    root.findall("{%s}comment" % W)
+                )
+
+            if "word/document.xml" in names:
+                with z.open("word/document.xml") as f:
+                    root = ET.parse(f).getroot()
+                result["tracked_insertion_count"] = len(
+                    root.findall(".//{%s}ins" % W)
+                )
+                result["tracked_deletion_count"] = len(
+                    root.findall(".//{%s}del" % W)
+                )
+                result["hyperlink_count"] = len(
+                    root.findall(".//{%s}hyperlink" % W)
+                )
+
+            if "word/footnotes.xml" in names:
+                with z.open("word/footnotes.xml") as f:
+                    root = ET.parse(f).getroot()
+                result["footnote_count"] = sum(
+                    1 for fn in root.findall("{%s}footnote" % W)
+                    if fn.get("{%s}type" % W) not in (
+                        "separator", "continuationSeparator"
+                    )
+                )
+
+            if "word/endnotes.xml" in names:
+                with z.open("word/endnotes.xml") as f:
+                    root = ET.parse(f).getroot()
+                result["endnote_count"] = sum(
+                    1 for en in root.findall("{%s}endnote" % W)
+                    if en.get("{%s}type" % W) not in (
+                        "separator", "continuationSeparator"
+                    )
+                )
+    except Exception:
+        pass
+    return result
 
 
 def _to_markdown(data):
@@ -118,6 +192,12 @@ def _to_markdown(data):
     lines.append("| Sections | {} |".format(data.get("sections", 0)))
     lines.append("| Has Header | {} |".format(data.get("has_header", False)))
     lines.append("| Has Footer | {} |".format(data.get("has_footer", False)))
+    lines.append("| Comments | {} |".format(data.get("comment_count", 0)))
+    lines.append("| Tracked Insertions | {} |".format(data.get("tracked_insertion_count", 0)))
+    lines.append("| Tracked Deletions | {} |".format(data.get("tracked_deletion_count", 0)))
+    lines.append("| Hyperlinks | {} |".format(data.get("hyperlink_count", 0)))
+    lines.append("| Footnotes | {} |".format(data.get("footnote_count", 0)))
+    lines.append("| Endnotes | {} |".format(data.get("endnote_count", 0)))
     if data.get("tables"):
         lines.append("")
         lines.append("## Tables")

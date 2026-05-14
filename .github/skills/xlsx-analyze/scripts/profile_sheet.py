@@ -86,6 +86,18 @@ def _profile_df(df, sample_size):
                 except Exception:
                     pass
             col_info["date_like"] = date_hits >= max(1, len(sample) // 2)
+            non_null = series.dropna()
+            if len(non_null) > 0:
+                lengths = non_null.astype(str).str.len()
+                col_info["str_len_min"] = int(lengths.min())
+                col_info["str_len_max"] = int(lengths.max())
+                col_info["str_len_mean"] = round(float(lengths.mean()), 2)
+            if unique <= 20:
+                vc = series.value_counts(dropna=True).head(5)
+                col_info["top_values"] = [[str(k), int(v)] for k, v in vc.items()]
+            _BOOL_SET = {"true", "false", "yes", "no", "y", "n", "1", "0", "t", "f"}
+            unique_strs = set(str(v).strip().lower() for v in non_null.unique())
+            col_info["bool_like"] = bool(unique_strs) and unique_strs.issubset(_BOOL_SET)
         else:
             col_info["date_like"] = False
 
@@ -216,11 +228,32 @@ def main():
     if args.max_rows and len(df) >= args.max_rows:
         truncation_notes.append("Row count limited to {}.".format(args.max_rows))
 
+    try:
+        dup_row_count = int(df.duplicated().sum())
+    except Exception:
+        dup_row_count = 0
+
+    blank_header_warnings = []
+    dup_header_warnings = []
+    seen_col = {}
+    for idx, col in enumerate(df.columns):
+        col_str = str(col)
+        if col_str.strip() in ("", "nan"):
+            blank_header_warnings.append(idx)
+        if col_str in seen_col:
+            if col_str not in dup_header_warnings:
+                dup_header_warnings.append(col_str)
+        else:
+            seen_col[col_str] = idx
+
     data = {
         "file": os.path.basename(args.path),
         "sheet": args.sheet,
         "row_count": len(df),
         "column_count": len(df.columns),
+        "duplicate_row_count": dup_row_count,
+        "blank_header_warnings": blank_header_warnings,
+        "duplicate_header_warnings": dup_header_warnings,
         "columns": columns,
         "sample_rows": sample_rows,
         "truncation_notes": truncation_notes,

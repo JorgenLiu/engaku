@@ -2,7 +2,16 @@
 
 ## [Unreleased]
 
-## [1.1.17] - 2026-05-09
+## [1.1.18] - 2026-05-14
+
+### Added
+- GitHub MCP is now a default bundled server in `.vscode/mcp.json`. Uses the official read-only HTTP endpoint (`https://api.githubcopilot.com/mcp/readonly`) — no local runtime, no PAT setup required. OAuth via VS Code's GitHub Copilot connection.
+- `engaku init` and `engaku update` now deploy a `github` skill (`SKILL.md`) alongside the other MCP-related skills. Skipped by `--no-mcp`.
+- `github/*` MCP tools granted to `coder`, `planner`, and `reviewer` in default `engaku.json` config (not `scanner`).
+- Bundled `src/engaku/templates/skills/github/SKILL.md` covering read-only default, OAuth authentication, write-access authorization requirement, private-content handling, and prompt injection precautions.
+
+### Changed
+- Lesson trigger rule in `copilot-instructions.md` and `lessons.instructions.md` updated from incident-explanation style to method-first style: lessons must describe what to do differently next time (a check, sequence, constraint, or recovery step), not explain why something happened.
 
 ### Added
 - Bundled `xlsx-analyze` skill with three helper scripts for Python 3.8.4: `inspect_workbook.py` (workbook structure, sheet dimensions, formula count), `profile_sheet.py` (column dtype/missing/unique/numeric stats using pandas), and `formula_graph.py` (formula dependency graph via `openpyxl.formula.Tokenizer`). Formulas are parsed but never evaluated.

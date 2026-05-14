@@ -55,15 +55,64 @@ def _inspect_xlsx(path, max_sheets, max_formulas):
                             "formula": cell.value,
                         })
 
+        # Optional sheet features (safe access — not all openpyxl versions expose these)
+        try:
+            table_names = list(ws.tables.keys()) if hasattr(ws, "tables") else []
+        except Exception:
+            table_names = []
+        try:
+            chart_count = len(ws._charts) if hasattr(ws, "_charts") else 0
+        except Exception:
+            chart_count = 0
+        try:
+            dv_count = len(list(ws.data_validations.dataValidation))
+        except Exception:
+            dv_count = 0
+        try:
+            cf_rules = ws.conditional_formatting._cf_rules
+            cf_count = len(cf_rules) if hasattr(cf_rules, "__len__") else sum(
+                1 for _ in cf_rules
+            )
+        except Exception:
+            cf_count = 0
+
         sheets.append({
             "name": sheet_name,
+            "hidden": getattr(ws, "sheet_state", "visible") != "visible",
             "min_row": ws.min_row or 0,
             "max_row": ws.max_row or 0,
             "min_col": ws.min_column or 0,
             "max_col": ws.max_column or 0,
             "merged_cells": merged,
             "formula_count": formula_count,
+            "table_count": len(table_names),
+            "table_names": table_names,
+            "chart_count": chart_count,
+            "data_validation_count": dv_count,
+            "conditional_formatting_count": cf_count,
+            "freeze_panes": str(ws.freeze_panes) if ws.freeze_panes else None,
+            "auto_filter": (
+                ws.auto_filter.ref
+                if ws.auto_filter and ws.auto_filter.ref
+                else None
+            ),
         })
+
+    # Workbook-level optional features
+    try:
+        dn_list = (
+            wb.defined_names.definedName
+            if hasattr(wb.defined_names, "definedName")
+            else list(wb.defined_names)
+        )
+        defined_name_count = len(list(dn_list))
+    except Exception:
+        defined_name_count = 0
+
+    try:
+        external_link_count = len(wb._external_links)
+    except Exception:
+        external_link_count = 0
 
     wb.close()
     ext = os.path.splitext(path)[1].lower().lstrip(".")
@@ -71,6 +120,8 @@ def _inspect_xlsx(path, max_sheets, max_formulas):
         "file": os.path.basename(path),
         "format": ext,
         "sheet_count": len(sheet_names),
+        "defined_name_count": defined_name_count,
+        "external_link_count": external_link_count,
         "sheets": sheets,
         "sample_formulas": sample_formulas,
     }
@@ -85,10 +136,8 @@ def _inspect_csv(path):
 
     with open(path, "r", encoding="utf-8", errors="replace", newline="") as f:
         reader = csv.reader(f, delimiter=delimiter)
-        rows = list(reader)
-
-    headers = rows[0] if rows else []
-    row_count = len(rows) - 1 if rows else 0
+        headers = next(reader, [])
+        row_count = sum(1 for _ in reader)
 
     return {
         "file": os.path.basename(path),
@@ -107,18 +156,25 @@ def _to_markdown(data):
 
     if "sheets" in data:
         lines.append("**Sheet count:** {}".format(data.get("sheet_count", "")))
+        if data.get("defined_name_count"):
+            lines.append("**Defined names:** {}".format(data["defined_name_count"]))
+        if data.get("external_link_count"):
+            lines.append("**External links:** {}".format(data["external_link_count"]))
         lines.append("")
         lines.append("## Sheets")
         lines.append("")
-        lines.append("| Sheet | Rows | Cols | Merged | Formulas |")
-        lines.append("|-------|------|------|--------|----------|")
+        lines.append("| Sheet | Hidden | Rows | Cols | Merged | Formulas | Tables | Charts |")
+        lines.append("|-------|--------|------|------|--------|----------|--------|--------|")
         for s in data["sheets"]:
-            lines.append("| {} | {}-{} | {}-{} | {} | {} |".format(
+            lines.append("| {} | {} | {}-{} | {}-{} | {} | {} | {} | {} |".format(
                 s["name"],
+                "yes" if s.get("hidden") else "no",
                 s["min_row"], s["max_row"],
                 s["min_col"], s["max_col"],
                 s["merged_cells"],
                 s["formula_count"],
+                s.get("table_count", 0),
+                s.get("chart_count", 0),
             ))
         if data.get("sample_formulas"):
             lines.append("")

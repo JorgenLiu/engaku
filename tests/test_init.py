@@ -29,6 +29,7 @@ EXPECTED_FILES = [
     os.path.join(".github", "skills", "chrome-devtools", "SKILL.md"),
     os.path.join(".github", "skills", "context7", "SKILL.md"),
     os.path.join(".github", "skills", "database", "SKILL.md"),
+    os.path.join(".github", "skills", "github", "SKILL.md"),
     os.path.join(".github", "skills", "karpathy-guidelines", "SKILL.md"),
     os.path.join(".github", "skills", "skill-authoring", "SKILL.md"),
     os.path.join(".github", "skills", "xlsx-analyze", "SKILL.md"),
@@ -240,7 +241,7 @@ class TestInit(unittest.TestCase):
         toml_path = os.path.join(self.tmpdir, ".vscode", "dbhub.toml")
         self.assertFalse(os.path.exists(toml_path), "dbhub.toml should not exist with --no-mcp")
         # MCP-related skills should NOT exist
-        for skill in ("chrome-devtools", "context7", "database"):
+        for skill in ("chrome-devtools", "context7", "database", "github"):
             skill_path = os.path.join(self.tmpdir, ".github", "skills", skill, "SKILL.md")
             self.assertFalse(os.path.exists(skill_path), "{} should not exist with --no-mcp".format(skill))
         # Non-MCP skills should still exist
@@ -273,9 +274,17 @@ class TestInit(unittest.TestCase):
         with open(mcp_path) as f:
             data = json.load(f)
         self.assertIn("servers", data)
-        for server in ("chrome-devtools", "context7", "dbhub"):
+        for server in ("chrome-devtools", "context7", "dbhub", "github"):
             self.assertIn(server, data["servers"], "Missing server: {}".format(server))
         self.assertNotIn("serena", data["servers"], "serena server must not be generated")
+        self.assertNotIn("gitlab", data["servers"], "gitlab server must not be generated")
+        # GitHub shape assertions (read-only HTTP endpoint)
+        gh = data["servers"]["github"]
+        self.assertEqual(gh.get("type"), "http", "github must have type=http")
+        self.assertEqual(
+            gh.get("url"), "https://api.githubcopilot.com/mcp/readonly",
+            "github must use read-only URL"
+        )
         # DBHub shape assertions (TOML-backed)
         db = data["servers"]["dbhub"]
         self.assertEqual(db.get("type"), "stdio", "dbhub must have type=stdio")
@@ -303,6 +312,7 @@ class TestInit(unittest.TestCase):
         self.assertIn("chrome-devtools/*", content)
         self.assertIn("context7/*", content)
         self.assertIn("dbhub/*", content)
+        self.assertIn("github/*", content)
         self.assertNotIn("serena/*", content)
 
     def test_no_mcp_init_has_no_mcp_tools_in_agents(self):
@@ -316,6 +326,7 @@ class TestInit(unittest.TestCase):
         self.assertNotIn("chrome-devtools/*", content)
         self.assertNotIn("context7/*", content)
         self.assertNotIn("dbhub/*", content)
+        self.assertNotIn("github/*", content)
 
     def test_engaku_json_shape_default(self):
         """Default init generates engaku.json with agents and mcp_tools."""
@@ -328,7 +339,7 @@ class TestInit(unittest.TestCase):
             data = json.load(f)
         self.assertIn("agents", data)
         self.assertIn("mcp_tools", data)
-        self.assertEqual(len(data["mcp_tools"]["coder"]), 3)
+        self.assertEqual(len(data["mcp_tools"]["coder"]), 4)
         self.assertNotIn("serena/*", data["mcp_tools"]["coder"])
         self.assertIn("python", data)
         self.assertIsNone(data["python"])
@@ -346,6 +357,7 @@ class TestInit(unittest.TestCase):
         self.assertIn("chrome-devtools/*", planner_tools)
         self.assertIn("context7/*", planner_tools)
         self.assertIn("dbhub/*", planner_tools)
+        self.assertIn("github/*", planner_tools)
         self.assertNotIn("serena/*", planner_tools)
 
     def test_engaku_json_has_python_key_no_mcp(self):

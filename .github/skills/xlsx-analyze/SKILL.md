@@ -59,7 +59,7 @@ python .github/skills/xlsx-analyze/scripts/inspect_workbook.py <path> \
     [--format json|markdown] [--max-sheets N] [--max-formulas N]
 ```
 
-Returns sheet names, row/column dimensions, merged cell count, formula count, and sample formula locations for `.xlsx`/`.xlsm`. Returns delimiter, headers, row count, and file size for `.csv`/`.tsv`.
+Returns sheet names, row/column dimensions, hidden state, merged cell count, formula count, table count/names, chart count, data validation count, conditional formatting count, freeze panes, auto-filter range, workbook defined name count, external link count, and sample formula locations for `.xlsx`/`.xlsm`. Streams row count without loading all rows for `.csv`/`.tsv`.
 
 ### `profile_sheet.py` — column statistics
 
@@ -80,7 +80,7 @@ python .github/skills/xlsx-analyze/scripts/formula_graph.py <path> \
     [--max-depth N] [--format json|markdown]
 ```
 
-Parses formulas using `openpyxl.formula.Tokenizer` and builds a graph of cell-to-cell and cell-to-range relationships. Output has `nodes`, `edges`, and `warnings`. Each edge records: `source`, `target`, `sheet`, `formula`, `token_type`, and `unresolved`. Formulas are parsed but **never evaluated**. External workbook references are flagged as `unresolved: true`.
+Scans formulas across **all sheets** in the workbook and builds a graph of cell-to-cell and cell-to-range relationships. Output has `nodes`, `edges`, and `warnings`. Each edge records: `source`, `target`, `sheet`, `formula`, `token_type`, and `unresolved`. Formulas are parsed but **never evaluated**. External workbook references are flagged as `unresolved: true`. Cross-sheet references within the same workbook are resolved when the target sheet exists. Named ranges are resolved where openpyxl exposes the destination. `--max-depth` limits BFS traversal depth when `--focus` is set.
 
 ## Output Format
 
@@ -131,6 +131,8 @@ All scripts support `--format json` (default) and `--format markdown`.
 
 - Formulas are parsed but **not evaluated** — no calculated values are returned.
 - External workbook references (e.g. `[other.xlsx]Sheet1!A1`) are marked `unresolved: true`; the external file is never opened.
+- Cross-sheet references within the same workbook are resolved (`unresolved: false`) when the target sheet exists; missing-sheet references are marked `unresolved: true`.
+- Named ranges are resolved when openpyxl exposes their destination; unresolvable names are emitted as warnings.
 - Password-protected workbooks cannot be read by openpyxl and produce a clear error.
 - Macro-enabled files (`.xlsm`) have formulas parsed; VBA macros are never executed.
-- Very large ranges are preserved as range nodes rather than expanded to individual cells.
+- Very large ranges (over 500 cells) are preserved as range nodes rather than expanded to individual cells.

@@ -34,6 +34,11 @@ src/engaku/templates/skills/chrome-devtools/SKILL.md
 src/engaku/templates/skills/context7/SKILL.md
 src/engaku/templates/skills/database/SKILL.md
 src/engaku/templates/skills/doc-coauthoring/SKILL.md
+src/engaku/templates/skills/docx-read/SKILL.md
+src/engaku/templates/skills/docx-read/requirements-py38.txt
+src/engaku/templates/skills/docx-read/scripts/docx_to_html.py
+src/engaku/templates/skills/docx-read/scripts/extract_text.py
+src/engaku/templates/skills/docx-read/scripts/inspect_docx.py
 src/engaku/templates/skills/frontend-design/SKILL.md
 src/engaku/templates/skills/karpathy-guidelines/SKILL.md
 src/engaku/templates/skills/mcp-builder/SKILL.md
@@ -41,6 +46,11 @@ src/engaku/templates/skills/proactive-initiative/SKILL.md
 src/engaku/templates/skills/skill-authoring/SKILL.md
 src/engaku/templates/skills/systematic-debugging/SKILL.md
 src/engaku/templates/skills/verification-before-completion/SKILL.md
+src/engaku/templates/skills/xlsx-analyze/SKILL.md
+src/engaku/templates/skills/xlsx-analyze/requirements-py38.txt
+src/engaku/templates/skills/xlsx-analyze/scripts/formula_graph.py
+src/engaku/templates/skills/xlsx-analyze/scripts/inspect_workbook.py
+src/engaku/templates/skills/xlsx-analyze/scripts/profile_sheet.py
 tests/test_apply.py
 tests/test_init.py
 tests/test_inject.py

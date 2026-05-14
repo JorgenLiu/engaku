@@ -106,7 +106,7 @@ def _expand_range(ref, sheet, max_cells):
     return cells, False
 
 
-def _parse_formula_refs(formula, sheet_name):
+def _parse_formula_refs(formula, sheet_name, defined_names=None, known_sheets=None):
     """Return (refs, warnings) where refs is a list of dicts."""
     from openpyxl.formula import tokenize
 
@@ -126,85 +126,165 @@ def _parse_formula_refs(formula, sheet_name):
         sheet, ref, is_external = _split_sheet_ref(value, sheet_name)
 
         if not _CELL_RANGE_RE.match(ref.replace("$", "")):
-            # Might be a named range or unsupported construct
+            # Try to resolve as a named range before emitting a warning
+            dn_key = ref.upper()
+            if defined_names is not None and dn_key in defined_names:
+                dn_target = defined_names[dn_key]
+                ns, nr, next_ = _split_sheet_ref(dn_target, sheet_name)
+                if _CELL_RANGE_RE.match(nr.replace("$", "")):
+                    if next_:
+                        dn_unresolved = True
+                    elif known_sheets is not None:
+                        dn_unresolved = ns not in known_sheets
+                    else:
+                        dn_unresolved = False
+                    refs.append({
+                        "target": dn_target,
+                        "ref": nr,
+                        "sheet": ns,
+                        "token_type": token.type,
+                        "unresolved": dn_unresolved,
+                    })
+                    continue
             warnings.append("Unrecognized reference token: {}".format(value))
             continue
+
+        if is_external:
+            unresolved = True
+        elif known_sheets is not None:
+            unresolved = sheet not in known_sheets
+        else:
+            unresolved = sheet != sheet_name
 
         refs.append({
             "target": value,
             "ref": ref,
             "sheet": sheet,
             "token_type": token.type,
-            "unresolved": is_external or (sheet != sheet_name),
+            "unresolved": unresolved,
         })
 
     return refs, warnings
 
 
-def _build_graph(path, sheet_name):
+def _build_graph(path, default_sheet):
     import openpyxl
 
     wb = openpyxl.load_workbook(path, data_only=False)
 
-    if sheet_name not in wb.sheetnames:
+    if default_sheet not in wb.sheetnames:
         sys.stderr.write(
             "Error: sheet '{}' not found. Available sheets: {}\n".format(
-                sheet_name, ", ".join(wb.sheetnames)
+                default_sheet, ", ".join(wb.sheetnames)
             )
         )
         wb.close()
         sys.exit(1)
 
-    ws = wb[sheet_name]
+    known_sheets = set(wb.sheetnames)
+
+    # Load workbook-scoped defined names for named-range resolution
+    defined_names = {}
+    try:
+        dn_list = (
+            wb.defined_names.definedName
+            if hasattr(wb.defined_names, "definedName")
+            else list(wb.defined_names)
+        )
+        for dn in dn_list:
+            try:
+                defined_names[dn.name.upper()] = dn.attr_text or ""
+            except Exception:
+                pass
+    except Exception:
+        pass
+
     nodes = set()
     edges = []
     all_warnings = []
 
-    for row in ws.iter_rows():
-        for cell in row:
-            if not isinstance(cell.value, str) or not cell.value.startswith("="):
-                continue
+    for sheet_name in wb.sheetnames:
+        ws = wb[sheet_name]
+        for row in ws.iter_rows():
+            for cell in row:
+                if not isinstance(cell.value, str) or not cell.value.startswith("="):
+                    continue
 
-            source = "{}!{}".format(sheet_name, cell.coordinate)
-            nodes.add(source)
+                source = "{}!{}".format(sheet_name, cell.coordinate)
+                nodes.add(source)
 
-            refs, warns = _parse_formula_refs(cell.value, sheet_name)
-            all_warnings.extend(warns)
+                refs, warns = _parse_formula_refs(
+                    cell.value, sheet_name, defined_names, known_sheets
+                )
+                all_warnings.extend(warns)
 
-            for ref_info in refs:
-                target_node = "{}!{}".format(ref_info["sheet"], ref_info["ref"])
-                nodes.add(target_node)
-                edges.append({
-                    "source": source,
-                    "target": ref_info["ref"],
-                    "sheet": ref_info["sheet"],
-                    "formula": cell.value,
-                    "token_type": ref_info["token_type"],
-                    "unresolved": ref_info["unresolved"],
-                })
+                for ref_info in refs:
+                    target_node = "{}!{}".format(ref_info["sheet"], ref_info["ref"])
+                    nodes.add(target_node)
+                    edges.append({
+                        "source": source,
+                        "target": ref_info["ref"],
+                        "sheet": ref_info["sheet"],
+                        "formula": cell.value,
+                        "token_type": ref_info["token_type"],
+                        "unresolved": ref_info["unresolved"],
+                    })
 
     wb.close()
     return sorted(nodes), edges, all_warnings
 
 
-def _filter_by_focus(nodes, edges, focus, direction, sheet_name):
+def _filter_by_focus(nodes, edges, focus, direction, sheet_name, max_depth=5):
     focus_full = "{}!{}".format(sheet_name, focus.upper().replace("$", ""))
-    filtered = []
-    for edge in edges:
-        src_matches = edge["source"] == focus_full
-        tgt_full = "{}!{}".format(edge["sheet"], edge["target"].replace("$", ""))
-        tgt_matches = tgt_full == focus_full
 
-        if direction in ("dependencies", "both") and src_matches:
-            filtered.append(edge)
-        elif direction in ("dependents", "both") and tgt_matches:
-            filtered.append(edge)
+    # Build adjacency maps for BFS
+    out_map = {}   # source node -> edges leaving it (dependencies)
+    in_map = {}    # normalized target node -> edges pointing to it (dependents)
+    for edge in edges:
+        src = edge["source"]
+        tgt = "{}!{}".format(edge["sheet"], edge["target"].replace("$", ""))
+        out_map.setdefault(src, []).append(edge)
+        in_map.setdefault(tgt, []).append(edge)
+
+    result_edges = []
+    seen_ids = set()
+    visited = {focus_full}
+    queue = [(focus_full, 0)]
+    qi = 0
+
+    while qi < len(queue):
+        node, depth = queue[qi]
+        qi += 1
+        if depth >= max_depth:
+            continue
+
+        if direction in ("dependencies", "both"):
+            for e in out_map.get(node, []):
+                eid = (e["source"], e["sheet"], e["target"])
+                if eid not in seen_ids:
+                    seen_ids.add(eid)
+                    result_edges.append(e)
+                tgt = "{}!{}".format(e["sheet"], e["target"].replace("$", ""))
+                if tgt not in visited:
+                    visited.add(tgt)
+                    queue.append((tgt, depth + 1))
+
+        if direction in ("dependents", "both"):
+            for e in in_map.get(node, []):
+                eid = (e["source"], e["sheet"], e["target"])
+                if eid not in seen_ids:
+                    seen_ids.add(eid)
+                    result_edges.append(e)
+                src = e["source"]
+                if src not in visited:
+                    visited.add(src)
+                    queue.append((src, depth + 1))
 
     used = set()
-    for e in filtered:
+    for e in result_edges:
         used.add(e["source"])
         used.add("{}!{}".format(e["sheet"], e["target"]))
-    return sorted(used), filtered
+    return sorted(used), result_edges
 
 
 def _to_markdown(data):
@@ -254,7 +334,7 @@ def main():
     )
     parser.add_argument(
         "--max-depth", type=int, default=5,
-        help="Max traversal depth (default: 5; reserved for future use)"
+        help="Max BFS traversal depth when --focus is set (default: 5)"
     )
     parser.add_argument(
         "--format", choices=["json", "markdown"], default="json",
@@ -283,7 +363,9 @@ def main():
     nodes, edges, warnings = _build_graph(args.path, sheet_name)
 
     if args.focus:
-        nodes, edges = _filter_by_focus(nodes, edges, args.focus, args.direction, sheet_name)
+        nodes, edges = _filter_by_focus(
+            nodes, edges, args.focus, args.direction, sheet_name, args.max_depth
+        )
 
     data = {
         "file": os.path.basename(args.path),

@@ -490,6 +490,82 @@ class TestUpdate(unittest.TestCase):
             data = json.load(f)
         self.assertNotIn("serena", data["servers"], "serena should not be in mcp.json")
 
+    def test_github_skill_included(self):
+        self.assertIn("github", _SKILLS)
+
+    def test_gitlab_not_in_skills(self):
+        self.assertNotIn("gitlab", _SKILLS)
+
+    def test_creates_github_skill_in_fresh_repo(self):
+        """run update on a fresh repo, verify github skill is created."""
+        _git_init(self.tmpdir)
+        skill_path = os.path.join(
+            self.tmpdir, ".github", "skills", "github", "SKILL.md"
+        )
+        self.assertFalse(os.path.exists(skill_path))
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        self.assertTrue(os.path.exists(skill_path), "github/SKILL.md should be created")
+        self.assertIn("[create]", out)
+
+    def test_update_merges_github_mcp_server(self):
+        """run init, remove github from mcp.json, run update, verify it's restored."""
+        import json
+        _git_init(self.tmpdir)
+        from engaku.cmd_init import run as init_run
+        import io
+        buf = io.StringIO()
+        orig = sys.stdout
+        sys.stdout = buf
+        try:
+            init_run(cwd=self.tmpdir)
+        finally:
+            sys.stdout = orig
+
+        mcp_path = os.path.join(self.tmpdir, ".vscode", "mcp.json")
+        with open(mcp_path) as f:
+            data = json.load(f)
+        del data["servers"]["github"]
+        with open(mcp_path, "w") as f:
+            json.dump(data, f, indent=2)
+
+        code, out, _ = self._capture_run()
+        self.assertEqual(code, 0)
+
+        with open(mcp_path) as f:
+            result = json.load(f)
+        self.assertIn("github", result["servers"], "github server should be merged back")
+        gh = result["servers"]["github"]
+        self.assertEqual(gh.get("type"), "http", "github must have type=http after merge")
+        self.assertEqual(
+            gh.get("url"), "https://api.githubcopilot.com/mcp/readonly",
+            "github must use read-only URL after merge",
+        )
+        self.assertNotIn("gitlab", result["servers"], "gitlab must not appear in mcp.json")
+
+    def test_github_mcp_url_is_readonly(self):
+        """Generated mcp.json uses the read-only GitHub endpoint."""
+        import json
+        _git_init(self.tmpdir)
+        from engaku.cmd_init import run as init_run
+        import io
+        buf = io.StringIO()
+        orig = sys.stdout
+        sys.stdout = buf
+        try:
+            init_run(cwd=self.tmpdir)
+        finally:
+            sys.stdout = orig
+
+        mcp_path = os.path.join(self.tmpdir, ".vscode", "mcp.json")
+        with open(mcp_path) as f:
+            data = json.load(f)
+        gh = data["servers"].get("github", {})
+        self.assertEqual(
+            gh.get("url"), "https://api.githubcopilot.com/mcp/readonly",
+            "GitHub MCP must use read-only URL",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

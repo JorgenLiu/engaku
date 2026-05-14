@@ -8,11 +8,13 @@ triggers:
   - DOCX structure inspection
   - Word to HTML conversion
   - Word to plain text conversion
+  - reading comments or tracked changes in Word documents
+  - counting footnotes, endnotes, or hyperlinks in Word documents
 non_triggers:
   - PDF files — use a PDF extraction tool instead
   - Spreadsheets (.xlsx/.csv) — use xlsx-analyze skill instead
   - Editing, generating, or saving Word documents
-  - Inserting comments or track changes
+  - Modifying, inserting, or resolving comments and tracked changes
   - Accepting or rejecting tracked changes
   - Exact layout or formatting reproduction
 ---
@@ -58,16 +60,19 @@ python .github/skills/docx-read/scripts/inspect_docx.py <file.docx> \
     [--format json|markdown]
 ```
 
-Returns paragraph count, heading counts by level, table count and dimensions, image/relationship count, section count, header/footer presence, and core properties (author, title, created date) when available.
+Returns paragraph count, heading counts by level, table count and dimensions, image/relationship count, section count, header/footer presence, comment count, tracked insertion/deletion counts, hyperlink count, footnote count, endnote count, and core properties (author, title, created date) when available.
+
+> **Safety note:** All inspection is read-only. Comments and tracked changes are counted and optionally extracted; they are never accepted, rejected, inserted, or modified.
 
 ### `extract_text.py` — content extraction
 
 ```bash
 python .github/skills/docx-read/scripts/extract_text.py <file.docx> \
-    [--format json|markdown] [--include-tables] [--heading-only]
+    [--format json|markdown] [--include-tables] [--heading-only] \
+    [--include-changes]
 ```
 
-Returns a sequential list of content blocks (paragraph, heading, table) with text content, heading level, and table cell coordinates. Use `--heading-only` to output only heading blocks.
+Returns a sequential list of content blocks (paragraph, heading, table) with text content, heading level, and table cell coordinates. Use `--heading-only` to output only heading blocks. Use `--include-changes` to also output tracked insertions and deletions as text snippets under `tracked_changes`.
 
 ### `docx_to_html.py` — HTML/plain-text conversion
 

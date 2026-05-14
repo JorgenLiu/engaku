@@ -28,6 +28,7 @@ Files created (never overwritten if they already exist):
             chrome-devtools/SKILL.md  (--no-mcp skips)
             context7/SKILL.md         (--no-mcp skips)
             database/SKILL.md         (--no-mcp skips)
+            github/SKILL.md           (--no-mcp skips)
         instructions/
             lessons.instructions.md
             agent-boundaries.instructions.md
@@ -103,9 +104,9 @@ def _write_engaku_json(cwd, no_mcp, out):
     }
     if not no_mcp:
         data["mcp_tools"] = {
-            "coder": ["chrome-devtools/*", "context7/*", "dbhub/*"],
-            "planner": ["chrome-devtools/*", "context7/*", "dbhub/*"],
-            "reviewer": ["chrome-devtools/*", "dbhub/*"],
+            "coder": ["chrome-devtools/*", "context7/*", "dbhub/*", "github/*"],
+            "planner": ["chrome-devtools/*", "context7/*", "dbhub/*", "github/*"],
+            "reviewer": ["chrome-devtools/*", "dbhub/*", "github/*"],
             "scanner": [],
         }
     dst_dir = os.path.dirname(dst)
@@ -223,7 +224,7 @@ def run(cwd=None, no_mcp=False):
     )
     # ── .github/skills/ (MCP-related, conditional) ────────────────────────────
     if not no_mcp:
-        for skill in ("chrome-devtools", "context7", "database"):
+        for skill in ("chrome-devtools", "context7", "database", "github"):
             _copy_skill_dir(
                 os.path.join(tpl, "skills", skill),
                 os.path.join(skills_dir, skill),

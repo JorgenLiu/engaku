@@ -27,7 +27,7 @@ def _check_deps():
         sys.exit(1)
 
 
-def _extract(path, include_tables, heading_only):
+def _extract(path, include_tables, heading_only, include_changes=False):
     from docx import Document
 
     doc = Document(path)
@@ -90,11 +90,43 @@ def _extract(path, include_tables, heading_only):
                 "cells": cells,
             })
 
+    changes = _extract_tracked_changes(path) if include_changes else []
     return {
         "file": os.path.basename(path),
         "block_count": len(blocks),
         "blocks": blocks,
+        "tracked_changes": changes,
     }
+
+
+def _extract_tracked_changes(path):
+    """Extract tracked insertions and deletions as text snippets.
+
+    Read-only ZIP/XML inspection. Never modifies the file.
+    Returns a list of dicts: {"type": "insertion"|"deletion", "text": "..."}.
+    """
+    import zipfile
+    import xml.etree.ElementTree as ET
+
+    W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+    results = []
+    try:
+        with zipfile.ZipFile(path, "r") as z:
+            if "word/document.xml" not in z.namelist():
+                return results
+            with z.open("word/document.xml") as f:
+                root = ET.parse(f).getroot()
+        for ins in root.findall(".//{%s}ins" % W):
+            text = "".join(t.text or "" for t in ins.findall(".//{%s}t" % W))
+            if text:
+                results.append({"type": "insertion", "text": text})
+        for del_elem in root.findall(".//{%s}del" % W):
+            text = "".join(t.text or "" for t in del_elem.findall(".//{%s}delText" % W))
+            if text:
+                results.append({"type": "deletion", "text": text})
+    except Exception:
+        pass
+    return results
 
 
 def _to_markdown(data):
@@ -117,6 +149,14 @@ def _to_markdown(data):
                 for row in cells[1:]:
                     lines.append("| " + " | ".join(row) + " |")
                 lines.append("")
+    changes = data.get("tracked_changes", [])
+    if changes:
+        lines.append("## Tracked Changes")
+        lines.append("")
+        for ch in changes:
+            prefix = "+" if ch["type"] == "insertion" else "-"
+            lines.append("{} {}".format(prefix, ch["text"]))
+        lines.append("")
     return "\n".join(lines)
 
 
@@ -137,6 +177,10 @@ def main():
         "--heading-only", action="store_true",
         help="Output only heading blocks"
     )
+    parser.add_argument(
+        "--include-changes", action="store_true",
+        help="Include tracked insertions and deletions as text snippets"
+    )
     args = parser.parse_args()
 
     if not os.path.exists(args.path):
@@ -144,7 +188,7 @@ def main():
         sys.exit(1)
 
     _check_deps()
-    data = _extract(args.path, args.include_tables, args.heading_only)
+    data = _extract(args.path, args.include_tables, args.heading_only, args.include_changes)
 
     if args.fmt == "markdown":
         print(_to_markdown(data))
