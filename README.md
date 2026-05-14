@@ -41,7 +41,7 @@ After running `init`, VS Code Agent Hooks are active. The `@coder`, `@planner`, 
   instructions/     — lessons and agent-boundaries.instructions.md stubs
   skills/           — bundled skills (systematic-debugging, verification-before-completion, etc.)
 .vscode/
-  settings.json     — enables VS Code custom agent hooks
+  settings.json     — enables VS Code terminal/tool output compression
   mcp.json          — MCP server configuration (chrome-devtools, context7, dbhub, github)
   dbhub.toml        — DBHub MCP TOML config (fill in your database sources)
 ```
@@ -273,14 +273,15 @@ The generated `.vscode/dbhub.toml` is a comment-only template — fill in your d
 
 The `/readonly` path disables all write tools unconditionally. To use write tools (create issues, open PRs, etc.), change the URL to `https://api.githubcopilot.com/mcp/` in your local `.vscode/mcp.json`. See [GitHub MCP docs](https://docs.github.com/en/copilot/customizing-copilot/using-model-context-protocol/using-the-github-mcp-server) for available toolsets and path variants.
 
-### VS Code 1.120 tool settings (optional)
+### VS Code 1.120 tool settings
 
-VS Code 1.120 adds two tool-behavior flags not set by `engaku init`. Enable them manually in `.vscode/settings.json` if needed:
+`engaku init` enables `chat.tools.compressOutput.enabled` by default in `.vscode/settings.json`. This VS Code 1.120 preview setting compresses large terminal/tool output (`git diff`, `ls -l`, test/build/lint output, package install progress, and repeated identical outputs) before it enters model context. To disable it, set `"chat.tools.compressOutput.enabled": false` in `.vscode/settings.json`.
+
+One additional optional flag:
 
 | Setting | Effect |
 |---------|--------|
-| `chat.tools.compressOutput.enabled` | Compresses MCP tool output before it enters the model context. Reduces token use for large responses. |
-| `chat.tools.riskAssessment.enabled` | Shows a risk badge on write-capable tools before execution. Useful when write tools are enabled. |
+| `chat.tools.riskAssessment.enabled` | Shows a risk badge on terminal commands before execution. Useful when write-capable tools are enabled. |
 
 ## Optional MCP Servers
 

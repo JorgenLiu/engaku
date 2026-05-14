@@ -162,6 +162,26 @@ def _ensure_vscode_setting(cwd, key, value, out):
     out.append("[create]  {} ({} = {})".format(settings_path, key, json.dumps(value)))
 
 
+def _remove_vscode_setting(cwd, key, out):
+    """Remove a key from .vscode/settings.json if present. No-op if file or key absent."""
+    import json
+    settings_path = os.path.join(cwd, ".vscode", "settings.json")
+    if not os.path.exists(settings_path):
+        return
+    try:
+        with open(settings_path, "r", encoding="utf-8") as f:
+            settings = json.load(f)
+    except (ValueError, OSError):
+        return
+    if key not in settings:
+        return
+    del settings[key]
+    with open(settings_path, "w", encoding="utf-8") as f:
+        json.dump(settings, f, indent=2)
+        f.write("\n")
+    out.append("[remove]  {} ({} removed)".format(settings_path, key))
+
+
 def run(cwd=None, no_mcp=False):
     if cwd is None:
         cwd = os.getcwd()
@@ -231,8 +251,9 @@ def run(cwd=None, no_mcp=False):
                 out,
             )
 
-    # ── .vscode/settings.json ── VS Code settings for hooks and skill context ─
-    _ensure_vscode_setting(cwd, "chat.useCustomAgentHooks", True, out)
+    # ── .vscode/settings.json ── VS Code settings ──────────────────────────────
+    _ensure_vscode_setting(cwd, "chat.tools.compressOutput.enabled", True, out)
+    _remove_vscode_setting(cwd, "chat.useCustomAgentHooks", out)
 
     # ── .vscode/mcp.json ── MCP server configuration ────────────────────────
     if not no_mcp:

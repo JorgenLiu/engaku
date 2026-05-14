@@ -126,9 +126,10 @@ def run(cwd=None):
             out,
         )
 
-    # ── .vscode/settings.json ── ensure hook setting is present ─────────────
-    from engaku.cmd_init import _ensure_vscode_setting
-    _ensure_vscode_setting(cwd, "chat.useCustomAgentHooks", True, out)
+    # ── .vscode/settings.json ── ensure compression setting is present ─────────
+    from engaku.cmd_init import _ensure_vscode_setting, _remove_vscode_setting
+    _ensure_vscode_setting(cwd, "chat.tools.compressOutput.enabled", True, out)
+    _remove_vscode_setting(cwd, "chat.useCustomAgentHooks", out)
 
     # ── .vscode/mcp.json ── merge new server entries if file exists ──────────
     import json

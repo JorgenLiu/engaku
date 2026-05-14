@@ -12,6 +12,8 @@
 
 ### Changed
 - Lesson trigger rule in `copilot-instructions.md` and `lessons.instructions.md` updated from incident-explanation style to method-first style: lessons must describe what to do differently next time (a check, sequence, constraint, or recovery step), not explain why something happened.
+- `engaku init` and `engaku update` now set `chat.tools.compressOutput.enabled: true` in `.vscode/settings.json` (VS Code 1.120 preview setting). Compresses large terminal/tool output — `git diff`, `ls -l`, test/build/lint output, install progress, and repeated identical outputs — before it enters model context. Structured JSON/YAML/TOML is protected and never compressed.
+- Removed `chat.useCustomAgentHooks` from generated `.vscode/settings.json`. This key was obsolete since VS Code 1.120 removed its registration; hook execution is now controlled by `chat.useHooks` (default `true`). `engaku init` and `engaku update` will remove the key if already present.
 
 ### Added
 - Bundled `xlsx-analyze` skill with three helper scripts for Python 3.8.4: `inspect_workbook.py` (workbook structure, sheet dimensions, formula count), `profile_sheet.py` (column dtype/missing/unique/numeric stats using pandas), and `formula_graph.py` (formula dependency graph via `openpyxl.formula.Tokenizer`). Formulas are parsed but never evaluated.

@@ -406,7 +406,8 @@ class TestInit(unittest.TestCase):
         self.assertTrue(os.path.exists(settings_path), "settings.json should be created")
         with open(settings_path) as f:
             settings = json.load(f)
-        self.assertTrue(settings.get("chat.useCustomAgentHooks"), "chat.useCustomAgentHooks should be True")
+        self.assertTrue(settings.get("chat.tools.compressOutput.enabled"), "chat.tools.compressOutput.enabled should be True")
+        self.assertNotIn("chat.useCustomAgentHooks", settings, "chat.useCustomAgentHooks must not be generated")
         self.assertNotIn("github.copilot.chat.skillTool.enabled", settings, "skillTool setting must not be generated")
 
     def test_vscode_settings_preserves_existing(self):
@@ -423,8 +424,25 @@ class TestInit(unittest.TestCase):
             settings = json.load(f)
         self.assertEqual(settings.get("editor.tabSize"), 4, "pre-existing editor.tabSize must be preserved")
         self.assertEqual(settings.get("unrelated.setting"), "keep-me", "pre-existing unrelated.setting must be preserved")
-        self.assertTrue(settings.get("chat.useCustomAgentHooks"))
+        self.assertTrue(settings.get("chat.tools.compressOutput.enabled"))
+        self.assertNotIn("chat.useCustomAgentHooks", settings)
         self.assertNotIn("github.copilot.chat.skillTool.enabled", settings)
+
+    def test_vscode_settings_removes_obsolete_hooks_key(self):
+        """engaku init removes chat.useCustomAgentHooks if already present in settings."""
+        import json
+        _git_init(self.tmpdir)
+        vscode_dir = os.path.join(self.tmpdir, ".vscode")
+        os.makedirs(vscode_dir, exist_ok=True)
+        settings_path = os.path.join(vscode_dir, "settings.json")
+        with open(settings_path, "w") as f:
+            json.dump({"chat.useCustomAgentHooks": True, "other.setting": "keep"}, f)
+        self._capture_run()
+        with open(settings_path) as f:
+            settings = json.load(f)
+        self.assertNotIn("chat.useCustomAgentHooks", settings, "obsolete key must be removed")
+        self.assertTrue(settings.get("chat.tools.compressOutput.enabled"))
+        self.assertEqual(settings.get("other.setting"), "keep", "other settings must be preserved")
 
 
 if __name__ == "__main__":
