@@ -12,10 +12,6 @@
       "type": "stdio",
       "command": "npx",
       "args": ["-y", "@bytebase/dbhub@latest", "--transport", "stdio", "--config", "${workspaceFolder}/.vscode/dbhub.toml"]
-    },
-    "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/readonly"
     }
   }
 }

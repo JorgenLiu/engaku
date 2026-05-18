@@ -40,6 +40,7 @@ src/engaku/templates/skills/docx-read/scripts/docx_to_html.py
 src/engaku/templates/skills/docx-read/scripts/extract_text.py
 src/engaku/templates/skills/docx-read/scripts/inspect_docx.py
 src/engaku/templates/skills/frontend-design/SKILL.md
+src/engaku/templates/skills/github/SKILL.md
 src/engaku/templates/skills/karpathy-guidelines/SKILL.md
 src/engaku/templates/skills/mcp-builder/SKILL.md
 src/engaku/templates/skills/proactive-initiative/SKILL.md

@@ -9,7 +9,11 @@
   "servers": {
     "chrome-devtools": {
       "command": "npx",
-      "args": ["-y", "chrome-devtools-mcp@latest", "--headless"]
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest",
+        "--headless"
+      ]
     },
     "context7": {
       "type": "http",
@@ -17,7 +21,15 @@
     },
     "dbhub": {
       "command": "npx",
-      "args": ["@bytebase/dbhub@latest", "--dsn", "${input:dbDsn}"]
+      "args": [
+        "@bytebase/dbhub@latest",
+        "--dsn",
+        "${input:dbDsn}"
+      ]
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/readonly"
     }
   }
 }

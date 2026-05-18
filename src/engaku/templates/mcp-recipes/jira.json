@@ -1,0 +1,19 @@
+{
+  "name": "jira",
+  "description": "Jira issues and project context via Atlassian MCP server",
+  "upstream": "https://github.com/sooperset/mcp-atlassian",
+  "last_verified": "2026-05-18",
+  "server": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "@sooperset/mcp-atlassian@latest"],
+    "env": {
+      "JIRA_URL": "${input:jira-url}",
+      "JIRA_USERNAME": "${input:jira-username}",
+      "JIRA_API_TOKEN": "${input:jira-api-token}"
+    }
+  },
+  "tool_wildcard": "jira/*",
+  "default_agents": ["coder", "planner"],
+  "notes": "Requires Jira URL, username (email), and API token from id.atlassian.com/manage-profile/security/api-tokens."
+}

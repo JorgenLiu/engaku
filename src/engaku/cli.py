@@ -55,6 +55,31 @@ def main():
         help="Update .github/skills/ from bundled templates (overwrites existing)",
     )
 
+    # engaku list-mcp
+    subparsers.add_parser(
+        "list-mcp",
+        help="List available built-in MCP server recipes",
+    )
+
+    # engaku add-mcp
+    add_mcp_parser = subparsers.add_parser(
+        "add-mcp",
+        help="Add a curated MCP server recipe to this repo",
+    )
+    add_mcp_parser.add_argument("name", help="Recipe name (github, gitlab, jira, confluence)")
+    add_mcp_parser.add_argument(
+        "--agents", nargs="+", metavar="AGENT",
+        help="Override default agents (space-separated)",
+    )
+    add_mcp_parser.add_argument(
+        "--dry-run", action="store_true",
+        help="Print planned changes without writing files",
+    )
+    add_mcp_parser.add_argument(
+        "--no-apply", action="store_true",
+        help="Skip engaku apply after writing files",
+    )
+
     args = parser.parse_args()
 
     if args.command == "init":
@@ -75,3 +100,9 @@ def main():
     elif args.command == "update":
         from engaku.cmd_update import run
         sys.exit(run())
+    elif args.command == "list-mcp":
+        from engaku.cmd_list_mcp import run
+        sys.exit(run())
+    elif args.command == "add-mcp":
+        from engaku.cmd_add_mcp import run
+        sys.exit(run(name=args.name, agents=args.agents, dry_run=args.dry_run, no_apply=args.no_apply))

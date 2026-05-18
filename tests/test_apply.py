@@ -146,20 +146,20 @@ class TestApply(unittest.TestCase):
         self.assertIn("read", content)
 
     def test_mcp_tools_replace_stale_entries(self):
-        """Agent with stale MCP entries gets them replaced."""
+        """Agent with stale managed MCP entries gets them replaced."""
         self._write_config_full(
             {"coder": "claude-sonnet"},
             mcp_tools={"coder": ["context7/*"]},
         )
         self._write_agent(
             "coder",
-            "---\nname: coder\ntools: ['edit', 'old-server/*']\n---\n\nBody.\n",
+            "---\nname: coder\ntools: ['edit', 'chrome-devtools/*']\n---\n\nBody.\n",
         )
         code, _, _ = self._capture_run()
         self.assertEqual(code, 0)
         content = self._read_agent("coder")
         self.assertIn("context7/*", content)
-        self.assertNotIn("old-server/*", content)
+        self.assertNotIn("chrome-devtools/*", content)
         self.assertIn("edit", content)
 
     def test_agent_not_in_mcp_tools_unchanged_when_no_mcp_entries(self):
@@ -274,7 +274,7 @@ class TestApply(unittest.TestCase):
         )
         self._write_agent(
             "coder",
-            "---\nname: coder\ntools: ['edit', 'vscode/askQuestions', 'old-server/*']\n---\n\nBody.\n",
+            "---\nname: coder\ntools: ['edit', 'vscode/askQuestions', 'chrome-devtools/*']\n---\n\nBody.\n",
         )
         code, _, _ = self._capture_run()
         self.assertEqual(code, 0)
@@ -283,8 +283,8 @@ class TestApply(unittest.TestCase):
         self.assertIn("vscode/askQuestions", content)
         # New MCP wildcard from config must be present
         self.assertIn("context7/*", content)
-        # Stale MCP wildcard must be removed
-        self.assertNotIn("old-server/*", content)
+        # Stale managed MCP wildcard must be removed
+        self.assertNotIn("chrome-devtools/*", content)
 
     def test_no_serena_in_default_mcp_tools(self):
         """Default MCP tool config does not include serena/*."""
@@ -311,3 +311,19 @@ class TestApply(unittest.TestCase):
         content = self._read_agent("coder")
         self.assertNotIn("model: [", content)
         self.assertIn('model: "claude-sonnet-4-5 (copilot)"', content)
+
+    def test_unrecognised_wildcard_preserved(self):
+        """A '/*' entry whose prefix is not a managed MCP name is NOT removed."""
+        self._write_config_full(
+            {"coder": "claude-sonnet"},
+            mcp_tools={"coder": ["context7/*"]},
+        )
+        self._write_agent(
+            "coder",
+            "---\nname: coder\ntools: ['edit', 'custom-corp/*']\n---\n\nBody.\n",
+        )
+        code, _, _ = self._capture_run()
+        self.assertEqual(code, 0)
+        content = self._read_agent("coder")
+        self.assertIn("custom-corp/*", content)
+        self.assertIn("context7/*", content)

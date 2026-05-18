@@ -1,0 +1,19 @@
+{
+  "name": "confluence",
+  "description": "Confluence pages and spaces context via Atlassian MCP server",
+  "upstream": "https://github.com/sooperset/mcp-atlassian",
+  "last_verified": "2026-05-18",
+  "server": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "@sooperset/mcp-atlassian@latest"],
+    "env": {
+      "CONFLUENCE_URL": "${input:confluence-url}",
+      "CONFLUENCE_USERNAME": "${input:confluence-username}",
+      "CONFLUENCE_API_TOKEN": "${input:confluence-api-token}"
+    }
+  },
+  "tool_wildcard": "confluence/*",
+  "default_agents": ["coder", "planner"],
+  "notes": "Requires Confluence URL, username (email), and API token from id.atlassian.com/manage-profile/security/api-tokens."
+}

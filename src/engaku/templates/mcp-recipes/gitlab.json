@@ -1,0 +1,18 @@
+{
+  "name": "gitlab",
+  "description": "GitLab repository, issues, and MR context via GitLab MCP server",
+  "upstream": "https://gitlab.com/gitlab-org/modelcontextprotocol/servers",
+  "last_verified": "2026-05-18",
+  "server": {
+    "type": "stdio",
+    "command": "npx",
+    "args": ["-y", "@gitlab-org/mcp-server-gitlab@latest"],
+    "env": {
+      "GITLAB_PERSONAL_ACCESS_TOKEN": "${input:gitlab-token}",
+      "GITLAB_API_URL": "https://gitlab.com"
+    }
+  },
+  "tool_wildcard": "gitlab/*",
+  "default_agents": ["coder", "planner", "reviewer"],
+  "notes": "Requires GITLAB_PERSONAL_ACCESS_TOKEN. Set GITLAB_API_URL for self-hosted instances."
+}

@@ -1,0 +1,13 @@
+{
+  "name": "github",
+  "description": "GitHub repository, issue, PR, and Actions context (read-only hosted endpoint)",
+  "upstream": "https://github.com/github/github-mcp-server",
+  "last_verified": "2026-05-18",
+  "server": {
+    "type": "http",
+    "url": "https://api.githubcopilot.com/mcp/readonly"
+  },
+  "tool_wildcard": "github/*",
+  "default_agents": ["coder", "planner", "reviewer"],
+  "notes": "Uses VS Code GitHub Copilot authentication. No extra env vars needed."
+}

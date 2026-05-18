@@ -2,6 +2,22 @@
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-05-18
+
+### Added
+- `engaku add-mcp <name>` command to install curated MCP server recipes (github, gitlab, jira, confluence) into `.vscode/mcp.json`, `.ai/engaku.json`, and agent tool frontmatter.
+- `engaku list-mcp` command to list available built-in MCP recipes.
+- Curated MCP recipe catalog in `src/engaku/templates/mcp-recipes/` with JSON descriptors for github, gitlab, jira, and confluence.
+
+### Changed
+- GitHub MCP server removed from default `engaku init`; now available via `engaku add-mcp github`. Default init configures chrome-devtools, context7, and dbhub only.
+
+### Removed
+- Bundled `github` skill removed from `engaku init` and `engaku update`; GitHub context is now provided through `engaku add-mcp github` and the GitHub MCP recipe.
+
+### Fixed
+- `engaku apply` no longer removes non-MCP slash tools (e.g. `vscode/askQuestions`) when updating MCP wildcard entries. Only wildcards whose server name is in the Engaku-managed set are replaced.
+
 ## [1.1.18] - 2026-05-14
 
 ### Added

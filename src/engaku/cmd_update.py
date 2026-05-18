@@ -26,7 +26,6 @@ _SKILLS = (
     "chrome-devtools",
     "context7",
     "database",
-    "github",
     "karpathy-guidelines",
     "skill-authoring",
     "xlsx-analyze",

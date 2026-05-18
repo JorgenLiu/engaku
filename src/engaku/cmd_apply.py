@@ -22,6 +22,13 @@ from engaku.utils import load_config
 # Engaku subcommands that appear in agent hook commands.
 _HOOK_SUBCOMMANDS = ("inject", "prompt-check", "task-review")
 
+# Known Engaku-managed MCP server names (builtin defaults + all recipe names).
+# Only wildcard entries whose prefix is in this set are removed by _update_agent_tools.
+_BUILTIN_MCP_NAMES = frozenset((
+    "chrome-devtools", "context7", "dbhub",
+    "github", "gitlab", "jira", "confluence",
+))
+
 
 def _render_hook_cmd(subcommand, python):
     """Return the hook command string for a given subcommand.
@@ -110,12 +117,17 @@ def _update_agent_model(agent_path, model):
     return True, "ok"
 
 
-def _update_agent_tools(agent_path, mcp_tools_list):
-    """Replace MCP wildcard entries in agent tools: frontmatter field.
+def _update_agent_tools(agent_path, mcp_tools_list, managed_names=None):
+    """Replace Engaku-managed MCP wildcard entries in agent tools: frontmatter field.
 
-    Strips any existing '<server>/*' entries and appends mcp_tools_list.
+    Only removes existing '<server>/*' entries where server is in managed_names.
+    Non-MCP slash tools (e.g. vscode/askQuestions) and unrecognised wildcards are
+    preserved unchanged.  managed_names defaults to _BUILTIN_MCP_NAMES.
     Returns (changed, reason).
     """
+    if managed_names is None:
+        managed_names = _BUILTIN_MCP_NAMES
+
     with open(agent_path, "r", encoding="utf-8") as f:
         content = f.read()
 
@@ -140,8 +152,11 @@ def _update_agent_tools(agent_path, mcp_tools_list):
     tools_str = tools_match.group(1).strip()
     # Parse quoted entries from inline YAML list: ['a', 'b'] or ["a", "b"]
     current_tools = re.findall(r"['\"]([^'\"]+)['\"]", tools_str)
-    # Strip existing MCP wildcard entries (entries ending with '/*')
-    non_mcp = [t for t in current_tools if not t.endswith("/*")]
+    # Strip only Engaku-managed MCP wildcard entries; preserve all others
+    non_mcp = [
+        t for t in current_tools
+        if not (t.endswith("/*") and t[:-2] in managed_names)
+    ]
 
     new_tools = non_mcp + list(mcp_tools_list)
     new_tools_str = "tools: [{}]".format(", ".join("'{}'".format(t) for t in new_tools))
@@ -217,12 +232,24 @@ def run(cwd=None):
     # ── mcp_tools → .github/agents/ ──────────────────────────────────────────
     if "mcp_tools" in config:
         mcp_tools_config = config["mcp_tools"]
+
+        # Build managed MCP server name set: built-ins + recipe names + mcp.json keys
+        managed_names = set(_BUILTIN_MCP_NAMES)
+        mcp_json_path = os.path.join(cwd, ".vscode", "mcp.json")
+        if os.path.isfile(mcp_json_path):
+            try:
+                with open(mcp_json_path, "r", encoding="utf-8") as _f:
+                    _mcp_data = json.load(_f)
+                managed_names |= set(_mcp_data.get("servers", {}).keys())
+            except (ValueError, OSError):
+                pass
+
         for agent_name in sorted(agents_config):
             tools_list = mcp_tools_config.get(agent_name, [])
             agent_path = os.path.join(agents_dir, "{}.agent.md".format(agent_name))
             if not os.path.isfile(agent_path):
                 continue
-            updated, reason = _update_agent_tools(agent_path, tools_list)
+            updated, reason = _update_agent_tools(agent_path, tools_list, managed_names)
             if updated:
                 sys.stdout.write(
                     "[updated] {}.agent.md tools -> {}\n".format(agent_name, tools_list)

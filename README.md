@@ -42,13 +42,13 @@ After running `init`, VS Code Agent Hooks are active. The `@coder`, `@planner`, 
   skills/           — bundled skills (systematic-debugging, verification-before-completion, etc.)
 .vscode/
   settings.json     — enables VS Code terminal/tool output compression
-  mcp.json          — MCP server configuration (chrome-devtools, context7, dbhub, github)
+  mcp.json          — MCP server configuration (chrome-devtools, context7, dbhub)
   dbhub.toml        — DBHub MCP TOML config (fill in your database sources)
 ```
 
 `engaku init --no-mcp` skips both `.vscode/mcp.json` and `.vscode/dbhub.toml`, along with the MCP-related skills.
 
-When MCP support is enabled, `engaku init` grants `chrome-devtools/*` to the planner agent by default (alongside `context7/*`, `dbhub/*`, and `github/*`), so planner can run browser-backed research and verification before producing plans. `engaku update` does not modify an existing `.ai/engaku.json` — once written, your MCP tool allocations stay user-owned.
+When MCP support is enabled, `engaku init` grants `chrome-devtools/*` to the planner agent by default (alongside `context7/*` and `dbhub/*`), so planner can run browser-backed research and verification before producing plans. `engaku update` does not modify an existing `.ai/engaku.json` — once written, your MCP tool allocations stay user-owned.
 
 ## Subcommands
 
@@ -60,6 +60,8 @@ When MCP support is enabled, `engaku init` grants `chrome-devtools/*` to the pla
 | `task-review` | Detect completed task plans and emit handoff reminder (Stop hook) |
 | `apply` | Apply `.ai/engaku.json` model, MCP tool, and hook Python runtime config to `.github/agents/` frontmatter |
 | `update` | Sync generated agents and skills from bundled templates, merge MCP server additions, and apply `.ai/engaku.json` config |
+| `list-mcp` | List available built-in MCP recipes |
+| `add-mcp` | Install a curated MCP recipe into `.vscode/mcp.json`, `.ai/engaku.json`, and agent frontmatter |
 
 ## How it works
 
@@ -188,7 +190,7 @@ The `applyTo: "**"` pattern makes this instruction active in every workspace wit
 
 ## MCP Servers
 
-`engaku init` creates `.vscode/mcp.json` with four preconfigured MCP servers that give VS Code Copilot structured tool access to browser automation, live library documentation, databases, and GitHub. Use `engaku init --no-mcp` to skip this entirely.
+`engaku init` creates `.vscode/mcp.json` with three default MCP servers that give VS Code Copilot structured tool access to browser automation, live library documentation, and databases. Use `engaku init --no-mcp` to skip this entirely.
 
 `engaku update` adds any missing server entries to an existing `.vscode/mcp.json` without overwriting your customizations.
 
@@ -254,25 +256,6 @@ The generated `.vscode/dbhub.toml` is a comment-only template — fill in your d
 # readonly = true
 ```
 
-### GitHub MCP
-
-[docs.github.com/en/copilot/customizing-copilot/using-model-context-protocol](https://docs.github.com/en/copilot/customizing-copilot/using-model-context-protocol/using-the-github-mcp-server) — Official GitHub MCP server providing read access to repositories, issues, pull requests, code, and user data.
-
-**Authentication:** OAuth via VS Code's GitHub Copilot connection (default). No PAT or manual setup required.
-
-**Prerequisites:** None (HTTP remote mode — no local process needed).
-
-```json
-{
-  "github": {
-    "type": "http",
-    "url": "https://api.githubcopilot.com/mcp/readonly"
-  }
-}
-```
-
-The `/readonly` path disables all write tools unconditionally. To use write tools (create issues, open PRs, etc.), change the URL to `https://api.githubcopilot.com/mcp/` in your local `.vscode/mcp.json`. See [GitHub MCP docs](https://docs.github.com/en/copilot/customizing-copilot/using-model-context-protocol/using-the-github-mcp-server) for available toolsets and path variants.
-
 ### VS Code 1.120 tool settings
 
 `engaku init` enables `chat.tools.compressOutput.enabled` by default in `.vscode/settings.json`. This VS Code 1.120 preview setting compresses large terminal/tool output (`git diff`, `ls -l`, test/build/lint output, package install progress, and repeated identical outputs) before it enters model context. To disable it, set `"chat.tools.compressOutput.enabled": false` in `.vscode/settings.json`.
@@ -282,6 +265,38 @@ One additional optional flag:
 | Setting | Effect |
 |---------|--------|
 | `chat.tools.riskAssessment.enabled` | Shows a risk badge on terminal commands before execution. Useful when write-capable tools are enabled. |
+
+## MCP Recipes
+
+Engaku ships curated recipes for popular services. A recipe installs the MCP server into `.vscode/mcp.json`, registers its wildcard in `.ai/engaku.json`, and (unless `--no-apply` is passed) rewrites all target agent frontmatter in one step.
+
+```sh
+engaku list-mcp           # show available recipes
+engaku add-mcp github     # install GitHub MCP (OAuth, no PAT required)
+engaku add-mcp gitlab     # install GitLab MCP (requires GITLAB_PERSONAL_ACCESS_TOKEN)
+engaku add-mcp jira       # install Jira MCP (requires JIRA_URL / USERNAME / API_TOKEN)
+engaku add-mcp confluence # install Confluence MCP (requires CONFLUENCE_URL / USERNAME / API_TOKEN)
+```
+
+**Options:**
+
+| Flag | Effect |
+|------|--------|
+| `--agents coder planner` | Override which agents receive the MCP wildcard (default: recipe's `default_agents`) |
+| `--dry-run` | Print planned changes without writing any files |
+| `--no-apply` | Write `.vscode/mcp.json` and `.ai/engaku.json` but skip `engaku apply` |
+
+Existing server entries in `.vscode/mcp.json` are never overwritten; the recipe is silently skipped for that server if it already exists.
+
+### GitHub MCP recipe
+
+```sh
+engaku add-mcp github
+```
+
+Uses the official hosted read-only endpoint — no local process, no PAT. OAuth via VS Code's GitHub Copilot connection. Grants `github/*` to `coder`, `planner`, and `reviewer` by default.
+
+To enable write tools (create issues, open PRs), edit `.vscode/mcp.json` manually and change the URL to `https://api.githubcopilot.com/mcp/`. See [GitHub MCP docs](https://docs.github.com/en/copilot/customizing-copilot/using-model-context-protocol/using-the-github-mcp-server) for available toolsets.
 
 ## Optional MCP Servers
 
@@ -334,4 +349,3 @@ Adapted from [forrestchang/andrej-karpathy-skills](https://github.com/forrestcha
 - [chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp) — browser automation and DevTools (Chrome DevTools team)
 - [context7](https://github.com/upstash/context7) — live library documentation (Upstash)
 - [dbhub](https://github.com/bytebase/dbhub) — multi-database access (Bytebase)
-- [GitHub MCP](https://docs.github.com/en/copilot/customizing-copilot/using-model-context-protocol/using-the-github-mcp-server) — repository, issue, PR, and Actions context (GitHub)
