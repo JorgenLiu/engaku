@@ -5,15 +5,10 @@
   "last_verified": "2026-05-18",
   "server": {
     "type": "stdio",
-    "command": "npx",
-    "args": ["-y", "@sooperset/mcp-atlassian@latest"],
-    "env": {
-      "CONFLUENCE_URL": "${input:confluence-url}",
-      "CONFLUENCE_USERNAME": "${input:confluence-username}",
-      "CONFLUENCE_API_TOKEN": "${input:confluence-api-token}"
-    }
+    "command": "uvx",
+    "args": ["mcp-atlassian"]
   },
   "tool_wildcard": "confluence/*",
   "default_agents": ["coder", "planner"],
-  "notes": "Requires Confluence URL, username (email), and API token from id.atlassian.com/manage-profile/security/api-tokens."
+  "notes": "Minimal config — add auth details to .vscode/mcp.json after install. Required env vars: CONFLUENCE_URL, CONFLUENCE_USERNAME, CONFLUENCE_API_TOKEN (API token from id.atlassian.com/manage-profile/security/api-tokens). Requires uv/uvx: https://docs.astral.sh/uv/"
 }

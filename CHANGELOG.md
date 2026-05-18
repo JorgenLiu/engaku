@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+### Changed
+- Optional MCP recipes (gitlab, jira, confluence) now generate minimal server blocks without credential input placeholders or env blocks; users own tokens, URLs, and service-specific env details.
+
+### Fixed
+- Jira and Confluence recipes now use upstream `uvx mcp-atlassian` instead of the invalid npm package `@sooperset/mcp-atlassian@latest`.
+- GitLab recipe now uses the verified npm package `@zereight/mcp-gitlab@latest` instead of the invalid `@gitlab-org/mcp-server-gitlab@latest`.
+
 ## [1.2.0] - 2026-05-18
 
 ### Added

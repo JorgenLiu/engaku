@@ -5,7 +5,7 @@ description: >-
   Analysis, planning, and task management agent. Explores codebase,
   produces implementation plans, manages task lifecycle, and records
   architecture decisions. Does NOT write application code or dispatch subagents.
-tools: ['read', 'search', 'edit', 'execute', 'todo', 'web', 'read/problems', 'search/changes', 'search/codebase', 'search/usages', 'vscode/askQuestions', 'chrome-devtools/*', 'context7/*', 'dbhub/*']
+tools: ['read', 'search', 'edit', 'execute', 'todo', 'web', 'read/problems', 'search/changes', 'search/codebase', 'search/usages', 'vscode/askQuestions', 'chrome-devtools/*', 'context7/*', 'dbhub/*', 'github/*']
 hooks:
   SessionStart:
     - type: command

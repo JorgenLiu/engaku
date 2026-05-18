@@ -182,6 +182,65 @@ class TestAddMcp(unittest.TestCase):
             finally:
                 shutil.rmtree(tmpdir)
 
+    def test_service_recipes_have_no_env_block(self):
+        """GitLab, Jira, and Confluence recipes must not contain an env block."""
+        for name in ("gitlab", "jira", "confluence"):
+            r = __import__("engaku.mcp_recipes", fromlist=["get_recipe"]).get_recipe(name)
+            self.assertNotIn(
+                "env", r["server"],
+                "Recipe '{}' must not have a server.env block (credentials belong to user)".format(name),
+            )
+
+    def test_jira_and_confluence_use_uvx(self):
+        """Jira and Confluence recipes use uvx mcp-atlassian launcher."""
+        from engaku.mcp_recipes import get_recipe
+        for name in ("jira", "confluence"):
+            r = get_recipe(name)
+            self.assertEqual(
+                r["server"]["command"], "uvx",
+                "Recipe '{}' must use uvx".format(name),
+            )
+            self.assertEqual(
+                r["server"]["args"], ["mcp-atlassian"],
+                "Recipe '{}' must have args=['mcp-atlassian']".format(name),
+            )
+
+    def test_gitlab_uses_zereight_package(self):
+        """GitLab recipe uses verified @zereight/mcp-gitlab@latest package."""
+        from engaku.mcp_recipes import get_recipe
+        r = get_recipe("gitlab")
+        self.assertEqual(r["server"]["command"], "npx")
+        self.assertIn("@zereight/mcp-gitlab@latest", r["server"]["args"])
+        # Must not contain the invalid old scoped package
+        args_str = " ".join(r["server"]["args"])
+        self.assertNotIn("@gitlab-org/mcp-server-gitlab", args_str)
+
+    def test_add_gitlab_writes_correct_args(self):
+        """add-mcp gitlab writes exact args string without encoding artifacts."""
+        _make_engaku_json(self.tmpdir)
+        code, _, err = self._capture_run("gitlab")
+        self.assertEqual(code, 0, err)
+        mcp_path = os.path.join(self.tmpdir, ".vscode", "mcp.json")
+        with open(mcp_path) as f:
+            raw = f.read()
+        # Verify exact string preserved (no URL encoding of @/slash)
+        self.assertIn("@zereight/mcp-gitlab@latest", raw)
+        self.assertNotIn("%40", raw, "Package @ must not be URL-encoded")
+        self.assertNotIn("%2f", raw.lower(), "Package / must not be URL-encoded")
+
+    def test_add_jira_no_invalid_atlassian_package(self):
+        """add-mcp jira generates config without the invalid @sooperset package."""
+        _make_engaku_json(self.tmpdir)
+        code, _, err = self._capture_run("jira")
+        self.assertEqual(code, 0, err)
+        mcp_path = os.path.join(self.tmpdir, ".vscode", "mcp.json")
+        with open(mcp_path) as f:
+            raw = f.read()
+        self.assertNotIn("@sooperset", raw, "Invalid @sooperset package must not appear in mcp.json")
+        self.assertNotIn("%2f", raw.lower(), "No URL-encoded slash in mcp.json")
+        self.assertIn("uvx", raw)
+        self.assertIn("mcp-atlassian", raw)
+
     def test_end_to_end_add_mcp_with_apply(self):
         """add-mcp with no_apply=False merges server, updates engaku.json, and rewrites agent frontmatter."""
         _git_init(self.tmpdir)

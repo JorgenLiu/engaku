@@ -78,6 +78,31 @@ class TestListMcp(unittest.TestCase):
         self.assertIn("planner", r["default_agents"])
         self.assertNotIn("reviewer", r["default_agents"])
 
+    def test_service_recipes_no_credential_inputs(self):
+        """GitLab, Jira, Confluence recipes must not include credential input placeholders."""
+        import json
+        for name in ("gitlab", "jira", "confluence"):
+            r = get_recipe(name)
+            raw = json.dumps(r)
+            self.assertNotIn("${input:", raw,
+                "Recipe '{}' must not contain VS Code input placeholders".format(name))
+            self.assertNotIn("env", r["server"],
+                "Recipe '{}' must not have a server.env block".format(name))
+
+    def test_atlassian_recipes_use_uvx(self):
+        """Jira and Confluence use uvx mcp-atlassian, not the invalid npm package."""
+        for name in ("jira", "confluence"):
+            r = get_recipe(name)
+            self.assertEqual(r["server"]["command"], "uvx")
+            self.assertEqual(r["server"]["args"], ["mcp-atlassian"])
+
+    def test_gitlab_uses_verified_package(self):
+        """GitLab recipe uses @zereight/mcp-gitlab@latest, not the invalid @gitlab-org package."""
+        r = get_recipe("gitlab")
+        args_str = " ".join(r["server"]["args"])
+        self.assertIn("@zereight/mcp-gitlab@latest", args_str)
+        self.assertNotIn("@gitlab-org/mcp-server-gitlab", args_str)
+
 
 if __name__ == "__main__":
     unittest.main()
