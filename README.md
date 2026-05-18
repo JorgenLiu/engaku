@@ -271,11 +271,10 @@ One additional optional flag:
 Engaku ships curated recipes for popular services. A recipe installs a minimal MCP server block into `.vscode/mcp.json`, registers its wildcard in `.ai/engaku.json`, and (unless `--no-apply` is passed) rewrites all target agent frontmatter in one step. Engaku does **not** inject credentials, input prompts, or service-specific env variables — add those directly to `.vscode/mcp.json` after install.
 
 ```sh
-engaku list-mcp           # show available recipes
-engaku add-mcp github     # install GitHub MCP (OAuth, no PAT required)
-engaku add-mcp gitlab     # install GitLab MCP (minimal config — add GITLAB_PERSONAL_ACCESS_TOKEN yourself)
-engaku add-mcp jira       # install Jira MCP (minimal config — add JIRA_URL / USERNAME / API_TOKEN yourself)
-engaku add-mcp confluence # install Confluence MCP (minimal config — add CONFLUENCE_URL / USERNAME / API_TOKEN yourself)
+engaku list-mcp            # show available recipes
+engaku add-mcp github      # install GitHub MCP (OAuth, no PAT required)
+engaku add-mcp gitlab      # install GitLab MCP (remote org endpoint — edit URL to your instance)
+engaku add-mcp atlassian   # install Atlassian MCP for Jira + Confluence (add auth env vars yourself)
 ```
 
 **Options:**
@@ -304,43 +303,41 @@ To enable write tools (create issues, open PRs), edit `.vscode/mcp.json` manuall
 engaku add-mcp gitlab
 ```
 
-Installs a minimal server block using [`@zereight/mcp-gitlab`](https://github.com/zereight/mcp-gitlab). After install, add your auth details to `.vscode/mcp.json`:
+Generates a remote HTTP server block pointing to your GitLab instance's built-in MCP endpoint. Edit the placeholder URL in `.vscode/mcp.json` to your actual instance:
 
 ```json
 "gitlab": {
-  "command": "npx",
-  "args": ["-y", "@zereight/mcp-gitlab@latest"],
-  "env": {
-    "GITLAB_PERSONAL_ACCESS_TOKEN": "<your-token>",
-    "GITLAB_API_URL": "https://gitlab.com"
-  }
+  "type": "http",
+  "url": "https://gitlab.example.com/api/v4/mcp"
 }
 ```
 
-Set `GITLAB_API_URL` to your self-hosted instance URL if applicable.
+Authenticate via a GitLab personal access token in VS Code. For local stdio fallback (e.g. gitlab.com without remote MCP enabled), use `npx -y @zereight/mcp-gitlab@latest` instead.
 
-### Jira and Confluence MCP recipes
+### Atlassian MCP recipe (Jira + Confluence)
 
 ```sh
-engaku add-mcp jira
-engaku add-mcp confluence
+engaku add-mcp atlassian
 ```
 
-Both use [`mcp-atlassian`](https://github.com/sooperset/mcp-atlassian) via `uvx`. Requires [uv](https://docs.astral.sh/uv/) to be installed. After install, add your auth details to `.vscode/mcp.json`:
+Uses upstream [`mcp-atlassian`](https://github.com/sooperset/mcp-atlassian) via `uvx`. Requires [uv](https://docs.astral.sh/uv/). One server covers both Jira and Confluence; grants `atlassian/*` to `coder` and `planner`. After install, add auth details to `.vscode/mcp.json`:
 
 ```json
-"jira": {
+"atlassian": {
   "command": "uvx",
   "args": ["mcp-atlassian"],
   "env": {
     "JIRA_URL": "https://your-company.atlassian.net",
     "JIRA_USERNAME": "your.email@company.com",
-    "JIRA_API_TOKEN": "<your-api-token>"
+    "JIRA_API_TOKEN": "<your-api-token>",
+    "CONFLUENCE_URL": "https://your-company.atlassian.net",
+    "CONFLUENCE_USERNAME": "your.email@company.com",
+    "CONFLUENCE_API_TOKEN": "<your-api-token>"
   }
 }
 ```
 
-For Confluence, substitute `CONFLUENCE_URL`, `CONFLUENCE_USERNAME`, `CONFLUENCE_API_TOKEN`. API tokens: [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens).
+API tokens: [id.atlassian.com/manage-profile/security/api-tokens](https://id.atlassian.com/manage-profile/security/api-tokens).
 
 ## Optional MCP Servers
 

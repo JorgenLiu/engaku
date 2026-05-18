@@ -1,0 +1,14 @@
+{
+  "name": "atlassian",
+  "description": "Jira and Confluence context via Atlassian MCP server (sooperset/mcp-atlassian)",
+  "upstream": "https://github.com/sooperset/mcp-atlassian",
+  "last_verified": "2026-05-18",
+  "server": {
+    "type": "stdio",
+    "command": "uvx",
+    "args": ["mcp-atlassian"]
+  },
+  "tool_wildcard": "atlassian/*",
+  "default_agents": ["coder", "planner"],
+  "notes": "Minimal config — add auth details to .vscode/mcp.json after install. For Jira: JIRA_URL, JIRA_USERNAME, JIRA_API_TOKEN. For Confluence: CONFLUENCE_URL, CONFLUENCE_USERNAME, CONFLUENCE_API_TOKEN. API tokens: https://id.atlassian.com/manage-profile/security/api-tokens. Requires uv/uvx: https://docs.astral.sh/uv/"
+}

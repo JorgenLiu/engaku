@@ -4,7 +4,7 @@ Catalog of built-in MCP server recipes.
 import json
 import os
 
-RECIPE_NAMES = ("github", "gitlab", "jira", "confluence")
+RECIPE_NAMES = ("github", "gitlab", "atlassian")
 
 
 def _recipes_dir():

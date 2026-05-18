@@ -183,55 +183,49 @@ class TestAddMcp(unittest.TestCase):
                 shutil.rmtree(tmpdir)
 
     def test_service_recipes_have_no_env_block(self):
-        """GitLab, Jira, and Confluence recipes must not contain an env block."""
-        for name in ("gitlab", "jira", "confluence"):
+        """GitLab and Atlassian recipes must not contain an env block."""
+        for name in ("gitlab", "atlassian"):
             r = __import__("engaku.mcp_recipes", fromlist=["get_recipe"]).get_recipe(name)
             self.assertNotIn(
                 "env", r["server"],
                 "Recipe '{}' must not have a server.env block (credentials belong to user)".format(name),
             )
 
-    def test_jira_and_confluence_use_uvx(self):
-        """Jira and Confluence recipes use uvx mcp-atlassian launcher."""
+    def test_atlassian_uses_uvx(self):
+        """Atlassian recipe uses uvx mcp-atlassian launcher."""
         from engaku.mcp_recipes import get_recipe
-        for name in ("jira", "confluence"):
-            r = get_recipe(name)
-            self.assertEqual(
-                r["server"]["command"], "uvx",
-                "Recipe '{}' must use uvx".format(name),
-            )
-            self.assertEqual(
-                r["server"]["args"], ["mcp-atlassian"],
-                "Recipe '{}' must have args=['mcp-atlassian']".format(name),
-            )
+        r = get_recipe("atlassian")
+        self.assertEqual(r["server"]["command"], "uvx", "Atlassian recipe must use uvx")
+        self.assertEqual(r["server"]["args"], ["mcp-atlassian"], "Atlassian recipe must have args=['mcp-atlassian']")
 
-    def test_gitlab_uses_zereight_package(self):
-        """GitLab recipe uses verified @zereight/mcp-gitlab@latest package."""
+    def test_gitlab_is_remote_http(self):
+        """GitLab recipe uses remote HTTP type with org URL placeholder."""
         from engaku.mcp_recipes import get_recipe
         r = get_recipe("gitlab")
-        self.assertEqual(r["server"]["command"], "npx")
-        self.assertIn("@zereight/mcp-gitlab@latest", r["server"]["args"])
-        # Must not contain the invalid old scoped package
-        args_str = " ".join(r["server"]["args"])
-        self.assertNotIn("@gitlab-org/mcp-server-gitlab", args_str)
+        self.assertEqual(r["server"]["type"], "http", "GitLab recipe must use type=http")
+        self.assertIn("url", r["server"], "GitLab recipe must have a url field")
+        self.assertIn("/api/v4/mcp", r["server"]["url"], "GitLab url must end in /api/v4/mcp")
+        self.assertNotIn("command", r["server"], "Remote GitLab recipe must not have command")
+        self.assertNotIn("args", r["server"], "Remote GitLab recipe must not have args")
 
-    def test_add_gitlab_writes_correct_args(self):
-        """add-mcp gitlab writes exact args string without encoding artifacts."""
+    def test_add_gitlab_writes_remote_url(self):
+        """add-mcp gitlab writes the remote HTTP URL placeholder into mcp.json."""
         _make_engaku_json(self.tmpdir)
         code, _, err = self._capture_run("gitlab")
         self.assertEqual(code, 0, err)
         mcp_path = os.path.join(self.tmpdir, ".vscode", "mcp.json")
         with open(mcp_path) as f:
-            raw = f.read()
-        # Verify exact string preserved (no URL encoding of @/slash)
-        self.assertIn("@zereight/mcp-gitlab@latest", raw)
-        self.assertNotIn("%40", raw, "Package @ must not be URL-encoded")
-        self.assertNotIn("%2f", raw.lower(), "Package / must not be URL-encoded")
+            data = json.load(f)
+        server = data["servers"]["gitlab"]
+        self.assertEqual(server["type"], "http")
+        self.assertIn("/api/v4/mcp", server["url"])
+        self.assertNotIn("command", server, "Remote gitlab entry must not have command")
+        self.assertNotIn("${input:", json.dumps(server), "No credential inputs in gitlab entry")
 
-    def test_add_jira_no_invalid_atlassian_package(self):
-        """add-mcp jira generates config without the invalid @sooperset package."""
+    def test_add_atlassian_uses_uvx(self):
+        """add-mcp atlassian generates config with uvx mcp-atlassian, no invalid packages."""
         _make_engaku_json(self.tmpdir)
-        code, _, err = self._capture_run("jira")
+        code, _, err = self._capture_run("atlassian")
         self.assertEqual(code, 0, err)
         mcp_path = os.path.join(self.tmpdir, ".vscode", "mcp.json")
         with open(mcp_path) as f:

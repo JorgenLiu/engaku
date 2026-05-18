@@ -1,4 +1,5 @@
 """Tests for engaku list-mcp."""
+import json
 import os
 import sys
 import unittest
@@ -37,11 +38,13 @@ class TestListMcp(unittest.TestCase):
         self.assertIn("WILDCARD", out)
         self.assertIn("DESCRIPTION", out)
 
-    def test_list_recipes_returns_all_four(self):
+    def test_list_recipes_returns_all_three(self):
         recipes = list_recipes()
         names = [r["name"] for r in recipes]
         for name in RECIPE_NAMES:
             self.assertIn(name, names, "Missing recipe: {}".format(name))
+        self.assertNotIn("jira", names, "jira must not appear; replaced by atlassian")
+        self.assertNotIn("confluence", names, "confluence must not appear; replaced by atlassian")
 
     def test_get_recipe_github(self):
         r = get_recipe("github")
@@ -66,22 +69,15 @@ class TestListMcp(unittest.TestCase):
         r = get_recipe("github")
         self.assertIn("planner", r["default_agents"])
 
-    def test_jira_default_agents_coder_planner_only(self):
-        r = get_recipe("jira")
-        self.assertIn("coder", r["default_agents"])
-        self.assertIn("planner", r["default_agents"])
-        self.assertNotIn("reviewer", r["default_agents"])
-
-    def test_confluence_default_agents_coder_planner_only(self):
-        r = get_recipe("confluence")
+    def test_atlassian_default_agents_coder_planner_only(self):
+        r = get_recipe("atlassian")
         self.assertIn("coder", r["default_agents"])
         self.assertIn("planner", r["default_agents"])
         self.assertNotIn("reviewer", r["default_agents"])
 
     def test_service_recipes_no_credential_inputs(self):
-        """GitLab, Jira, Confluence recipes must not include credential input placeholders."""
-        import json
-        for name in ("gitlab", "jira", "confluence"):
+        """GitLab and Atlassian recipes must not include credential input placeholders."""
+        for name in ("gitlab", "atlassian"):
             r = get_recipe(name)
             raw = json.dumps(r)
             self.assertNotIn("${input:", raw,
@@ -89,19 +85,19 @@ class TestListMcp(unittest.TestCase):
             self.assertNotIn("env", r["server"],
                 "Recipe '{}' must not have a server.env block".format(name))
 
-    def test_atlassian_recipes_use_uvx(self):
-        """Jira and Confluence use uvx mcp-atlassian, not the invalid npm package."""
-        for name in ("jira", "confluence"):
-            r = get_recipe(name)
-            self.assertEqual(r["server"]["command"], "uvx")
-            self.assertEqual(r["server"]["args"], ["mcp-atlassian"])
+    def test_atlassian_recipe_uses_uvx(self):
+        """Atlassian uses uvx mcp-atlassian, not an invalid npm package."""
+        r = get_recipe("atlassian")
+        self.assertEqual(r["server"]["command"], "uvx")
+        self.assertEqual(r["server"]["args"], ["mcp-atlassian"])
 
-    def test_gitlab_uses_verified_package(self):
-        """GitLab recipe uses @zereight/mcp-gitlab@latest, not the invalid @gitlab-org package."""
+    def test_gitlab_is_remote_http(self):
+        """GitLab recipe uses remote HTTP type with /api/v4/mcp URL placeholder."""
         r = get_recipe("gitlab")
-        args_str = " ".join(r["server"]["args"])
-        self.assertIn("@zereight/mcp-gitlab@latest", args_str)
-        self.assertNotIn("@gitlab-org/mcp-server-gitlab", args_str)
+        self.assertEqual(r["server"]["type"], "http")
+        self.assertIn("/api/v4/mcp", r["server"]["url"])
+        self.assertNotIn("command", r["server"])
+        self.assertNotIn("@gitlab-org/mcp-server-gitlab", json.dumps(r))
 
 
 if __name__ == "__main__":

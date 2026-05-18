@@ -2,12 +2,16 @@
 
 ## [Unreleased]
 
+## [1.2.1] - 2026-05-18
+
 ### Changed
 - Optional MCP recipes (gitlab, jira, confluence) now generate minimal server blocks without credential input placeholders or env blocks; users own tokens, URLs, and service-specific env details.
+- `jira` and `confluence` recipes replaced by a single `atlassian` recipe that covers both products via one `uvx mcp-atlassian` process; wildcard is `atlassian/*`.
+- GitLab recipe changed to remote-first: generates an HTTP server block with a placeholder URL (`https://<gitlab.example.com>/api/v4/mcp`) instead of a local stdio npx block.
 
 ### Fixed
 - Jira and Confluence recipes now use upstream `uvx mcp-atlassian` instead of the invalid npm package `@sooperset/mcp-atlassian@latest`.
-- GitLab recipe now uses the verified npm package `@zereight/mcp-gitlab@latest` instead of the invalid `@gitlab-org/mcp-server-gitlab@latest`.
+- GitLab recipe now defaults to the organization remote MCP endpoint shape instead of the community `@zereight/mcp-gitlab@latest` stdio package.
 
 ## [1.2.0] - 2026-05-18
 

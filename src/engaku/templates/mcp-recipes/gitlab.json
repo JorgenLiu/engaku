@@ -1,14 +1,13 @@
 {
   "name": "gitlab",
-  "description": "GitLab repository, issues, and MR context via GitLab MCP server",
-  "upstream": "https://github.com/zereight/mcp-gitlab",
+  "description": "GitLab repository, issues, and MR context via GitLab remote MCP endpoint",
+  "upstream": "https://docs.gitlab.com/user/gitlab_duo/mcp/",
   "last_verified": "2026-05-18",
   "server": {
-    "type": "stdio",
-    "command": "npx",
-    "args": ["-y", "@zereight/mcp-gitlab@latest"]
+    "type": "http",
+    "url": "https://<gitlab.example.com>/api/v4/mcp"
   },
   "tool_wildcard": "gitlab/*",
   "default_agents": ["coder", "planner", "reviewer"],
-  "notes": "Minimal config — add auth and instance details to .vscode/mcp.json after install. Set env GITLAB_PERSONAL_ACCESS_TOKEN and GITLAB_API_URL (for self-hosted) in the server env block."
+  "notes": "Replace https://<gitlab.example.com> with your GitLab instance URL (e.g. https://gitlab.com or your org self-hosted URL). Authenticate via a GitLab personal access token in VS Code. Local stdio fallback: npx -y @zereight/mcp-gitlab@latest"
 }
